@@ -9,7 +9,7 @@ import com.github.c5fr7q.playground.presentation.theme.PlaygroundTheme
 import com.github.c5fr7q.playground.presentation.ui.fancy.FancyScreen
 
 @Composable
-fun Application() {
+fun Main() {
 	PlaygroundTheme {
 		val navController = rememberNavController()
 		NavHost(navController = navController, startDestination = "fancy_screen") {
