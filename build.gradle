@@ -13,6 +13,7 @@ buildscript {
 		hilt_version = '2.33-beta'
 		hilt_compose_version = '1.0.0-alpha01'
 		navigation_compose_version = '1.0.0-alpha10'
+		hilt_navigation_compose_version = '1.0.0-alpha01'
 	}
 	repositories {
 		google()
