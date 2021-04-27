@@ -5,7 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.c5fr7q.playground.domain.repository.FancyRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @HiltViewModel
@@ -19,8 +22,19 @@ class FancyViewModel @Inject constructor(
 
 	init {
 		fancyRepository.getFancyData()
-			.map { FancyState(it.name) }
-			.onEach { _state.value = it }
+			.onEach { updateState { copy(name = it.name) } }
 			.launchIn(viewModelScope)
+
+		fancyRepository.getNumbersList()
+			.onEach { updateState { copy(numbers = it) } }
+			.launchIn(viewModelScope)
+	}
+
+	fun loadMore() {
+		fancyRepository.requestMoreNumbers()
+	}
+
+	private fun updateState(update: FancyState.() -> FancyState) {
+		_state.value = _state.value.update()
 	}
 }
