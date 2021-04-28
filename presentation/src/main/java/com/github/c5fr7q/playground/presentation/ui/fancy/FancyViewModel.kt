@@ -5,10 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.c5fr7q.playground.domain.repository.FancyRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -27,6 +24,10 @@ class FancyViewModel @Inject constructor(
 
 		fancyRepository.getNumbersList()
 			.onEach { updateState { copy(numbers = it) } }
+			.launchIn(viewModelScope)
+
+		fancyRepository.getCount().take(1)
+			.onEach { updateState { copy(currentResult = it) } }
 			.launchIn(viewModelScope)
 	}
 

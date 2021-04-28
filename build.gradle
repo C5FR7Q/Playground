@@ -14,6 +14,7 @@ buildscript {
 		hilt_compose_version = '1.0.0-alpha01'
 		navigation_compose_version = '1.0.0-alpha10'
 		hilt_navigation_compose_version = '1.0.0-alpha01'
+		datastore_version = '1.0.0-beta01'
 	}
 	repositories {
 		google()
