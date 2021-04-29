@@ -1,4 +1,4 @@
-package com.github.c5fr7q.playground.presentation.theme
+package com.github.c5fr7q.playground.presentation.ui.theme
 
 import androidx.compose.material.Typography
 import androidx.compose.ui.text.TextStyle

@@ -1,5 +1,6 @@
-package com.github.c5fr7q.playground.presentation.ui.fancy
+package com.github.c5fr7q.playground.presentation.ui.screen.fancy
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -12,18 +13,30 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.github.c5fr7q.playground.presentation.manager.Route
+
+object FancyNavigation {
+	const val destination = "fancy"
+
+	fun createRoute() = Route(destination)
+}
 
 @Composable
 fun FancyScreen(viewModel: FancyViewModel) {
 	val state by viewModel.state.collectAsState()
 	FancyScreen(
 		fancyState = state,
-		onLoadMore = viewModel::loadMore
+		onLoadMore = viewModel::loadMore,
+		onItemClicked = viewModel::onItemClicked
 	)
 }
 
 @Composable
-private fun FancyScreen(fancyState: FancyState, onLoadMore: () -> Unit) {
+private fun FancyScreen(
+	fancyState: FancyState,
+	onLoadMore: () -> Unit,
+	onItemClicked: (String) -> Unit
+) {
 	Column(horizontalAlignment = Alignment.CenterHorizontally) {
 		Text(
 			modifier = Modifier.padding(top = 16.dp),
@@ -54,7 +67,9 @@ private fun FancyScreen(fancyState: FancyState, onLoadMore: () -> Unit) {
 						}
 					}
 					Text(
-						modifier = Modifier.padding(16.dp),
+						modifier = Modifier
+							.padding(16.dp)
+							.clickable { onItemClicked(item.toString()) },
 						style = MaterialTheme.typography.h4,
 						text = item.toString()
 					)

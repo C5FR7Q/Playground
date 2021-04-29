@@ -3,7 +3,9 @@ package com.github.c5fr7q.playground.di
 import android.content.Context
 import com.github.c5fr7q.playground.data.Storage
 import com.github.c5fr7q.playground.data.repository.FancyRepositoryImpl
+import com.github.c5fr7q.playground.data.repository.ProfileRepositoryImpl
 import com.github.c5fr7q.playground.domain.repository.FancyRepository
+import com.github.c5fr7q.playground.domain.repository.ProfileRepository
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -25,5 +27,9 @@ abstract class AppModule {
 	@Singleton
 	@Binds
 	abstract fun bindFancyRepository(fancyRepositoryImpl: FancyRepositoryImpl): FancyRepository
+
+	@Singleton
+	@Binds
+	abstract fun bindProfileRepository(profileRepositoryImpl: ProfileRepositoryImpl): ProfileRepository
 
 }
