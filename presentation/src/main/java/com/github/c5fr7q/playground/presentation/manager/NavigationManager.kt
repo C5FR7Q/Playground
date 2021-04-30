@@ -1,18 +1,16 @@
 package com.github.c5fr7q.playground.presentation.manager
 
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.navigate
+import com.github.c5fr7q.playground.presentation.ui.screen.profile.ProfileNavigation
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class NavigationManager @Inject constructor() {
-	private val _commands = MutableStateFlow<Route?>(null)
-	val commands: StateFlow<Route?> = _commands
+	var navController: NavHostController? = null
 
-	fun navigate(route: Route) {
-		_commands.value = route
+	fun openProfile(userId: String) {
+		navController?.navigate(ProfileNavigation.createRoute(userId = userId))
 	}
 }
-
-data class Route(val value: String)

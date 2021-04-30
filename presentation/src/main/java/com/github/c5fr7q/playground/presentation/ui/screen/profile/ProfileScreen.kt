@@ -11,7 +11,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.navArgument
-import com.github.c5fr7q.playground.presentation.manager.Route
 
 object ProfileNavigation {
 	object Argument {
@@ -24,7 +23,7 @@ object ProfileNavigation {
 		navArgument(Argument.USER_ID) {}
 	)
 
-	fun createRoute(userId: String) = Route("profile/$userId")
+	fun createRoute(userId: String) = "profile/$userId"
 }
 
 @Composable

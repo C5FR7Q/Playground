@@ -3,7 +3,6 @@ package com.github.c5fr7q.playground.presentation.ui.screen.fancy
 import androidx.lifecycle.viewModelScope
 import com.github.c5fr7q.playground.domain.repository.FancyRepository
 import com.github.c5fr7q.playground.presentation.manager.NavigationManager
-import com.github.c5fr7q.playground.presentation.ui.screen.profile.ProfileNavigation
 import com.github.c5fr7q.playground.presentation.ui.util.StatefulViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,6 +37,6 @@ class FancyViewModel @Inject constructor(
 	}
 
 	fun onItemClicked(userId: String) {
-		navigationManager.navigate(ProfileNavigation.createRoute(userId))
+		navigationManager.openProfile(userId)
 	}
 }

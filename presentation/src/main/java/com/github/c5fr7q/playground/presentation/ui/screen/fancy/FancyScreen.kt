@@ -13,12 +13,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.github.c5fr7q.playground.presentation.manager.Route
 
 object FancyNavigation {
 	const val destination = "fancy"
 
-	fun createRoute() = Route(destination)
+	fun createRoute() = destination
 }
 
 @Composable
