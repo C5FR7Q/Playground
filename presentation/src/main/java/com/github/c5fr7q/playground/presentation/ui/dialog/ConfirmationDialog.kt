@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 data class ConfirmationDialogModel(
 	val title: String,
 	val text: String,
+	val confirmButtonText: String,
 	val onConfirmed: () -> Unit
 ) : DialogModel
 
@@ -22,7 +23,7 @@ fun ConfirmationDialog(defaultOnDismissRequest: () -> Unit, model: ConfirmationD
 				model.onConfirmed()
 				defaultOnDismissRequest()
 			}) {
-				Text(text = "Confirm")
+				Text(text = model.confirmButtonText)
 			}
 		}
 	)

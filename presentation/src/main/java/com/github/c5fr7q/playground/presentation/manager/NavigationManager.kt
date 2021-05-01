@@ -26,8 +26,11 @@ class NavigationManager @Inject constructor() {
 		addDialog(model)
 	}
 
-	fun closeDialog(dialogModel: DialogModel) {
-		dialogs.value = dialogs.value - dialogModel
+	fun closeDialog() {
+		val dialogsList = dialogs.value
+		if (dialogsList.isNotEmpty()) {
+			dialogs.value = dialogsList.toMutableList().apply { removeFirst() }
+		}
 	}
 
 	private fun addDialog(dialogModel: DialogModel) {

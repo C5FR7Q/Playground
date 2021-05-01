@@ -32,7 +32,8 @@ class ProfileViewModel @Inject constructor(
 		navigationManager.openConfirmationDialog(
 			ConfirmationDialogModel(
 				"Change content?",
-				"This content will be replaced with something cool"
+				"This content will be replaced with something cool",
+				"Confirm"
 			) {
 				updateState { copy(userName = "ABRACADABRA") }
 			})

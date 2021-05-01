@@ -35,7 +35,7 @@ fun Main(navigationManager: NavigationManager) {
 
 		val dialog by navigationManager.dialog.collectAsState(initial = null)
 		dialog?.let {
-			val defaultOnDismissRequest = remember { { navigationManager.closeDialog(it) } }
+			val defaultOnDismissRequest = remember { { navigationManager.closeDialog() } }
 			when (it) {
 				is ConfirmationDialogModel -> ConfirmationDialog(defaultOnDismissRequest, it)
 				else -> Log.d("Main", "Unknown dialog $it")
