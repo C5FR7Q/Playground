@@ -17,12 +17,15 @@ import com.github.c5fr7q.playground.presentation.ui.theme.PlaygroundTheme
 
 @Composable
 fun Main(navigationManager: NavigationManager) {
+
+
+	val navController = rememberNavController()
+	DisposableEffect(navController) {
+		navigationManager.navController = navController
+		onDispose { navigationManager.navController = null }
+	}
+
 	PlaygroundTheme {
-		val navController = rememberNavController()
-		DisposableEffect(navController) {
-			navigationManager.navController = navController
-			onDispose { navigationManager.navController = null }
-		}
 
 		NavHost(navController = navController, startDestination = FancyNavigation.destination) {
 			composable(FancyNavigation.destination) {
