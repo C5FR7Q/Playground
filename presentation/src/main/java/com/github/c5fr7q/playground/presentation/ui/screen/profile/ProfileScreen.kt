@@ -1,5 +1,6 @@
 package com.github.c5fr7q.playground.presentation.ui.screen.profile
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
@@ -30,18 +31,24 @@ object ProfileNavigation {
 fun ProfileScreen(viewModel: ProfileViewModel) {
 	val state by viewModel.state.collectAsState()
 	ProfileScreen(
-		state = state
+		state = state,
+		onItemClicked = viewModel::onItemClicked
 	)
 }
 
 @Composable
-private fun ProfileScreen(state: ProfileState) {
+private fun ProfileScreen(
+	state: ProfileState,
+	onItemClicked: () -> Unit
+) {
 	Surface(
 		modifier = Modifier.fillMaxSize(),
 		color = MaterialTheme.colors.primary,
 	) {
 		Box(
-			modifier = Modifier.fillMaxSize(),
+			modifier = Modifier
+				.fillMaxSize()
+				.clickable { onItemClicked() },
 			contentAlignment = Alignment.Center
 		) {
 			Text(

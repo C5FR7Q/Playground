@@ -3,6 +3,8 @@ package com.github.c5fr7q.playground.presentation.ui.screen.profile
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.github.c5fr7q.playground.domain.repository.ProfileRepository
+import com.github.c5fr7q.playground.presentation.manager.NavigationManager
+import com.github.c5fr7q.playground.presentation.ui.dialog.ConfirmationDialogModel
 import com.github.c5fr7q.playground.presentation.ui.util.StatefulViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,7 +15,8 @@ import javax.inject.Inject
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
 	savedStateHandle: SavedStateHandle,
-	profileRepository: ProfileRepository
+	profileRepository: ProfileRepository,
+	private val navigationManager: NavigationManager
 ) : StatefulViewModel<ProfileState>() {
 	private val userId: String = savedStateHandle[ProfileNavigation.Argument.USER_ID]!!
 
@@ -23,5 +26,15 @@ class ProfileViewModel @Inject constructor(
 		profileRepository.getUserName(userId)
 			.onEach { updateState { copy(userName = it) } }
 			.launchIn(viewModelScope)
+	}
+
+	fun onItemClicked() {
+		navigationManager.openConfirmationDialog(
+			ConfirmationDialogModel(
+				"Change content?",
+				"This content will be replaced with something cool"
+			) {
+				updateState { copy(userName = "ABRACADABRA") }
+			})
 	}
 }
