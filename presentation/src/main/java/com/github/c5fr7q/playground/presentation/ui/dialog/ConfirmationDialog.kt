@@ -14,19 +14,24 @@ data class ConfirmationDialogModel(
 ) : DialogModel
 
 @Composable
-fun ConfirmationDialog(model: ConfirmationDialogModel) {
-	val onDismissRequest = LocalOnDismissRequest.current
+fun ConfirmationDialog(
+	model: ConfirmationDialogModel,
+	onDismissRequest: () -> Unit = LocalOnDismissRequest.current,
+	title: @Composable () -> Unit = { Text(text = model.title) },
+	text: @Composable () -> Unit = { Text(text = model.text) },
+	button: @Composable () -> Unit = {
+		Button(onClick = {
+			model.onConfirmed()
+			onDismissRequest()
+		}) {
+			Text(text = model.confirmButtonText)
+		}
+	}
+) {
 	AlertDialog(
 		onDismissRequest = onDismissRequest,
-		title = { Text(text = model.title) },
-		text = { Text(text = model.text) },
-		confirmButton = {
-			Button(onClick = {
-				model.onConfirmed()
-				onDismissRequest()
-			}) {
-				Text(text = model.confirmButtonText)
-			}
-		}
+		title = title,
+		text = text,
+		confirmButton = button
 	)
 }
