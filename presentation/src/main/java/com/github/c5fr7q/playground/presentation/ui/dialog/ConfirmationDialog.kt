@@ -4,6 +4,7 @@ import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import com.github.c5fr7q.playground.presentation.ui.LocalOnDismissRequest
 
 data class ConfirmationDialogModel(
 	val title: String,
@@ -13,15 +14,16 @@ data class ConfirmationDialogModel(
 ) : DialogModel
 
 @Composable
-fun ConfirmationDialog(defaultOnDismissRequest: () -> Unit, model: ConfirmationDialogModel) {
+fun ConfirmationDialog(model: ConfirmationDialogModel) {
+	val onDismissRequest = LocalOnDismissRequest.current
 	AlertDialog(
-		onDismissRequest = defaultOnDismissRequest,
+		onDismissRequest = onDismissRequest,
 		title = { Text(text = model.title) },
 		text = { Text(text = model.text) },
 		confirmButton = {
 			Button(onClick = {
 				model.onConfirmed()
-				defaultOnDismissRequest()
+				onDismissRequest()
 			}) {
 				Text(text = model.confirmButtonText)
 			}

@@ -15,10 +15,10 @@ import com.github.c5fr7q.playground.presentation.ui.screen.profile.ProfileNaviga
 import com.github.c5fr7q.playground.presentation.ui.screen.profile.ProfileScreen
 import com.github.c5fr7q.playground.presentation.ui.theme.PlaygroundTheme
 
+val LocalOnDismissRequest = compositionLocalOf<() -> Unit> { error("localOnDismissRequest is not specified") }
+
 @Composable
 fun Main(navigationManager: NavigationManager) {
-
-
 	val navController = rememberNavController()
 	DisposableEffect(navController) {
 		navigationManager.navController = navController
@@ -36,12 +36,13 @@ fun Main(navigationManager: NavigationManager) {
 			}
 		}
 
-		val dialog by navigationManager.dialog.collectAsState(initial = null)
-		dialog?.let {
-			val defaultOnDismissRequest = remember { { navigationManager.closeDialog() } }
-			when (it) {
-				is ConfirmationDialogModel -> ConfirmationDialog(defaultOnDismissRequest, it)
-				else -> Log.d("Main", "Unknown dialog $it")
+		CompositionLocalProvider(LocalOnDismissRequest provides { navigationManager.closeDialog() }) {
+			val dialog by navigationManager.dialog.collectAsState(initial = null)
+			dialog?.let {
+				when (it) {
+					is ConfirmationDialogModel -> ConfirmationDialog(it)
+					else -> Log.d("Main", "Unknown dialog $it")
+				}
 			}
 		}
 	}
