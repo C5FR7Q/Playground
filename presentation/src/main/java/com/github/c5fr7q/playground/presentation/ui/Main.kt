@@ -2,7 +2,10 @@ package com.github.c5fr7q.playground.presentation.ui
 
 import android.util.Log
 import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.hilt.navigation.compose.hiltNavGraphViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -14,6 +17,7 @@ import com.github.c5fr7q.playground.presentation.ui.screen.fancy.FancyScreen
 import com.github.c5fr7q.playground.presentation.ui.screen.profile.ProfileNavigation
 import com.github.c5fr7q.playground.presentation.ui.screen.profile.ProfileScreen
 import com.github.c5fr7q.playground.presentation.ui.theme.PlaygroundTheme
+import com.github.c5fr7q.playground.presentation.ui.util.BaseViewModel
 
 val LocalOnDismissRequest = compositionLocalOf<() -> Unit> { error("localOnDismissRequest is not specified") }
 
@@ -29,10 +33,10 @@ fun Main(navigationManager: NavigationManager) {
 
 		NavHost(navController = navController, startDestination = FancyNavigation.destination) {
 			composable(FancyNavigation.destination) {
-				FancyScreen(hiltNavGraphViewModel())
+				FancyScreen(baseViewModel())
 			}
 			composable(ProfileNavigation.destination, arguments = ProfileNavigation.arguments) {
-				ProfileScreen(hiltNavGraphViewModel())
+				ProfileScreen(baseViewModel())
 			}
 		}
 
@@ -47,3 +51,35 @@ fun Main(navigationManager: NavigationManager) {
 		}
 	}
 }
+
+@Composable
+fun OnLifecycleEvent(onEvent: (event: Lifecycle.Event) -> Unit) {
+	val eventHandler = rememberUpdatedState(onEvent)
+	val lifecycleOwner = rememberUpdatedState(LocalLifecycleOwner.current)
+
+	DisposableEffect(lifecycleOwner.value) {
+		val lifecycle = lifecycleOwner.value.lifecycle
+		val observer = LifecycleEventObserver { _, event ->
+			eventHandler.value(event)
+		}
+
+		lifecycle.addObserver(observer)
+		onDispose {
+			lifecycle.removeObserver(observer)
+		}
+	}
+}
+
+@Composable
+inline fun <reified VM : BaseViewModel<*>> baseViewModel(): VM {
+	val viewModel = hiltNavGraphViewModel<VM>()
+	OnLifecycleEvent { event ->
+		when (event) {
+			Lifecycle.Event.ON_START -> viewModel.attach()
+			Lifecycle.Event.ON_STOP -> viewModel.detach()
+			else -> Unit
+		}
+	}
+	return viewModel
+}
+

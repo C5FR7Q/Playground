@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.github.c5fr7q.playground.domain.repository.ProfileRepository
 import com.github.c5fr7q.playground.presentation.manager.NavigationManager
 import com.github.c5fr7q.playground.presentation.ui.dialog.ConfirmationDialogModel
-import com.github.c5fr7q.playground.presentation.ui.util.StatefulViewModel
+import com.github.c5fr7q.playground.presentation.ui.util.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.launchIn
@@ -15,14 +15,14 @@ import javax.inject.Inject
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
 	savedStateHandle: SavedStateHandle,
-	profileRepository: ProfileRepository,
+	private val profileRepository: ProfileRepository,
 	private val navigationManager: NavigationManager
-) : StatefulViewModel<ProfileState>() {
+) : BaseViewModel<ProfileState>() {
 	private val userId: String = savedStateHandle[ProfileNavigation.Argument.USER_ID]!!
 
 	override val mutableState: MutableStateFlow<ProfileState> = MutableStateFlow(ProfileState())
 
-	init {
+	override fun attach() {
 		profileRepository.getUserName(userId)
 			.onEach { updateState { copy(userName = it) } }
 			.launchIn(viewModelScope)

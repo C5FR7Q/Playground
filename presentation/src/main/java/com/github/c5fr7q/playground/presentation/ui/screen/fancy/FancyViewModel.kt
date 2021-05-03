@@ -3,7 +3,7 @@ package com.github.c5fr7q.playground.presentation.ui.screen.fancy
 import androidx.lifecycle.viewModelScope
 import com.github.c5fr7q.playground.domain.repository.FancyRepository
 import com.github.c5fr7q.playground.presentation.manager.NavigationManager
-import com.github.c5fr7q.playground.presentation.ui.util.StatefulViewModel
+import com.github.c5fr7q.playground.presentation.ui.util.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.launchIn
@@ -15,10 +15,10 @@ import javax.inject.Inject
 class FancyViewModel @Inject constructor(
 	private val fancyRepository: FancyRepository,
 	private val navigationManager: NavigationManager
-) : StatefulViewModel<FancyState>() {
+) : BaseViewModel<FancyState>() {
 	override val mutableState: MutableStateFlow<FancyState> = MutableStateFlow(FancyState())
 
-	init {
+	override fun attach() {
 		fancyRepository.getFancyData()
 			.onEach { updateState { copy(name = it.name) } }
 			.launchIn(viewModelScope)
