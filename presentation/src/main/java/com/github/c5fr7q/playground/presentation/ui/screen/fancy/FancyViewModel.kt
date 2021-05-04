@@ -3,7 +3,7 @@ package com.github.c5fr7q.playground.presentation.ui.screen.fancy
 import androidx.lifecycle.viewModelScope
 import com.github.c5fr7q.playground.domain.repository.FancyRepository
 import com.github.c5fr7q.playground.presentation.manager.NavigationManager
-import com.github.c5fr7q.playground.presentation.ui.util.BaseViewModel
+import com.github.c5fr7q.playground.presentation.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.launchIn
@@ -15,28 +15,35 @@ import javax.inject.Inject
 class FancyViewModel @Inject constructor(
 	private val fancyRepository: FancyRepository,
 	private val navigationManager: NavigationManager
-) : BaseViewModel<FancyState>() {
+) : BaseViewModel<FancyState, FancyIntent>() {
 	override val mutableState: MutableStateFlow<FancyState> = MutableStateFlow(FancyState())
 
 	override fun attach() {
-		fancyRepository.getFancyData()
-			.onEach { updateState { copy(name = it.name) } }
-			.launchIn(viewModelScope)
-
-		fancyRepository.getNumbersList()
-			.onEach { updateState { copy(numbers = it) } }
-			.launchIn(viewModelScope)
-
-		fancyRepository.getCount().take(1)
-			.onEach { updateState { copy(currentResult = it) } }
-			.launchIn(viewModelScope)
+		super.attach()
+		produceIntent(FancyIntent.Init)
 	}
 
-	fun loadMore() {
-		fancyRepository.requestMoreNumbers()
-	}
+	override fun handleIntent(intent: FancyIntent) {
+		when (intent) {
+			is FancyIntent.Init -> {
+				fancyRepository.getFancyData()
+					.onEach { updateState { copy(name = it.name) } }
+					.launchIn(viewModelScope)
 
-	fun onItemClicked(userId: String) {
-		navigationManager.openProfile(userId)
+				fancyRepository.getNumbersList()
+					.onEach { updateState { copy(numbers = it) } }
+					.launchIn(viewModelScope)
+
+				fancyRepository.getCount().take(1)
+					.onEach { updateState { copy(currentResult = it) } }
+					.launchIn(viewModelScope)
+			}
+			is FancyIntent.ClickItem -> {
+				navigationManager.openProfile(intent.userId)
+			}
+			is FancyIntent.LoadMore -> {
+				fancyRepository.requestMoreNumbers()
+			}
+		}
 	}
 }

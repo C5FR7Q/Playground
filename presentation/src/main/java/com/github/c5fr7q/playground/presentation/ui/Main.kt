@@ -17,7 +17,7 @@ import com.github.c5fr7q.playground.presentation.ui.screen.fancy.FancyScreen
 import com.github.c5fr7q.playground.presentation.ui.screen.profile.ProfileNavigation
 import com.github.c5fr7q.playground.presentation.ui.screen.profile.ProfileScreen
 import com.github.c5fr7q.playground.presentation.ui.theme.PlaygroundTheme
-import com.github.c5fr7q.playground.presentation.ui.util.BaseViewModel
+import com.github.c5fr7q.playground.presentation.ui.base.BaseViewModel
 
 val LocalOnDismissRequest = compositionLocalOf<() -> Unit> { error("localOnDismissRequest is not specified") }
 
@@ -71,7 +71,7 @@ fun OnLifecycleEvent(onEvent: (event: Lifecycle.Event) -> Unit) {
 }
 
 @Composable
-inline fun <reified VM : BaseViewModel<*>> baseViewModel(): VM {
+inline fun <reified VM : BaseViewModel<*, *>> baseViewModel(): VM {
 	val viewModel = hiltNavGraphViewModel<VM>()
 	OnLifecycleEvent { event ->
 		when (event) {

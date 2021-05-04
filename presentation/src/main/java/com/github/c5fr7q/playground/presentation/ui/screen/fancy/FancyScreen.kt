@@ -25,8 +25,8 @@ fun FancyScreen(viewModel: FancyViewModel) {
 	val state by viewModel.state.collectAsState()
 	FancyScreen(
 		fancyState = state,
-		onLoadMore = viewModel::loadMore,
-		onItemClicked = viewModel::onItemClicked
+		onLoadMore = { viewModel.produceIntent(FancyIntent.LoadMore) },
+		onItemClicked = { viewModel.produceIntent(FancyIntent.ClickItem(it)) }
 	)
 }
 
