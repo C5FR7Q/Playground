@@ -4,15 +4,14 @@ import androidx.annotation.CallSuper
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.cancelChildren
-import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 abstract class BaseViewModel<State, Intent> : ViewModel() {
-	private val intentChannel = Channel<Intent>(Channel.UNLIMITED)
+	private val intentFlow = MutableSharedFlow<Intent>()
 
 	protected abstract val mutableState: MutableStateFlow<State>
 	val state: StateFlow<State> get() = mutableState
@@ -20,9 +19,7 @@ abstract class BaseViewModel<State, Intent> : ViewModel() {
 	@CallSuper
 	open fun attach() {
 		viewModelScope.launch {
-			intentChannel
-				.receiveAsFlow()
-				.collect { handleIntent(it) }
+			intentFlow.collect { handleIntent(it) }
 		}
 	}
 
@@ -33,7 +30,7 @@ abstract class BaseViewModel<State, Intent> : ViewModel() {
 
 	fun produceIntent(intent: Intent) {
 		viewModelScope.launch {
-			intentChannel.send(intent)
+			intentFlow.emit(intent)
 		}
 	}
 
