@@ -2,18 +2,17 @@ package com.github.c5fr7q.playground.presentation.ui.screen.fancy
 
 import androidx.lifecycle.viewModelScope
 import com.github.c5fr7q.playground.domain.repository.FancyRepository
+import com.github.c5fr7q.playground.domain.repository.UserRepository
 import com.github.c5fr7q.playground.presentation.manager.NavigationManager
 import com.github.c5fr7q.playground.presentation.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
 @HiltViewModel
 class FancyViewModel @Inject constructor(
 	private val fancyRepository: FancyRepository,
+	private val userRepository: UserRepository,
 	private val navigationManager: NavigationManager
 ) : BaseViewModel<FancyState, FancyIntent>() {
 	override val mutableState: MutableStateFlow<FancyState> = MutableStateFlow(FancyState())
@@ -31,7 +30,10 @@ class FancyViewModel @Inject constructor(
 					.launchIn(viewModelScope)
 
 				fancyRepository.getNumbersList()
-					.onEach { updateState { copy(numbers = it) } }
+					.combine(
+						userRepository.getAllUsers().map { list -> list.map { "${it.name}___${it.age}" } }
+					) { numbers, users -> users + numbers }
+					.onEach { updateState { copy(dataList = it) } }
 					.launchIn(viewModelScope)
 
 				fancyRepository.getCount().take(1)
@@ -39,6 +41,7 @@ class FancyViewModel @Inject constructor(
 					.launchIn(viewModelScope)
 			}
 			is FancyIntent.ClickItem -> {
+				userRepository.addUser(intent.userId)
 				navigationManager.openProfile(intent.userId)
 			}
 			is FancyIntent.LoadMore -> {

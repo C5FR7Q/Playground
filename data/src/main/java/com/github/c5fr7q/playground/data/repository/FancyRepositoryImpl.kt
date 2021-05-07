@@ -21,11 +21,11 @@ class FancyRepositoryImpl @Inject constructor(
 		emit(FancyData("bar"))
 	}
 
-	override fun getNumbersList(): Flow<List<Int>> {
+	override fun getNumbersList(): Flow<List<String>> {
 		if (numbers.value.isEmpty()) {
 			requestMoreNumbers()
 		}
-		return numbers.asStateFlow()
+		return numbers.asStateFlow().map { list -> list.map { it.toString() } }
 	}
 
 	override fun getCount() = storage.getCount().map { it ?: 0 }

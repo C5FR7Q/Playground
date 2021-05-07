@@ -57,8 +57,8 @@ private fun FancyScreen(
 				.padding(top = 16.dp),
 			horizontalAlignment = Alignment.CenterHorizontally
 		) {
-			val lastIndex = fancyState.numbers.lastIndex
-			itemsIndexed(fancyState.numbers) { index, item ->
+			val lastIndex = fancyState.dataList.lastIndex
+			itemsIndexed(fancyState.dataList) { index, item ->
 				key(item) {
 					if (index == lastIndex) {
 						LaunchedEffect(null) {

@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface FancyRepository {
 	fun getFancyData(): Flow<FancyData>
-	fun getNumbersList(): Flow<List<Int>>
+	fun getNumbersList(): Flow<List<String>>
 	fun getCount(): Flow<Int>
 
 	fun requestMoreNumbers()
