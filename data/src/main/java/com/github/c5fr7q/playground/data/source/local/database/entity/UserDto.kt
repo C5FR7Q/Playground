@@ -1,4 +1,4 @@
-package com.github.c5fr7q.playground.data.database.entity
+package com.github.c5fr7q.playground.data.source.local.database.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

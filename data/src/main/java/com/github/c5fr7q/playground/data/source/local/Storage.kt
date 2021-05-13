@@ -1,4 +1,4 @@
-package com.github.c5fr7q.playground.data
+package com.github.c5fr7q.playground.data.source.local
 
 import android.content.Context
 import androidx.datastore.core.DataStore

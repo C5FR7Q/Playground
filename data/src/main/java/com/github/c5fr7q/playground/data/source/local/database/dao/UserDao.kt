@@ -1,7 +1,7 @@
-package com.github.c5fr7q.playground.data.database.dao
+package com.github.c5fr7q.playground.data.source.local.database.dao
 
 import androidx.room.*
-import com.github.c5fr7q.playground.data.database.entity.UserDto
+import com.github.c5fr7q.playground.data.source.local.database.entity.UserDto
 import kotlinx.coroutines.flow.Flow
 
 @Dao

@@ -1,16 +1,18 @@
 package com.github.c5fr7q.playground.data.repository
 
-import com.github.c5fr7q.playground.data.Storage
+import com.github.c5fr7q.playground.data.GeneralCoroutineScope
+import com.github.c5fr7q.playground.data.source.local.Storage
 import com.github.c5fr7q.playground.domain.entity.FancyData
 import com.github.c5fr7q.playground.domain.repository.FancyRepository
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class FancyRepositoryImpl @Inject constructor(
-	private val storage: Storage
+	private val storage: Storage,
+	@GeneralCoroutineScope private val generalScope: CoroutineScope
 ) : FancyRepository {
 	private val numbers = MutableStateFlow(emptyList<Int>())
 
@@ -31,7 +33,7 @@ class FancyRepositoryImpl @Inject constructor(
 	override fun getCount() = storage.getCount().map { it ?: 0 }
 
 	override fun requestMoreNumbers() {
-		GlobalScope.launch {
+		generalScope.launch {
 			requestMoreNumbers(numbers.value.size, 100)
 			storage.setCount(numbers.value.size)
 		}
