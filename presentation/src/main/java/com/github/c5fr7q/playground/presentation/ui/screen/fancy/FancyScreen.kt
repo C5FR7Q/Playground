@@ -22,12 +22,14 @@ object FancyNavigation {
 
 @Composable
 fun FancyScreen(viewModel: FancyViewModel) {
+/*
 	val state by viewModel.state.collectAsState()
 	FancyScreen(
 		fancyState = state,
 		onLoadMore = { viewModel.produceIntent(FancyIntent.LoadMore) },
 		onItemClicked = { viewModel.produceIntent(FancyIntent.ClickItem(it)) }
 	)
+*/
 }
 
 @Composable

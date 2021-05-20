@@ -1,5 +1,6 @@
 package com.github.c5fr7q.playground.presentation.ui.base
 
+import android.util.Log
 import androidx.annotation.CallSuper
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -36,6 +37,7 @@ abstract class BaseViewModel<State, Intent> : ViewModel() {
 
 	protected fun updateState(update: State.() -> State) {
 		mutableState.value = mutableState.value.update()
+		Log.d("VVA", "state=${mutableState.value}")
 	}
 
 	protected open fun handleIntent(intent: Intent) {}

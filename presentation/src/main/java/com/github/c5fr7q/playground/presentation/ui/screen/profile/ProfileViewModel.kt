@@ -4,18 +4,16 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.github.c5fr7q.playground.domain.entity.Place
 import com.github.c5fr7q.playground.domain.repository.PlaceRepository
-import com.github.c5fr7q.playground.domain.repository.ProfileRepository
 import com.github.c5fr7q.playground.presentation.manager.NavigationManager
 import com.github.c5fr7q.playground.presentation.ui.base.BaseViewModel
 import com.github.c5fr7q.playground.presentation.ui.dialog.ConfirmationDialogModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
-@HiltViewModel
-class ProfileViewModel @Inject constructor(
+//@HiltViewModel
+class ProfileViewModel /*@Inject constructor(
 	savedStateHandle: SavedStateHandle,
 	private val profileRepository: ProfileRepository,
 	private val placeRepository: PlaceRepository,
@@ -50,4 +48,4 @@ class ProfileViewModel @Inject constructor(
 			}
 		}
 	}
-}
+}*/

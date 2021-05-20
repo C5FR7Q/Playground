@@ -4,6 +4,7 @@ import com.github.c5fr7q.playground.domain.entity.Place
 import kotlinx.coroutines.flow.Flow
 
 interface PlaceRepository {
-	fun getPlaces(categories: List<Place.Category>, radius: Int): Flow<List<Place>>
+	fun getPreviousPlaces(): Flow<List<Place>>
+	fun getPlaces(categories: List<Place.Category>): Flow<List<Place>>
 	fun loadMorePlaces()
 }

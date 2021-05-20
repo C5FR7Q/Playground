@@ -5,9 +5,11 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import java.time.Duration
 import javax.inject.Inject
 
 class Storage @Inject constructor(
@@ -17,12 +19,18 @@ class Storage @Inject constructor(
 	private val dataStore = context.dataStore
 
 	private companion object {
-		val COUNT = intPreferencesKey("count")
+		val PLACES_PACK_COUNT = intPreferencesKey("places_pack_count")
+		val PLACES_METERS_CALL_THRESHOLD = intPreferencesKey("places_meters_call_threshold")
+		val DATA_CACHING_TIME = longPreferencesKey("data_caching_time")
 	}
 
-	suspend fun setCount(value: Int) = set(COUNT, value)
+	suspend fun setPlacesPackCount(value: Int) = set(PLACES_PACK_COUNT, value)
+	suspend fun setPlacesMetersCallThreshold(value: Int) = set(PLACES_METERS_CALL_THRESHOLD, value)
+	suspend fun setDataCachingTime(duration: Duration) = set(DATA_CACHING_TIME, duration.toHours())
 
-	fun getCount() = get(COUNT)
+	fun getPlacesPackCount() = get(PLACES_PACK_COUNT).map { it ?: 10 }
+	fun getPlacesMetersCallThreshold() = get(PLACES_METERS_CALL_THRESHOLD).map { it ?: 100 }
+	fun getDataCachingTime() = get(DATA_CACHING_TIME).map { Duration.ofHours(it ?: 0L) }
 
 	private suspend fun <T> set(key: Preferences.Key<T>, value: T) {
 		dataStore.edit { it[key] = value }

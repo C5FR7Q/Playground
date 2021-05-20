@@ -1,16 +1,14 @@
 package com.github.c5fr7q.playground.presentation.ui.screen.fancy
 
 import androidx.lifecycle.viewModelScope
-import com.github.c5fr7q.playground.domain.repository.FancyRepository
-import com.github.c5fr7q.playground.domain.repository.UserRepository
 import com.github.c5fr7q.playground.presentation.manager.NavigationManager
 import com.github.c5fr7q.playground.presentation.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
-@HiltViewModel
-class FancyViewModel @Inject constructor(
+//@HiltViewModel
+class FancyViewModel /*@Inject constructor(
 	private val fancyRepository: FancyRepository,
 	private val userRepository: UserRepository,
 	private val navigationManager: NavigationManager
@@ -49,4 +47,4 @@ class FancyViewModel @Inject constructor(
 			}
 		}
 	}
-}
+}*/

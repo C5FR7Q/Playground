@@ -10,14 +10,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.github.c5fr7q.playground.presentation.manager.NavigationManager
-import com.github.c5fr7q.playground.presentation.ui.dialog.ConfirmationDialog
-import com.github.c5fr7q.playground.presentation.ui.dialog.ConfirmationDialogModel
-import com.github.c5fr7q.playground.presentation.ui.screen.fancy.FancyNavigation
-import com.github.c5fr7q.playground.presentation.ui.screen.fancy.FancyScreen
-import com.github.c5fr7q.playground.presentation.ui.screen.profile.ProfileNavigation
-import com.github.c5fr7q.playground.presentation.ui.screen.profile.ProfileScreen
-import com.github.c5fr7q.playground.presentation.ui.theme.PlaygroundTheme
 import com.github.c5fr7q.playground.presentation.ui.base.BaseViewModel
+import com.github.c5fr7q.playground.presentation.ui.screen.main.MainNavigation
+import com.github.c5fr7q.playground.presentation.ui.screen.main.MainScreen
+import com.github.c5fr7q.playground.presentation.ui.theme.PlaygroundTheme
+import com.google.accompanist.insets.ProvideWindowInsets
 
 val LocalOnDismissRequest = compositionLocalOf<() -> Unit> { error("localOnDismissRequest is not specified") }
 
@@ -30,22 +27,20 @@ fun Main(navigationManager: NavigationManager) {
 	}
 
 	PlaygroundTheme {
-
-		NavHost(navController = navController, startDestination = FancyNavigation.destination) {
-			composable(FancyNavigation.destination) {
-				FancyScreen(baseViewModel())
+		ProvideWindowInsets {
+			NavHost(navController = navController, startDestination = MainNavigation.destination) {
+				composable(MainNavigation.destination) {
+					MainScreen(baseViewModel())
+				}
 			}
-			composable(ProfileNavigation.destination, arguments = ProfileNavigation.arguments) {
-				ProfileScreen(baseViewModel())
-			}
-		}
 
-		CompositionLocalProvider(LocalOnDismissRequest provides { navigationManager.closeDialog() }) {
-			val dialog by navigationManager.dialog.collectAsState(initial = null)
-			dialog?.let {
-				when (it) {
-					is ConfirmationDialogModel -> ConfirmationDialog(it)
-					else -> Log.d("Main", "Unknown dialog $it")
+			CompositionLocalProvider(LocalOnDismissRequest provides { navigationManager.closeDialog() }) {
+				val dialog by navigationManager.dialog.collectAsState(initial = null)
+				dialog?.let {
+					when (it) {
+//						is ConfirmationDialogModel -> ConfirmationDialog(it)
+						else -> Log.d("Main", "Unknown dialog $it")
+					}
 				}
 			}
 		}

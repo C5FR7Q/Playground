@@ -20,9 +20,15 @@ data class SygicPlacesResponse(
 			@Json(name = "name") val name: String,
 			@Json(name = "thumbnail_url") val thumbnailUrl: String?,
 			@Json(name = "rating") val rating: Float,
-			@Json(name = "rating_local") val ratingLocal: Float,
 			@Json(name = "categories") val categories: List<String>,
 			@Json(name = "tag_keys") val tags: List<String>,
-		)
+			@Json(name = "location") val location: Location,
+		) {
+			@JsonClass(generateAdapter = true)
+			data class Location(
+				@Json(name = "lat") val lat: Float,
+				@Json(name = "lng") val lon: Float,
+			)
+		}
 	}
 }

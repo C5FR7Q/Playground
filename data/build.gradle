@@ -10,6 +10,7 @@ android {
 	buildToolsVersion "30.0.3"
 
 	defaultConfig {
+		multiDexEnabled true
 		minSdk 23
 		targetSdk 30
 		versionCode 1
@@ -25,6 +26,7 @@ android {
 		}
 	}
 	compileOptions {
+		coreLibraryDesugaringEnabled true
 		sourceCompatibility JavaVersion.VERSION_1_8
 		targetCompatibility JavaVersion.VERSION_1_8
 	}
@@ -34,6 +36,8 @@ android {
 }
 
 dependencies {
+	coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:$desugaring_version"
+
 	implementation project(':domain')
 
 	implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"

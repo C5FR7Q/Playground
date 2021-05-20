@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.github.c5fr7q.playground.data.source.local.Storage
 import com.github.c5fr7q.playground.data.source.local.database.AppDatabase
-import com.github.c5fr7q.playground.data.source.local.database.dao.UserDao
+import com.github.c5fr7q.playground.data.source.local.database.dao.PlaceDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -30,7 +30,7 @@ abstract class LocalSourceModule {
 
 		@Singleton
 		@Provides
-		fun provideUserDao(appDatabase: AppDatabase): UserDao {
+		fun provideUserDao(appDatabase: AppDatabase): PlaceDao {
 			return appDatabase.userDao()
 		}
 	}

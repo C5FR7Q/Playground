@@ -29,11 +29,13 @@ object ProfileNavigation {
 
 @Composable
 fun ProfileScreen(viewModel: ProfileViewModel) {
+/*
 	val state by viewModel.state.collectAsState()
 	ProfileScreen(
 		state = state,
 		onItemClicked = { viewModel.produceIntent(ProfileIntent.Click) }
 	)
+*/
 }
 
 @Composable

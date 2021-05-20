@@ -2,6 +2,7 @@ package com.github.c5fr7q.playground.data.repository.mapper
 
 import com.github.c5fr7q.playground.data.source.remote.sygic.entity.SygicPlacesResponse
 import com.github.c5fr7q.playground.domain.entity.Place
+import com.github.c5fr7q.playground.domain.entity.Position
 import javax.inject.Inject
 
 class SygicPlaceMapper @Inject constructor() {
@@ -13,13 +14,11 @@ class SygicPlaceMapper @Inject constructor() {
 				Place(
 					id = id,
 					name = name,
-					rating = Place.Rating(
-						globalRating = rating,
-						localRating = ratingLocal
-					),
+					rating = rating,
 					categories = mapStringsToCategories(categories),
 					tags = tags,
-					imageUrl = thumbnailUrl ?: ""
+					imageUrl = thumbnailUrl ?: "",
+					position = place.location.run { Position(lon, lat) }
 				)
 			}
 		}

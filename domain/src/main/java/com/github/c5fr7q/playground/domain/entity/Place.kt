@@ -3,10 +3,11 @@ package com.github.c5fr7q.playground.domain.entity
 data class Place(
 	val id: String,
 	val name: String,
-	val rating: Rating,
+	val rating: Float,
 	val categories: List<Category>,
 	val tags: List<String>,
-	val imageUrl: String
+	val imageUrl: String,
+	val position: Position
 ) {
 	enum class Category {
 		DISCOVERING,
@@ -21,9 +22,4 @@ data class Place(
 		DOING_SPORTS,
 		TRAVELING
 	}
-
-	data class Rating(
-		val globalRating: Float,
-		val localRating: Float
-	)
 }
