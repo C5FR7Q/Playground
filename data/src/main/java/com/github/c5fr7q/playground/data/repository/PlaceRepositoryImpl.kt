@@ -10,7 +10,10 @@ import com.github.c5fr7q.playground.domain.entity.Place
 import com.github.c5fr7q.playground.domain.entity.Position
 import com.github.c5fr7q.playground.domain.repository.PlaceRepository
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.math.*
@@ -51,17 +54,19 @@ class PlaceRepositoryImpl @Inject constructor(
 */
 	}
 
-	override fun getPreviousPlaces(): Flow<List<Place>> = flow {
-		emit(placeDao.getAllPlacesOnce().map { placeDtoMapper.mapDtoToPlace(it) })
-	}
+	override suspend fun getPreviousPlaces() = placeDao.getAllPlacesOnce().map { placeDtoMapper.mapDtoToPlace(it) }
 
-	override fun getPlaces(categories: List<Place.Category>): Flow<List<Place>> {
+	override fun getPlaces() = requestedPlaces.asStateFlow()
+
+	override suspend fun tryRefreshPlaces(categories: List<Place.Category>): Boolean {
 		val radius = 5000 // TODO: 21.05.2021 get from prefs
-		val wasDistanceReached = requestedPosition == null || distanceThresholdReached()
-		if (
-			requestedCategories == null || requestedRadius == null ||
-			wasDistanceReached || requestedCategories != categories || requestedRadius != radius
-		) {
+		val canRefreshPlaces = requestedCategories == null ||
+				requestedRadius == null ||
+				requestedPosition == null ||
+				distanceThresholdReached() ||
+				requestedCategories != categories ||
+				requestedRadius != radius
+		if (canRefreshPlaces) {
 			requestedCategories = categories
 			requestedRadius = radius
 			requestedPosition = currentPosition.value
@@ -69,7 +74,7 @@ class PlaceRepositoryImpl @Inject constructor(
 				fetchPlaces(categories, radius, 0)
 			}
 		}
-		return requestedPlaces
+		return canRefreshPlaces
 	}
 
 	override fun loadMorePlaces() {

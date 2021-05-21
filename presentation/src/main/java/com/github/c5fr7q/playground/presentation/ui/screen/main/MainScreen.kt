@@ -1,10 +1,12 @@
 package com.github.c5fr7q.playground.presentation.ui.screen.main
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -60,11 +62,19 @@ private fun MainScreen(
 ) {
 	Box {
 		Scaffold(
-			topBar = { TopBar(titleRes = if (state.usesPreviousPlaces) R.string.previous_places else R.string.near_you) },
+			topBar = {
+				TopBar(
+					titleRes = if (state.usesPreviousPlaces) R.string.previous_places else R.string.near_you,
+					selectedCategories = state.selectedCategories,
+					onCategoryToggle = onCategoryToggle
+				)
+			},
 			bottomBar = { BottomBar(onLikeClick, onPreviousClick, onSettingsClick) },
 			floatingActionButton = {
-				FloatingActionButton(onClick = onRefreshClick) {
-					Icon(Icons.Default.Refresh, contentDescription = null)
+				if (state.selectedCategories.isNotEmpty()) {
+					FloatingActionButton(onClick = onRefreshClick) {
+						Icon(Icons.Default.Refresh, contentDescription = null)
+					}
 				}
 			},
 			floatingActionButtonPosition = FabPosition.Center,
@@ -168,7 +178,11 @@ fun PlaceImage(url: String, rating: Float) {
 }
 
 @Composable
-private fun TopBar(@StringRes titleRes: Int) {
+private fun TopBar(
+	@StringRes titleRes: Int,
+	selectedCategories: List<Place.Category>,
+	onCategoryToggle: (Place.Category) -> Unit
+) {
 	Column {
 		Box(
 			modifier = Modifier
@@ -189,6 +203,38 @@ private fun TopBar(@StringRes titleRes: Int) {
 			contentColor = MaterialTheme.colors.onSurface,
 			elevation = 0.dp
 		)
+		Divider()
+		LazyRow(modifier = Modifier.padding(vertical = 6.dp)) {
+			val allCategories = Place.Category.values()
+			val lastIndex = allCategories.lastIndex
+			itemsIndexed(allCategories) { index, category ->
+				val selected = selectedCategories.contains(category)
+				if (selected) {
+					Button(
+						modifier = Modifier.padding(
+							start = if (index == 0) 16.dp else 0.dp,
+							end = if (index == lastIndex) 16.dp else 6.dp
+						),
+						contentPadding = PaddingValues(4.dp),
+						onClick = { onCategoryToggle(category) }
+					) {
+						Text(text = category.asText(), style = MaterialTheme.typography.button)
+					}
+				} else {
+					OutlinedButton(
+						modifier = Modifier.padding(
+							start = if (index == 0) 16.dp else 0.dp,
+							end = if (index == lastIndex) 16.dp else 6.dp,
+						),
+						contentPadding = PaddingValues(4.dp),
+						onClick = { onCategoryToggle(category) },
+						border = BorderStroke(ButtonDefaults.OutlinedBorderSize, MaterialTheme.colors.primary)
+					) {
+						Text(text = category.asText(), style = MaterialTheme.typography.button, color = MaterialTheme.colors.primary)
+					}
+				}
+			}
+		}
 		Divider()
 	}
 }
@@ -234,3 +280,22 @@ private fun BottomBar(
 }
 
 private fun Position.asText() = "%.5f".format(Locale.US, lon) + "," + "%.5f".format(Locale.US, lat)
+
+@Composable
+private fun Place.Category.asText(): String {
+	return stringResource(
+		when (this) {
+			Place.Category.DISCOVERING -> R.string.discovering
+			Place.Category.EATING -> R.string.eating
+			Place.Category.GOING_OUT -> R.string.going_out
+			Place.Category.HIKING -> R.string.hiking
+			Place.Category.PLAYING -> R.string.playing
+			Place.Category.RELAXING -> R.string.relaxing
+			Place.Category.SHOPPING -> R.string.shopping
+			Place.Category.SIGHTSEEING -> R.string.sightseeing
+			Place.Category.SLEEPING -> R.string.sleeping
+			Place.Category.DOING_SPORTS -> R.string.doing_sports
+			Place.Category.TRAVELING -> R.string.traveling
+		}
+	)
+}

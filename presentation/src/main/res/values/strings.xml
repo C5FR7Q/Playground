@@ -4,4 +4,15 @@
 	<string name = "previous_places">Previous places</string>
 	<string name = "near_you">Near you</string>
 	<string name = "show_previous_places">Show previous places</string>
+	<string name = "discovering">Discovering</string>
+	<string name = "eating">Eating</string>
+	<string name = "going_out">Going out</string>
+	<string name = "hiking">Hiking</string>
+	<string name = "playing">Playing</string>
+	<string name = "relaxing">Relaxing</string>
+	<string name = "shopping">Shopping</string>
+	<string name = "sightseeing">Sightseeing</string>
+	<string name = "sleeping">Sleeping</string>
+	<string name = "doing_sports">Doing sports</string>
+	<string name = "traveling">Traveling</string>
 </resources>

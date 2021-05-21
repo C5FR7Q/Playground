@@ -24,7 +24,7 @@ class SygicPlaceMapper @Inject constructor() {
 		}
 	}
 
-	fun mapCategoriesToString(categories: List<Place.Category>) = categories.joinToString { mapCategoryToString(it) }
+	fun mapCategoriesToString(categories: List<Place.Category>) = categories.joinToString { mapCategoryToString(it) }.replace(" ", "")
 
 	fun mapStringsToCategories(strings: List<String>): List<Place.Category> {
 		return strings.mapNotNull { string ->
