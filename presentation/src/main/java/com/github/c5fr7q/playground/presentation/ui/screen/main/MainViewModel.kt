@@ -30,20 +30,20 @@ class MainViewModel @Inject constructor(
 					updateState {
 						copy(isLoading = true)
 					}
-					if (shouldUsePreviousPlaces.value) {
-						viewModelScope.launch {
-							val previousPlaces = placeRepository.getPreviousPlaces()
-							if (previousPlaces.isNotEmpty()) {
-								updateState {
-									copy(places = previousPlaces, usesPreviousPlaces = true, isLoading = false)
-								}
-							} else {
-								updateState { copy(isLoading = false) }
-								// TODO: 21.05.2021 Display nothing prev found?
-							}
-						}
-					}
 				}
+				shouldUsePreviousPlaces
+					.flatMapLatest { if (it) flow { emit(placeRepository.getPreviousPlaces()) } else emptyFlow() }
+					.onEach {
+						if (it.isNotEmpty()) {
+							updateState {
+								copy(places = it, usesPreviousPlaces = true, isLoading = false)
+							}
+						} else {
+							updateState { copy(isLoading = false) }
+							// TODO: 21.05.2021 Display nothing prev found?
+						}
+					}.launchIn(viewModelScope)
+
 				shouldUsePreviousPlaces
 					.flatMapLatest { if (!it) placeRepository.getPlaces() else emptyFlow() }
 					.onEach {
@@ -65,7 +65,9 @@ class MainViewModel @Inject constructor(
 			}
 			MainIntent.ClickLike -> TODO("")
 			MainIntent.ClickSettings -> TODO("")
-			MainIntent.ClickPrevious -> TODO("")
+			MainIntent.ClickPrevious -> {
+				shouldUsePreviousPlaces.value = true
+			}
 			MainIntent.ClickRefresh -> {
 				viewModelScope.launch {
 					val selectedCategories = state.value.selectedCategories
