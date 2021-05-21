@@ -36,6 +36,7 @@ class PlaceRepositoryImpl @Inject constructor(
 
 	private var placesPackCount: Int = 0
 	private var placesMetersCallThreshold: Int = 0
+	private var placesMetersRadius: Int = 0
 
 	init {
 		storage.getPlacesPackCount()
@@ -46,6 +47,11 @@ class PlaceRepositoryImpl @Inject constructor(
 			.onEach { placesMetersCallThreshold = it }
 			.launchIn(generalScope)
 
+		storage.getPlacesRadius()
+			.onEach { placesMetersCallThreshold = it }
+			.launchIn(generalScope)
+
+		// TODO: 21.05.2021
 /*
 		storage.getDataCachingTime()
 			.take(1)
@@ -59,19 +65,18 @@ class PlaceRepositoryImpl @Inject constructor(
 	override fun getPlaces() = requestedPlaces.asStateFlow()
 
 	override suspend fun tryRefreshPlaces(categories: List<Place.Category>): Boolean {
-		val radius = 5000 // TODO: 21.05.2021 get from prefs
 		val canRefreshPlaces = requestedCategories == null ||
 				requestedRadius == null ||
 				requestedPosition == null ||
 				distanceThresholdReached() ||
 				requestedCategories != categories ||
-				requestedRadius != radius
+				requestedRadius != placesMetersRadius
 		if (canRefreshPlaces) {
 			requestedCategories = categories
-			requestedRadius = radius
+			requestedRadius = placesMetersRadius
 			requestedPosition = currentPosition.value
 			generalScope.launch {
-				fetchPlaces(categories, radius, 0)
+				fetchPlaces(categories, placesMetersRadius, 0)
 			}
 		}
 		return canRefreshPlaces

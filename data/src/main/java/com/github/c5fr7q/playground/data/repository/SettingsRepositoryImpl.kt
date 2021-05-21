@@ -30,9 +30,17 @@ class SettingsRepositoryImpl @Inject constructor(
 		}
 	}
 
+	override fun setPlacesRadius(value: Int) {
+		generalScope.launch {
+			storage.setPlacesRadius(value)
+		}
+	}
+
 	override fun getPlacesPackCount() = storage.getPlacesPackCount()
 
 	override fun getPlacesMetersCallThreshold() = storage.getPlacesMetersCallThreshold()
 
 	override fun getDataCachingTime() = storage.getDataCachingTime()
+
+	override fun getPlacesRadius() = storage.getPlacesRadius()
 }
