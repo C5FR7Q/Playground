@@ -13,6 +13,8 @@ import com.github.c5fr7q.playground.domain.repository.PlaceRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import java.time.Instant
+import java.util.*
 import javax.inject.Inject
 import kotlin.math.*
 
@@ -50,13 +52,10 @@ class PlaceRepositoryImpl @Inject constructor(
 			.onEach { placesMetersCallThreshold = it }
 			.launchIn(generalScope)
 
-		// TODO: 21.05.2021
-/*
 		storage.getDataCachingTime()
 			.take(1)
-			.onEach { placeDao.deleteOutdated(Date.from(Instant.now()).time + it.toMillis()) }
+			.onEach { placeDao.deleteOutdated(Date.from(Instant.now()).time - it.toMillis()) }
 			.launchIn(generalScope)
-*/
 	}
 
 	override suspend fun getPreviousPlaces() = placeDao.getAllPlacesOnce().map { placeDtoMapper.mapDtoToPlace(it) }

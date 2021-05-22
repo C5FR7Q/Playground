@@ -27,12 +27,12 @@ class Storage @Inject constructor(
 
 	suspend fun setPlacesPackCount(value: Int) = set(PLACES_PACK_COUNT, value)
 	suspend fun setPlacesMetersCallThreshold(value: Int) = set(PLACES_METERS_CALL_THRESHOLD, value)
-	suspend fun setDataCachingTime(duration: Duration) = set(DATA_CACHING_TIME, duration.toHours())
+	suspend fun setDataCachingTime(duration: Duration) = set(DATA_CACHING_TIME, duration.toDays())
 	suspend fun setPlacesRadius(value: Int) = set(PLACES_RADIUS, value)
 
 	fun getPlacesPackCount() = get(PLACES_PACK_COUNT).map { it ?: 10 }
 	fun getPlacesMetersCallThreshold() = get(PLACES_METERS_CALL_THRESHOLD).map { it ?: 100 }
-	fun getDataCachingTime() = get(DATA_CACHING_TIME).map { Duration.ofHours(it ?: 0L) }
+	fun getDataCachingTime() = get(DATA_CACHING_TIME).map { Duration.ofDays(it ?: 30L) }
 	fun getPlacesRadius() = get(PLACES_RADIUS).map { it ?: 5000 }
 
 	private suspend fun <T> set(key: Preferences.Key<T>, value: T) {
