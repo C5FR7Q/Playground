@@ -260,10 +260,16 @@ private fun BottomBar(
 						expanded = showMenu,
 						onDismissRequest = { showMenu = false })
 					{
-						DropdownMenuItem(onClick = onPreviousClick) {
+						DropdownMenuItem(onClick = {
+							showMenu = false
+							onPreviousClick()
+						}) {
 							Text(text = stringResource(id = R.string.show_previous_places))
 						}
-						DropdownMenuItem(onClick = onSettingsClick) {
+						DropdownMenuItem(onClick = {
+							showMenu = false
+							onSettingsClick()
+						}) {
 							Text(text = stringResource(id = R.string.settings))
 						}
 					}

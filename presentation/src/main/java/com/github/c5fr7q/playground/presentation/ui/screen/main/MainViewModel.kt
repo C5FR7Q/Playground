@@ -1,6 +1,8 @@
 package com.github.c5fr7q.playground.presentation.ui.screen.main
 
+import android.util.Log
 import androidx.lifecycle.viewModelScope
+import com.github.c5fr7q.playground.domain.entity.PlacesStatus
 import com.github.c5fr7q.playground.domain.repository.PlaceRepository
 import com.github.c5fr7q.playground.presentation.manager.NavigationManager
 import com.github.c5fr7q.playground.presentation.ui.base.BaseViewModel
@@ -45,15 +47,25 @@ class MainViewModel @Inject constructor(
 					}.launchIn(viewModelScope)
 
 				shouldUsePreviousPlaces
-					.flatMapLatest { if (!it) placeRepository.getPlaces() else emptyFlow() }
-					.onEach {
-						updateState {
-							copy(
-								isLoading = false,
-								places = it,
-								usesPreviousPlaces = false
-								// TODO: 21.05.2021 Show empty results if need
-							)
+					.flatMapLatest { if (it) emptyFlow() else placeRepository.getPlacesStatus() }
+					.combine(placeRepository.getPlaces()) { status, places -> status to places }
+					.onEach { (status, places) ->
+						when (status) {
+							PlacesStatus.LOADED -> {
+								updateState {
+									copy(
+										isLoading = false,
+										places = places,
+										usesPreviousPlaces = false
+										// TODO: 21.05.2021 Show empty results if need
+									)
+								}
+							}
+							PlacesStatus.FAILED -> {
+								updateState { copy(isLoading = false) }
+								// TODO: 21.05.2021 Show something went wrong
+							}
+							PlacesStatus.LOADING -> Unit
 						}
 					}.launchIn(viewModelScope)
 			}

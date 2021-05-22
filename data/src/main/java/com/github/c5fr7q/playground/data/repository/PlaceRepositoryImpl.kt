@@ -7,13 +7,11 @@ import com.github.c5fr7q.playground.data.source.local.Storage
 import com.github.c5fr7q.playground.data.source.local.database.dao.PlaceDao
 import com.github.c5fr7q.playground.data.source.remote.sygic.SygicService
 import com.github.c5fr7q.playground.domain.entity.Place
+import com.github.c5fr7q.playground.domain.entity.PlacesStatus
 import com.github.c5fr7q.playground.domain.entity.Position
 import com.github.c5fr7q.playground.domain.repository.PlaceRepository
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.math.*
@@ -28,7 +26,8 @@ class PlaceRepositoryImpl @Inject constructor(
 ) : PlaceRepository {
 
 	private val currentPosition = MutableStateFlow(Position(84.98107413147059f, 56.481796f)) // TODO: 10.05.2021 0f, 0f
-	private val requestedPlaces = MutableStateFlow(emptyList<Place>())
+	private val requestedPlaces = MutableSharedFlow<List<Place>>(1)
+	private val placesStatus = MutableStateFlow(PlacesStatus.LOADED)
 
 	private var requestedPosition: Position? = null
 	private var requestedCategories: List<Place.Category>? = null
@@ -62,7 +61,9 @@ class PlaceRepositoryImpl @Inject constructor(
 
 	override suspend fun getPreviousPlaces() = placeDao.getAllPlacesOnce().map { placeDtoMapper.mapDtoToPlace(it) }
 
-	override fun getPlaces() = requestedPlaces.asStateFlow()
+	override fun getPlaces() = requestedPlaces.asSharedFlow()
+
+	override fun getPlacesStatus() = placesStatus.asStateFlow()
 
 	override suspend fun tryRefreshPlaces(categories: List<Place.Category>): Boolean {
 		val canRefreshPlaces = requestedCategories == null ||
@@ -84,25 +85,35 @@ class PlaceRepositoryImpl @Inject constructor(
 
 	override fun loadMorePlaces() {
 		generalScope.launch {
-			fetchPlaces(requestedCategories!!, requestedRadius!!, requestedPlaces.value.size)
+			fetchPlaces(requestedCategories!!, requestedRadius!!, requestedPlaces.replayCache[0].size)
 		}
 	}
 
 	private suspend fun fetchPlaces(categories: List<Place.Category>, radius: Int, offset: Int) {
-		val placesResponse = sygicService.getPlaces(
-			sygicPlaceMapper.mapCategoriesToString(categories),
-			sygicPlaceMapper.mapArea(currentPosition.value.lat, currentPosition.value.lon, radius),
-			placesPackCount,
-			offset
-		)
-		val places = sygicPlaceMapper.mapResponse(placesResponse)
-		places.map { placeDtoMapper.mapPlaceToDto(it) }.let { placeDao.addPlaces(it) }
-		requestedPlaces.emit(
-			when {
-				offset != 0 -> requestedPlaces.value + places
-				else -> places
-			}
-		)
+		try {
+			placesStatus.value = PlacesStatus.LOADING
+			val placesResponse = sygicService.getPlaces(
+				sygicPlaceMapper.mapCategoriesToString(categories),
+				sygicPlaceMapper.mapArea(currentPosition.value.lat, currentPosition.value.lon, radius),
+				placesPackCount,
+				offset
+			)
+			val places = sygicPlaceMapper.mapResponse(placesResponse)
+			places.map { placeDtoMapper.mapPlaceToDto(it) }.let { placeDao.addPlaces(it) }
+			requestedPlaces.emit(
+				when {
+					offset != 0 -> requestedPlaces.replayCache[0] + places
+					else -> places
+				}
+			)
+			placesStatus.value = PlacesStatus.LOADED
+		} catch (e: Exception) {
+			requestedCategories = null
+			requestedRadius = null
+			requestedPosition = null
+			requestedPlaces.emit(emptyList())
+			placesStatus.value = PlacesStatus.FAILED
+		}
 	}
 
 	private fun distanceThresholdReached() = positionDistance(requestedPosition!!, currentPosition.value) > placesMetersCallThreshold
