@@ -5,12 +5,10 @@ import java.time.Duration
 
 interface SettingsRepository {
 	fun setPlacesPackCount(value: Int)
-	fun setPlacesMetersCallThreshold(value: Int)
 	fun setDataCachingTime(duration: Duration)
 	fun setPlacesRadius(value: Int)
 
 	fun getPlacesPackCount(): Flow<Int>
-	fun getPlacesMetersCallThreshold(): Flow<Int>
 	fun getDataCachingTime(): Flow<Duration>
 	fun getPlacesRadius(): Flow<Int>
 }

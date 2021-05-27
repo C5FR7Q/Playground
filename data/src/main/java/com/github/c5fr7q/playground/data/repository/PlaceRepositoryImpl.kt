@@ -16,7 +16,6 @@ import kotlinx.coroutines.launch
 import java.time.Instant
 import java.util.*
 import javax.inject.Inject
-import kotlin.math.*
 
 class PlaceRepositoryImpl @Inject constructor(
 	private val sygicService: SygicService,
@@ -36,7 +35,6 @@ class PlaceRepositoryImpl @Inject constructor(
 	private var requestedRadius: Int? = null
 
 	private var placesPackCount: Int = 0
-	private var placesMetersCallThreshold: Int = 0
 	private var placesMetersRadius: Int = 0
 
 	init {
@@ -44,12 +42,8 @@ class PlaceRepositoryImpl @Inject constructor(
 			.onEach { placesPackCount = it }
 			.launchIn(generalScope)
 
-		storage.getPlacesMetersCallThreshold()
-			.onEach { placesMetersCallThreshold = it }
-			.launchIn(generalScope)
-
 		storage.getPlacesRadius()
-			.onEach { placesMetersCallThreshold = it }
+			.onEach { placesMetersRadius = it }
 			.launchIn(generalScope)
 
 		storage.getDataCachingTime()
@@ -60,13 +54,13 @@ class PlaceRepositoryImpl @Inject constructor(
 
 	override fun getPreviousPlaces() = placeDao.getAllPlaces().map { list -> list.map { placeDtoMapper.mapDtoToPlace(it) } }
 
-	override suspend fun updatePlaces(categories: List<Place.Category>): Boolean {
+	override fun updatePlaces(categories: List<Place.Category>) {
 		val canRefreshPlaces = requestedCategories == null ||
 				requestedRadius == null ||
 				requestedPosition == null ||
-				distanceThresholdReached() ||
 				requestedCategories != categories ||
-				requestedRadius != placesMetersRadius
+				requestedRadius != placesMetersRadius ||
+				requestedPosition != currentPosition.value
 		if (canRefreshPlaces) {
 			requestedCategories = categories
 			requestedRadius = placesMetersRadius
@@ -75,7 +69,6 @@ class PlaceRepositoryImpl @Inject constructor(
 				fetchPlaces(categories, placesMetersRadius, 0)
 			}
 		}
-		return canRefreshPlaces
 	}
 
 	override fun loadMorePlaces() {
@@ -145,20 +138,5 @@ class PlaceRepositoryImpl @Inject constructor(
 			}
 		}
 	}
-
-	private fun distanceThresholdReached() = positionDistance(requestedPosition!!, currentPosition.value) > placesMetersCallThreshold
-
-	private fun positionDistance(position1: Position, position2: Position): Int {
-		val earthRadius = 6371 /* Kilometres */
-
-		val dLat = (position2.lat - position1.lat).toRad()
-		val dLon = (position2.lon - position1.lon).toRad()
-
-		val a = sin(dLat / 2) * sin(dLat / 2) + cos(position1.lat.toRad()) * cos(position2.lat.toRad()) * sin(dLon / 2) * sin(dLon / 2)
-		val c = 2 * atan2(sqrt(a), sqrt(1 - a))
-		return (earthRadius * c * 1000).roundToInt()
-	}
-
-	private fun Float.toRad() = this * (Math.PI / 180).toFloat()
 
 }

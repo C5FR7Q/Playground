@@ -109,12 +109,9 @@ class MainViewModel @Inject constructor(
 				viewModelScope.launch {
 					val selectedCategories = state.value.selectedCategories
 					if (selectedCategories.isNotEmpty()) {
-						if (placeRepository.updatePlaces(selectedCategories)) {
-							updateState { copy(isLoading = true) }
-							placesSource.value = MainState.ContentType.NEAR
-						} else {
-							// TODO: 21.05.2021 Display "You're too close"
-						}
+						placeRepository.updatePlaces(selectedCategories)
+						updateState { copy(isLoading = true) }
+						placesSource.value = MainState.ContentType.NEAR
 					}
 				}
 			}

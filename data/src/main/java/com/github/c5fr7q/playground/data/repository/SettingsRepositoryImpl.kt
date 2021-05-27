@@ -18,12 +18,6 @@ class SettingsRepositoryImpl @Inject constructor(
 		}
 	}
 
-	override fun setPlacesMetersCallThreshold(value: Int) {
-		generalScope.launch {
-			storage.setPlacesMetersCallThreshold(value)
-		}
-	}
-
 	override fun setDataCachingTime(duration: Duration) {
 		generalScope.launch {
 			storage.setDataCachingTime(duration)
@@ -37,8 +31,6 @@ class SettingsRepositoryImpl @Inject constructor(
 	}
 
 	override fun getPlacesPackCount() = storage.getPlacesPackCount()
-
-	override fun getPlacesMetersCallThreshold() = storage.getPlacesMetersCallThreshold()
 
 	override fun getDataCachingTime() = storage.getDataCachingTime()
 

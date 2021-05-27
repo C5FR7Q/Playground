@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 interface PlaceRepository {
 	fun getPreviousPlaces(): Flow<List<Place>>
 
-	suspend fun updatePlaces(categories: List<Place.Category>): Boolean
+	fun updatePlaces(categories: List<Place.Category>)
 	fun loadMorePlaces()
 	fun getUpdatedPlacesStatus(): Flow<UpdatedPlacesStatus>
 	fun getUpdatedPlaces(): Flow<List<Place>>
