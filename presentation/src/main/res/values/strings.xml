@@ -3,7 +3,6 @@
 	<string name = "settings">Settings</string>
 	<string name = "previous">Previous</string>
 	<string name = "near_you">Near you</string>
-	<string name = "show_previous_places">Show previous places</string>
 	<string name = "discovering">Discovering</string>
 	<string name = "eating">Eating</string>
 	<string name = "going_out">Going out</string>
@@ -16,4 +15,5 @@
 	<string name = "doing_sports">Doing sports</string>
 	<string name = "traveling">Traveling</string>
 	<string name = "favorite">Favorite</string>
+	<string name = "blocked">Blocked</string>
 </resources>

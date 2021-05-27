@@ -105,6 +105,7 @@ class MainViewModel @Inject constructor(
 			MainIntent.ClickPrevious -> {
 				placesSource.value = MainState.ContentType.PREVIOUS
 			}
+			MainIntent.ClickBlocked -> TODO("")
 			MainIntent.ClickRefresh -> {
 				viewModelScope.launch {
 					val selectedCategories = state.value.selectedCategories

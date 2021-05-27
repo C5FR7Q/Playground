@@ -43,6 +43,7 @@ fun MainScreen(viewModel: MainViewModel) {
 		onLoadMore = { viewModel.produceIntent(MainIntent.LoadMore) },
 		onLikeClick = { viewModel.produceIntent(MainIntent.ClickLike) },
 		onPreviousClick = { viewModel.produceIntent(MainIntent.ClickPrevious) },
+		onBlockedClick = { viewModel.produceIntent(MainIntent.ClickBlocked) },
 		onSettingsClick = { viewModel.produceIntent(MainIntent.ClickSettings) },
 		onRefreshClick = { viewModel.produceIntent(MainIntent.ClickRefresh) },
 		onCategoryToggle = { viewModel.produceIntent(MainIntent.ToggleCategory(it)) },
@@ -56,6 +57,7 @@ private fun MainScreen(
 	onLoadMore: () -> Unit,
 	onLikeClick: () -> Unit,
 	onPreviousClick: () -> Unit,
+	onBlockedClick: () -> Unit,
 	onSettingsClick: () -> Unit,
 	onRefreshClick: () -> Unit,
 	onCategoryToggle: (Place.Category) -> Unit,
@@ -79,6 +81,7 @@ private fun MainScreen(
 					contentType = state.contentType,
 					onLikeClick = onLikeClick,
 					onPreviousClick = onPreviousClick,
+					onBlockedClick = onBlockedClick,
 					onSettingsClick = onSettingsClick
 				)
 			},
@@ -310,6 +313,7 @@ private fun BottomBar(
 	contentType: MainState.ContentType,
 	onLikeClick: () -> Unit,
 	onPreviousClick: () -> Unit,
+	onBlockedClick: () -> Unit,
 	onSettingsClick: () -> Unit
 ) {
 	var showMenu by remember { mutableStateOf(false) }
@@ -334,8 +338,14 @@ private fun BottomBar(
 								showMenu = false
 								onPreviousClick()
 							}) {
-								Text(text = stringResource(id = R.string.show_previous_places))
+								Text(text = stringResource(id = R.string.previous))
 							}
+						}
+						DropdownMenuItem(onClick = {
+							showMenu = false
+							onBlockedClick()
+						}) {
+							Text(text = stringResource(id = R.string.blocked))
 						}
 						DropdownMenuItem(onClick = {
 							showMenu = false

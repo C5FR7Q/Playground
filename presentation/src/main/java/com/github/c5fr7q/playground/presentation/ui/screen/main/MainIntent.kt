@@ -7,6 +7,7 @@ sealed class MainIntent {
 	object LoadMore : MainIntent()
 	object ClickLike : MainIntent()
 	object ClickPrevious : MainIntent()
+	object ClickBlocked : MainIntent()
 	object ClickSettings : MainIntent()
 	object ClickRefresh : MainIntent()
 	data class ToggleCategory(val category: Place.Category) : MainIntent()
