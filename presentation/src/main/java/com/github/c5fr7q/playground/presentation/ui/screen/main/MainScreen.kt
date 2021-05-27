@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import com.github.c5fr7q.playground.domain.entity.Place
 import com.github.c5fr7q.playground.domain.entity.Position
 import com.github.c5fr7q.playground.presentation.R
+import com.github.c5fr7q.playground.presentation.ui.theme.Purple900
 import com.github.c5fr7q.playground.presentation.ui.util.TagRow
 import com.google.accompanist.coil.rememberCoilPainter
 import com.google.accompanist.insets.navigationBarsHeight
@@ -106,6 +107,7 @@ private fun MainScreen(
 								}
 							}
 							PlaceItem(
+								contentType = state.contentType,
 								place = item,
 								onToggleFavoriteClicked = { onToggleItemFavorite(item) }
 							)
@@ -126,6 +128,7 @@ private fun MainScreen(
 
 @Composable
 private fun PlaceItem(
+	contentType: MainState.ContentType,
 	place: Place,
 	onToggleFavoriteClicked: () -> Unit
 ) {
@@ -146,6 +149,25 @@ private fun PlaceItem(
 					Text(text = place.position.asText(), style = MaterialTheme.typography.overline)
 				}
 				Spacer(modifier = Modifier.height(2.dp))
+				if (contentType != MainState.ContentType.NEAR) {
+					Column (modifier = Modifier.wrapContentWidth()) {
+						TagRow(tags = place.categories.map { it.asText() }) {
+							CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
+								Text(
+									text = it,
+									maxLines = 1,
+									overflow = TextOverflow.Ellipsis,
+									modifier = Modifier
+										.background(Purple900, RoundedCornerShape(4.dp)) // TODO: 28.05.2021 Rework
+										.padding(4.dp),
+									style = MaterialTheme.typography.caption,
+									color = MaterialTheme.colors.onPrimary.copy(alpha = ContentAlpha.high)
+								)
+							}
+						}
+					}
+					Spacer(modifier = Modifier.height(6.dp))
+				}
 				TagRow(tags = place.tags) {
 					CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
 						Text(
