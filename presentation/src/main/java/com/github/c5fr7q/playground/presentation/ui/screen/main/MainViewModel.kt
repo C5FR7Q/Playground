@@ -101,11 +101,15 @@ class MainViewModel @Inject constructor(
 			MainIntent.ClickLike -> {
 				placesSource.value = MainState.ContentType.FAVORITE
 			}
-			MainIntent.ClickSettings -> TODO("")
+			MainIntent.ClickSettings -> {
+				navigationManager.openSettings()
+			}
 			MainIntent.ClickPrevious -> {
 				placesSource.value = MainState.ContentType.PREVIOUS
 			}
-			MainIntent.ClickBlocked -> TODO("")
+			MainIntent.ClickBlocked -> {
+				navigationManager.openBlocked()
+			}
 			MainIntent.ClickRefresh -> {
 				viewModelScope.launch {
 					val selectedCategories = state.value.selectedCategories

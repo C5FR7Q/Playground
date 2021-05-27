@@ -4,7 +4,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.navigate
 import com.github.c5fr7q.playground.presentation.ui.dialog.ConfirmationDialogModel
 import com.github.c5fr7q.playground.presentation.ui.dialog.DialogModel
+import com.github.c5fr7q.playground.presentation.ui.screen.blocked.BlockedNavigation
 import com.github.c5fr7q.playground.presentation.ui.screen.profile.ProfileNavigation
+import com.github.c5fr7q.playground.presentation.ui.screen.settings.SettingsNavigation
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -17,6 +19,14 @@ class NavigationManager @Inject constructor() {
 	val dialog = dialogs.map { it.firstOrNull() }
 
 	var navController: NavHostController? = null
+
+	fun openSettings() {
+		navController?.navigate(SettingsNavigation.createRoute())
+	}
+
+	fun openBlocked() {
+		navController?.navigate(BlockedNavigation.createRoute())
+	}
 
 	fun openProfile(userId: String) {
 		navController?.navigate(ProfileNavigation.createRoute(userId = userId))
@@ -31,6 +41,10 @@ class NavigationManager @Inject constructor() {
 		if (dialogsList.isNotEmpty()) {
 			dialogs.value = dialogsList.toMutableList().apply { removeFirst() }
 		}
+	}
+
+	fun closeScreen() {
+		navController?.popBackStack()
 	}
 
 	private fun addDialog(dialogModel: DialogModel) {
