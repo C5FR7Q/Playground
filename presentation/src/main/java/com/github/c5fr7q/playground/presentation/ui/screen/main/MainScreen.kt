@@ -108,7 +108,7 @@ private fun MainScreen(
 						PlaceItem(
 							contentType = state.contentType,
 							place = item,
-							onToggleFavoriteClicked = { onToggleItemFavorite(item) }
+							onToggleFavoriteClick = { onToggleItemFavorite(item) }
 						)
 					}
 				}
@@ -128,7 +128,7 @@ private fun MainScreen(
 private fun PlaceItem(
 	contentType: MainState.ContentType,
 	place: Place,
-	onToggleFavoriteClicked: () -> Unit
+	onToggleFavoriteClick: () -> Unit
 ) {
 	Column {
 		Surface {
@@ -140,7 +140,7 @@ private fun PlaceItem(
 						.fillMaxWidth(),
 					verticalAlignment = Alignment.CenterVertically
 				) {
-					IconButton(onClick = onToggleFavoriteClicked) {
+					IconButton(onClick = onToggleFavoriteClick) {
 						Icon(if (place.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder, contentDescription = null)
 					}
 					Spacer(modifier = Modifier.height(6.dp))
