@@ -1,5 +1,6 @@
 package com.github.c5fr7q.playground.data.source.local.database.entity
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -15,5 +16,6 @@ data class PlaceDto(
 	val lat: Float,
 	val lon: Float,
 	val createdDate: Long,
+	@ColumnInfo(defaultValue = "0")
 	val isFavorite: Boolean
 )
