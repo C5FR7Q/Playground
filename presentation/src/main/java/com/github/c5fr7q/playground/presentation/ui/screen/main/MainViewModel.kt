@@ -36,6 +36,12 @@ class MainViewModel @Inject constructor(
 					.map { it == MainState.ContentType.PREVIOUS }
 					.distinctUntilChanged()
 					.flatMapLatest { if (it) placeRepository.getPreviousPlaces() else emptyFlow() }
+					.flatMapLatest { places ->
+						state
+							.map { it.selectedCategories }
+							.distinctUntilChanged()
+							.map { categories -> places.filter { it.categories.containsAll(categories) } }
+					}
 					.onEach {
 						updateState {
 							copy(places = it, contentType = MainState.ContentType.PREVIOUS, isLoading = false)
@@ -47,6 +53,12 @@ class MainViewModel @Inject constructor(
 					.map { it == MainState.ContentType.FAVORITE }
 					.distinctUntilChanged()
 					.flatMapLatest { if (it) placeRepository.getFavoritePlaces() else emptyFlow() }
+					.flatMapLatest { places ->
+						state
+							.map { it.selectedCategories }
+							.distinctUntilChanged()
+							.map { categories -> places.filter { it.categories.containsAll(categories) } }
+					}
 					.onEach {
 						updateState {
 							copy(places = it, contentType = MainState.ContentType.FAVORITE, isLoading = false)
