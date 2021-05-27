@@ -17,12 +17,6 @@ import com.github.c5fr7q.playground.presentation.R
 import com.github.c5fr7q.playground.presentation.ui.screen.blocked.BlockedState
 import com.google.accompanist.insets.statusBarsHeight
 
-object SettingsNavigation {
-	const val destination = "settings"
-
-	fun createRoute() = destination
-}
-
 @Composable
 fun SettingsScreen(viewModel: SettingsViewModel) {
 	val state by viewModel.state.collectAsState()

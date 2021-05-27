@@ -29,12 +29,6 @@ import com.google.accompanist.insets.navigationBarsHeight
 import com.google.accompanist.insets.statusBarsHeight
 import java.util.*
 
-object MainNavigation {
-	const val destination = "main"
-
-	fun createRoute() = destination
-}
-
 @Composable
 fun MainScreen(viewModel: MainViewModel) {
 	val state by viewModel.state.collectAsState()

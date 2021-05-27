@@ -16,12 +16,6 @@ import androidx.compose.ui.unit.dp
 import com.github.c5fr7q.playground.presentation.R
 import com.google.accompanist.insets.statusBarsHeight
 
-object BlockedNavigation {
-	const val destination = "blocked"
-
-	fun createRoute() = destination
-}
-
 @Composable
 fun BlockedScreen(viewModel: BlockedViewModel) {
 	val state by viewModel.state.collectAsState()
