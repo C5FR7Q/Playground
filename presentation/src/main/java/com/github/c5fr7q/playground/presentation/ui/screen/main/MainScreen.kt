@@ -133,10 +133,15 @@ private fun PlaceItem(
 	onToggleFavoriteClicked: () -> Unit
 ) {
 	Column {
-		Surface(modifier = Modifier.padding(horizontal = 16.dp)) {
+		Surface {
 			Column {
 				Spacer(modifier = Modifier.height(16.dp))
-				Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+				Row(
+					modifier = Modifier
+						.padding(horizontal = 4.dp)
+						.fillMaxWidth(),
+					verticalAlignment = Alignment.CenterVertically
+				) {
 					IconButton(onClick = onToggleFavoriteClicked) {
 						Icon(if (place.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder, contentDescription = null)
 					}
@@ -146,11 +151,19 @@ private fun PlaceItem(
 					}
 				}
 				CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-					Text(text = place.position.asText(), style = MaterialTheme.typography.overline)
+					Text(
+						modifier = Modifier.padding(horizontal = 16.dp),
+						text = place.position.asText(),
+						style = MaterialTheme.typography.overline
+					)
 				}
 				Spacer(modifier = Modifier.height(2.dp))
 				if (contentType != MainState.ContentType.NEAR) {
-					Column (modifier = Modifier.wrapContentWidth()) {
+					Column(
+						modifier = Modifier
+							.padding(horizontal = 16.dp)
+							.wrapContentWidth()
+					) {
 						TagRow(tags = place.categories.map { it.asText() }) {
 							CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
 								Text(
@@ -168,7 +181,7 @@ private fun PlaceItem(
 					}
 					Spacer(modifier = Modifier.height(6.dp))
 				}
-				TagRow(tags = place.tags) {
+				TagRow(modifier = Modifier.padding(horizontal = 16.dp), tags = place.tags) {
 					CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
 						Text(
 							text = it,
@@ -183,7 +196,7 @@ private fun PlaceItem(
 					}
 				}
 				Spacer(modifier = Modifier.height(6.dp))
-				PlaceImage(url = place.imageUrl, rating = place.rating)
+				PlaceImage(modifier = Modifier.padding(horizontal = 16.dp), url = place.imageUrl, rating = place.rating)
 				Spacer(modifier = Modifier.height(16.dp))
 			}
 		}
@@ -192,9 +205,9 @@ private fun PlaceItem(
 }
 
 @Composable
-fun PlaceImage(url: String, rating: Float) {
+fun PlaceImage(modifier: Modifier = Modifier, url: String, rating: Float) {
 	Box(
-		modifier = Modifier
+		modifier = modifier
 			.background(color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.medium), RoundedCornerShape(4.dp))
 			.aspectRatio(4f / 3f)
 			.fillMaxWidth()

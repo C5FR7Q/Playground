@@ -10,8 +10,9 @@ import androidx.compose.ui.unit.dp
 import kotlin.math.max
 
 @Composable
-fun TagRow(tags: Collection<String>, item: @Composable (String) -> Unit) {
+fun TagRow(modifier: Modifier = Modifier, tags: Collection<String>, item: @Composable (String) -> Unit) {
 	SimpleFlowRow(
+		modifier = modifier,
 		verticalGap = 6.dp,
 		horizontalGap = 6.dp,
 	) {
