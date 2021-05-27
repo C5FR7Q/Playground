@@ -8,8 +8,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor() : BaseViewModel<SettingsState, SettingsIntent>() {
-	override val mutableState = MutableStateFlow(SettingsState())
-
 	override fun handleIntent(intent: BaseIntent.Default) {
 		super.handleIntent(intent)
 		if (intent is BaseIntent.Default.Init) {

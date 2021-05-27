@@ -8,8 +8,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class BlockedViewModel @Inject constructor() : BaseViewModel<BlockedState, BlockedIntent>() {
-	override val mutableState = MutableStateFlow(BlockedState())
-
 	override fun handleIntent(intent: BaseIntent.Default) {
 		super.handleIntent(intent)
 		if (intent is BaseIntent.Default.Init) {

@@ -10,18 +10,21 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import java.lang.reflect.ParameterizedType
 import javax.inject.Inject
 
+@Suppress("UNCHECKED_CAST")
 abstract class BaseViewModel<State, Intent : BaseIntent> : ViewModel() {
 	@Inject
 	lateinit var navigationManager: NavigationManager
 
 	private val intentFlow = MutableSharedFlow<BaseIntent>()
 
-	protected abstract val mutableState: MutableStateFlow<State>
+	private val stateType = (javaClass.genericSuperclass as ParameterizedType).actualTypeArguments[0] as Class<State>
+	private val mutableState = MutableStateFlow(Class.forName(stateType.name).newInstance() as State)
+
 	val state: StateFlow<State> get() = mutableState
 
-	@Suppress("UNCHECKED_CAST")
 	@CallSuper
 	open fun attach() {
 		viewModelScope.launch {

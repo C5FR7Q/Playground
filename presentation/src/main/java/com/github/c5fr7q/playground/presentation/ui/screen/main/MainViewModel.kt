@@ -14,8 +14,6 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
 	private val placeRepository: PlaceRepository
 ) : BaseViewModel<MainState, MainIntent>() {
-	override val mutableState: MutableStateFlow<MainState> = MutableStateFlow(MainState())
-
 	private val placesSource = MutableStateFlow(MainState.ContentType.PREVIOUS)
 
 	override fun handleIntent(intent: BaseIntent.Default) {
