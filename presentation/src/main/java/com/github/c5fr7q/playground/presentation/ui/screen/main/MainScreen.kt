@@ -63,64 +63,62 @@ private fun MainScreen(
 	onCategoryToggle: (Place.Category) -> Unit,
 	onToggleItemFavorite: (Place) -> Unit
 ) {
-	Box {
-		Scaffold(
-			topBar = {
-				TopBar(
-					titleRes = when (state.contentType) {
-						MainState.ContentType.PREVIOUS -> R.string.previous
-						MainState.ContentType.NEAR -> R.string.near_you
-						MainState.ContentType.FAVORITE -> R.string.favorite
-					},
-					selectedCategories = state.selectedCategories,
-					onCategoryToggle = onCategoryToggle
-				)
-			},
-			bottomBar = {
-				BottomBar(
-					contentType = state.contentType,
-					onLikeClick = onLikeClick,
-					onPreviousClick = onPreviousClick,
-					onBlockedClick = onBlockedClick,
-					onSettingsClick = onSettingsClick
-				)
-			},
-			floatingActionButton = {
-				if (state.selectedCategories.isNotEmpty()) {
-					FloatingActionButton(onClick = onRefreshClick) {
-						Icon(Icons.Default.Refresh, contentDescription = null)
-					}
+	Scaffold(
+		topBar = {
+			TopBar(
+				titleRes = when (state.contentType) {
+					MainState.ContentType.PREVIOUS -> R.string.previous
+					MainState.ContentType.NEAR -> R.string.near_you
+					MainState.ContentType.FAVORITE -> R.string.favorite
+				},
+				selectedCategories = state.selectedCategories,
+				onCategoryToggle = onCategoryToggle
+			)
+		},
+		bottomBar = {
+			BottomBar(
+				contentType = state.contentType,
+				onLikeClick = onLikeClick,
+				onPreviousClick = onPreviousClick,
+				onBlockedClick = onBlockedClick,
+				onSettingsClick = onSettingsClick
+			)
+		},
+		floatingActionButton = {
+			if (state.selectedCategories.isNotEmpty()) {
+				FloatingActionButton(onClick = onRefreshClick) {
+					Icon(Icons.Default.Refresh, contentDescription = null)
 				}
-			},
-			floatingActionButtonPosition = FabPosition.Center,
-			isFloatingActionButtonDocked = true
-		) { innerPadding ->
-			Box {
-				LazyColumn(modifier = Modifier.fillMaxSize()) {
-					val places = state.places
-					if (places.isNotEmpty()) {
-						val lastIndex = places.lastIndex
-						itemsIndexed(places) { index, item ->
-							if (index == lastIndex) {
-								LaunchedEffect(null) {
-									onLoadMore()
-								}
+			}
+		},
+		floatingActionButtonPosition = FabPosition.Center,
+		isFloatingActionButtonDocked = true
+	) { innerPadding ->
+		Box {
+			LazyColumn(modifier = Modifier.fillMaxSize()) {
+				val places = state.places
+				if (places.isNotEmpty()) {
+					val lastIndex = places.lastIndex
+					itemsIndexed(places) { index, item ->
+						if (index == lastIndex) {
+							LaunchedEffect(null) {
+								onLoadMore()
 							}
-							PlaceItem(
-								contentType = state.contentType,
-								place = item,
-								onToggleFavoriteClicked = { onToggleItemFavorite(item) }
-							)
 						}
+						PlaceItem(
+							contentType = state.contentType,
+							place = item,
+							onToggleFavoriteClicked = { onToggleItemFavorite(item) }
+						)
 					}
 				}
-				if (state.isLoading) {
-					LinearProgressIndicator(
-						modifier = Modifier
-							.align(Alignment.TopCenter)
-							.fillMaxWidth()
-					)
-				}
+			}
+			if (state.isLoading) {
+				LinearProgressIndicator(
+					modifier = Modifier
+						.align(Alignment.TopCenter)
+						.fillMaxWidth()
+				)
 			}
 		}
 	}
@@ -205,7 +203,7 @@ private fun PlaceItem(
 }
 
 @Composable
-fun PlaceImage(modifier: Modifier = Modifier, url: String, rating: Float) {
+private fun PlaceImage(modifier: Modifier = Modifier, url: String, rating: Float) {
 	Box(
 		modifier = modifier
 			.background(color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.medium), RoundedCornerShape(4.dp))
