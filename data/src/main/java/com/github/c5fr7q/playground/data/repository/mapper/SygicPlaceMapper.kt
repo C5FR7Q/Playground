@@ -18,7 +18,8 @@ class SygicPlaceMapper @Inject constructor() {
 					categories = mapStringsToCategories(categories),
 					tags = tags,
 					imageUrl = thumbnailUrl ?: "",
-					position = place.location.run { Position(lon, lat) }
+					position = place.location.run { Position(lon, lat) },
+					false
 				)
 			}
 		}

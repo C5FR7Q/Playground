@@ -15,4 +15,5 @@
 	<string name = "sleeping">Sleeping</string>
 	<string name = "doing_sports">Doing sports</string>
 	<string name = "traveling">Traveling</string>
+	<string name = "favorite_places">Favorite places</string>
 </resources>

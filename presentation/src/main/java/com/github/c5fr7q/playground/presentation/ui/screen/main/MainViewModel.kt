@@ -1,8 +1,7 @@
 package com.github.c5fr7q.playground.presentation.ui.screen.main
 
-import android.util.Log
 import androidx.lifecycle.viewModelScope
-import com.github.c5fr7q.playground.domain.entity.PlacesStatus
+import com.github.c5fr7q.playground.domain.entity.UpdatedPlacesStatus
 import com.github.c5fr7q.playground.domain.repository.PlaceRepository
 import com.github.c5fr7q.playground.presentation.manager.NavigationManager
 import com.github.c5fr7q.playground.presentation.ui.base.BaseViewModel
@@ -18,7 +17,7 @@ class MainViewModel @Inject constructor(
 ) : BaseViewModel<MainState, MainIntent>() {
 	override val mutableState: MutableStateFlow<MainState> = MutableStateFlow(MainState())
 
-	private val shouldUsePreviousPlaces = MutableStateFlow(true)
+	private val placesSource = MutableStateFlow(MainState.ContentType.PREVIOUS)
 
 	override fun attach() {
 		super.attach()
@@ -33,60 +32,74 @@ class MainViewModel @Inject constructor(
 						copy(isLoading = true)
 					}
 				}
-				shouldUsePreviousPlaces
-					.flatMapLatest { if (it) flow { emit(placeRepository.getPreviousPlaces()) } else emptyFlow() }
+				placesSource
+					.map { it == MainState.ContentType.PREVIOUS }
+					.distinctUntilChanged()
+					.flatMapLatest { if (it) placeRepository.getPreviousPlaces() else emptyFlow() }
 					.onEach {
-						if (it.isNotEmpty()) {
-							updateState {
-								copy(places = it, usesPreviousPlaces = true, isLoading = false)
-							}
-						} else {
-							updateState { copy(isLoading = false) }
-							// TODO: 21.05.2021 Display nothing prev found?
+						updateState {
+							copy(places = it, contentType = MainState.ContentType.PREVIOUS, isLoading = false)
 						}
+						// TODO: 21.05.2021 Display nothing prev found?
 					}.launchIn(viewModelScope)
 
-				shouldUsePreviousPlaces
-					.flatMapLatest { if (it) emptyFlow() else placeRepository.getPlacesStatus() }
-					.combine(placeRepository.getPlaces()) { status, places -> status to places }
+				placesSource
+					.map { it == MainState.ContentType.FAVORITE }
+					.distinctUntilChanged()
+					.flatMapLatest { if (it) placeRepository.getFavoritePlaces() else emptyFlow() }
+					.onEach {
+						updateState {
+							copy(places = it, contentType = MainState.ContentType.FAVORITE, isLoading = false)
+						}
+						// TODO: 21.05.2021 Display nothing favorite found?
+					}.launchIn(viewModelScope)
+
+				placesSource
+					.map { it == MainState.ContentType.NEAR }
+					.distinctUntilChanged()
+					.flatMapLatest { if (it) placeRepository.getUpdatedPlacesStatus() else emptyFlow() }
+					.combine(placeRepository.getUpdatedPlaces()) { status, places -> status to places }
 					.onEach { (status, places) ->
 						when (status) {
-							PlacesStatus.LOADED -> {
+							UpdatedPlacesStatus.LOADED -> {
 								updateState {
 									copy(
 										isLoading = false,
 										places = places,
-										usesPreviousPlaces = false
+										contentType = MainState.ContentType.NEAR
 										// TODO: 21.05.2021 Show empty results if need
 									)
 								}
 							}
-							PlacesStatus.FAILED -> {
+							UpdatedPlacesStatus.FAILED -> {
 								updateState { copy(isLoading = false) }
+								placesSource.value = state.value.contentType
 								// TODO: 21.05.2021 Show something went wrong
 							}
-							PlacesStatus.LOADING -> Unit
+							UpdatedPlacesStatus.LOADING -> Unit
 						}
 					}.launchIn(viewModelScope)
 			}
 			MainIntent.LoadMore -> {
-				if (!state.value.usesPreviousPlaces) {
+				if (state.value.contentType == MainState.ContentType.NEAR) {
 					placeRepository.loadMorePlaces()
 					updateState { copy(isLoading = true) }
 				}
 			}
-			MainIntent.ClickLike -> TODO("")
+			MainIntent.ClickLike -> {
+				placesSource.value = MainState.ContentType.FAVORITE
+			}
 			MainIntent.ClickSettings -> TODO("")
 			MainIntent.ClickPrevious -> {
-				shouldUsePreviousPlaces.value = true
+				placesSource.value = MainState.ContentType.PREVIOUS
 			}
 			MainIntent.ClickRefresh -> {
 				viewModelScope.launch {
 					val selectedCategories = state.value.selectedCategories
 					if (selectedCategories.isNotEmpty()) {
-						if (placeRepository.tryRefreshPlaces(selectedCategories)) {
+						if (placeRepository.updatePlaces(selectedCategories)) {
 							updateState { copy(isLoading = true) }
-							shouldUsePreviousPlaces.value = false
+							placesSource.value = MainState.ContentType.NEAR
 						} else {
 							// TODO: 21.05.2021 Display "You're too close"
 						}
@@ -106,6 +119,9 @@ class MainViewModel @Inject constructor(
 					}
 					copy(selectedCategories = newCategories)
 				}
+			}
+			is MainIntent.ToggleItemFavorite -> {
+				placeRepository.toggleFavoriteState(intent.place)
 			}
 		}
 	}

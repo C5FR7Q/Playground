@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.runtime.*
@@ -47,6 +48,7 @@ fun MainScreen(viewModel: MainViewModel) {
 		onSettingsClick = { viewModel.produceIntent(MainIntent.ClickSettings) },
 		onRefreshClick = { viewModel.produceIntent(MainIntent.ClickRefresh) },
 		onCategoryToggle = { viewModel.produceIntent(MainIntent.ToggleCategory(it)) },
+		onToggleItemFavorite = { viewModel.produceIntent(MainIntent.ToggleItemFavorite(it)) },
 	)
 }
 
@@ -59,17 +61,29 @@ private fun MainScreen(
 	onSettingsClick: () -> Unit,
 	onRefreshClick: () -> Unit,
 	onCategoryToggle: (Place.Category) -> Unit,
+	onToggleItemFavorite: (Place) -> Unit
 ) {
 	Box {
 		Scaffold(
 			topBar = {
 				TopBar(
-					titleRes = if (state.usesPreviousPlaces) R.string.previous_places else R.string.near_you,
+					titleRes = when (state.contentType) {
+						MainState.ContentType.PREVIOUS -> R.string.previous_places
+						MainState.ContentType.NEAR -> R.string.near_you
+						MainState.ContentType.FAVORITE -> R.string.favorite_places
+					},
 					selectedCategories = state.selectedCategories,
 					onCategoryToggle = onCategoryToggle
 				)
 			},
-			bottomBar = { BottomBar(onLikeClick, onPreviousClick, onSettingsClick) },
+			bottomBar = {
+				BottomBar(
+					contentType = state.contentType,
+					onLikeClick = onLikeClick,
+					onPreviousClick = onPreviousClick,
+					onSettingsClick = onSettingsClick
+				)
+			},
 			floatingActionButton = {
 				if (state.selectedCategories.isNotEmpty()) {
 					FloatingActionButton(onClick = onRefreshClick) {
@@ -91,7 +105,10 @@ private fun MainScreen(
 									onLoadMore()
 								}
 							}
-							PlaceItem(item)
+							PlaceItem(
+								place = item,
+								onToggleFavoriteClicked = { onToggleItemFavorite(item) }
+							)
 						}
 					}
 				}
@@ -108,13 +125,22 @@ private fun MainScreen(
 }
 
 @Composable
-private fun PlaceItem(place: Place) {
+private fun PlaceItem(
+	place: Place,
+	onToggleFavoriteClicked: () -> Unit
+) {
 	Column {
 		Surface(modifier = Modifier.padding(horizontal = 16.dp)) {
 			Column {
 				Spacer(modifier = Modifier.height(16.dp))
-				CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
-					Text(text = place.name, style = MaterialTheme.typography.h4)
+				Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+					IconButton(onClick = onToggleFavoriteClicked) {
+						Icon(if (place.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder, contentDescription = null)
+					}
+					Spacer(modifier = Modifier.height(6.dp))
+					CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
+						Text(text = place.name, style = MaterialTheme.typography.h4)
+					}
 				}
 				CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
 					Text(text = place.position.asText(), style = MaterialTheme.typography.overline)
@@ -241,6 +267,7 @@ private fun TopBar(
 
 @Composable
 private fun BottomBar(
+	contentType: MainState.ContentType,
 	onLikeClick: () -> Unit,
 	onPreviousClick: () -> Unit,
 	onSettingsClick: () -> Unit
@@ -251,8 +278,10 @@ private fun BottomBar(
 			cutoutShape = CircleShape
 		) {
 			Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-				IconButton(onClick = onLikeClick) {
-					Icon(Icons.Default.Favorite, contentDescription = null)
+				if (contentType != MainState.ContentType.FAVORITE) {
+					IconButton(onClick = onLikeClick) {
+						Icon(Icons.Default.Favorite, contentDescription = null)
+					}
 				}
 				IconButton(onClick = { showMenu = true }) {
 					Icon(Icons.Default.MoreVert, contentDescription = null)
@@ -260,11 +289,13 @@ private fun BottomBar(
 						expanded = showMenu,
 						onDismissRequest = { showMenu = false })
 					{
-						DropdownMenuItem(onClick = {
-							showMenu = false
-							onPreviousClick()
-						}) {
-							Text(text = stringResource(id = R.string.show_previous_places))
+						if (contentType != MainState.ContentType.PREVIOUS) {
+							DropdownMenuItem(onClick = {
+								showMenu = false
+								onPreviousClick()
+							}) {
+								Text(text = stringResource(id = R.string.show_previous_places))
+							}
 						}
 						DropdownMenuItem(onClick = {
 							showMenu = false

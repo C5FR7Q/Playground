@@ -14,5 +14,6 @@ data class PlaceDto(
 	val imageUrl: String,
 	val lat: Float,
 	val lon: Float,
-	val createdDate: Long
+	val createdDate: Long,
+	val isFavorite: Boolean
 )

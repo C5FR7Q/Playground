@@ -4,7 +4,13 @@ import com.github.c5fr7q.playground.domain.entity.Place
 
 data class MainState(
 	val isLoading: Boolean = false,
-	val usesPreviousPlaces: Boolean = true,
+	val contentType: ContentType = ContentType.PREVIOUS,
 	val places: List<Place> = emptyList(),
 	val selectedCategories: List<Place.Category> = emptyList()
-)
+) {
+	enum class ContentType {
+		PREVIOUS,
+		NEAR,
+		FAVORITE
+	}
+}

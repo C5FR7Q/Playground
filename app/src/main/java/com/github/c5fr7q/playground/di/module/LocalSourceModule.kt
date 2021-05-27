@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.github.c5fr7q.playground.data.source.local.Storage
 import com.github.c5fr7q.playground.data.source.local.database.AppDatabase
 import com.github.c5fr7q.playground.data.source.local.database.dao.PlaceDao
+import com.github.c5fr7q.playground.data.source.local.database.migrations
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -25,7 +26,9 @@ abstract class LocalSourceModule {
 		@Singleton
 		@Provides
 		fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase {
-			return Room.databaseBuilder(context, AppDatabase::class.java, "app_db").build()
+			return Room.databaseBuilder(context, AppDatabase::class.java, "app_db")
+				.addMigrations(*migrations)
+				.build()
 		}
 
 		@Singleton

@@ -10,14 +10,17 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface PlaceDao {
 	@Query("SELECT * FROM place")
-	suspend fun getAllPlacesOnce(): List<PlaceDto>
-
-	@Query("SELECT * FROM place")
 	fun getAllPlaces(): Flow<List<PlaceDto>>
 
 	@Insert(onConflict = OnConflictStrategy.IGNORE)
 	suspend fun addPlaces(places: List<PlaceDto>)
 
-	@Query("DELETE FROM place WHERE createdDate < :minDate")
+	@Query("DELETE FROM place WHERE createdDate < :minDate AND isFavorite = 0")
 	suspend fun deleteOutdated(minDate: Long)
+
+	@Query("UPDATE place SET isFavorite = 1 WHERE id == :placeId")
+	suspend fun addPlaceToFavorite(placeId: String)
+
+	@Query("UPDATE place SET isFavorite = 0 WHERE id == :placeId")
+	suspend fun removePlaceFromFavorite(placeId: String)
 }
