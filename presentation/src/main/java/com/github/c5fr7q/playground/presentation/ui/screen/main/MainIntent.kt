@@ -1,9 +1,9 @@
 package com.github.c5fr7q.playground.presentation.ui.screen.main
 
 import com.github.c5fr7q.playground.domain.entity.Place
+import com.github.c5fr7q.playground.presentation.ui.base.BaseIntent
 
-sealed class MainIntent {
-	object Init : MainIntent()
+sealed class MainIntent : BaseIntent {
 	object LoadMore : MainIntent()
 	object ClickLike : MainIntent()
 	object ClickPrevious : MainIntent()

@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.github.c5fr7q.playground.presentation.R
-import com.github.c5fr7q.playground.presentation.ui.screen.blocked.BlockedState
+import com.github.c5fr7q.playground.presentation.ui.base.BaseIntent
 import com.google.accompanist.insets.statusBarsHeight
 
 @Composable
@@ -22,7 +22,7 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
 	val state by viewModel.state.collectAsState()
 	SettingsScreen(
 		state = state,
-		onBackClick = { viewModel.produceIntent(SettingsIntent.ClickBack) }
+		onBackClick = { viewModel.produceIntent(BaseIntent.Default.ClickBack) }
 	)
 }
 

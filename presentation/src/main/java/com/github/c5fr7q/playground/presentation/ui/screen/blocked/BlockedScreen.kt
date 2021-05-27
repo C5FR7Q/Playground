@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.github.c5fr7q.playground.presentation.R
+import com.github.c5fr7q.playground.presentation.ui.base.BaseIntent
 import com.google.accompanist.insets.statusBarsHeight
 
 @Composable
@@ -21,7 +22,7 @@ fun BlockedScreen(viewModel: BlockedViewModel) {
 	val state by viewModel.state.collectAsState()
 	BlockedScreen(
 		state = state,
-		onBackClick = { viewModel.produceIntent(BlockedIntent.ClickBack) }
+		onBackClick = { viewModel.produceIntent(BaseIntent.Default.ClickBack) }
 	)
 }
 
