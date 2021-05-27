@@ -68,9 +68,9 @@ private fun MainScreen(
 			topBar = {
 				TopBar(
 					titleRes = when (state.contentType) {
-						MainState.ContentType.PREVIOUS -> R.string.previous_places
+						MainState.ContentType.PREVIOUS -> R.string.previous
 						MainState.ContentType.NEAR -> R.string.near_you
-						MainState.ContentType.FAVORITE -> R.string.favorite_places
+						MainState.ContentType.FAVORITE -> R.string.favorite
 					},
 					selectedCategories = state.selectedCategories,
 					onCategoryToggle = onCategoryToggle
