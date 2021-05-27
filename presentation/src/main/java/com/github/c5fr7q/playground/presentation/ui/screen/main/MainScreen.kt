@@ -12,10 +12,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -244,6 +241,7 @@ private fun TopBar(
 	selectedCategories: List<Place.Category>,
 	onCategoryToggle: (Place.Category) -> Unit
 ) {
+	var filterIsActive by remember { mutableStateOf(true) }
 	Column {
 		Box(
 			modifier = Modifier
@@ -260,43 +258,50 @@ private fun TopBar(
 					)
 				}
 			},
+			actions = {
+				IconButton(onClick = { filterIsActive = !filterIsActive }) {
+					Icon(Icons.Default.FilterList, contentDescription = null)
+				}
+			},
 			backgroundColor = MaterialTheme.colors.surface,
 			contentColor = MaterialTheme.colors.onSurface,
 			elevation = 0.dp
 		)
 		Divider()
-		LazyRow(modifier = Modifier.padding(vertical = 6.dp)) {
-			val allCategories = Place.Category.values()
-			val lastIndex = allCategories.lastIndex
-			itemsIndexed(allCategories) { index, category ->
-				val selected = selectedCategories.contains(category)
-				if (selected) {
-					Button(
-						modifier = Modifier.padding(
-							start = if (index == 0) 16.dp else 0.dp,
-							end = if (index == lastIndex) 16.dp else 6.dp
-						),
-						contentPadding = PaddingValues(4.dp),
-						onClick = { onCategoryToggle(category) }
-					) {
-						Text(text = category.asText(), style = MaterialTheme.typography.button)
-					}
-				} else {
-					OutlinedButton(
-						modifier = Modifier.padding(
-							start = if (index == 0) 16.dp else 0.dp,
-							end = if (index == lastIndex) 16.dp else 6.dp,
-						),
-						contentPadding = PaddingValues(4.dp),
-						onClick = { onCategoryToggle(category) },
-						border = BorderStroke(ButtonDefaults.OutlinedBorderSize, MaterialTheme.colors.primary)
-					) {
-						Text(text = category.asText(), style = MaterialTheme.typography.button, color = MaterialTheme.colors.primary)
+		if (filterIsActive) {
+			LazyRow(modifier = Modifier.padding(vertical = 6.dp)) {
+				val allCategories = Place.Category.values()
+				val lastIndex = allCategories.lastIndex
+				itemsIndexed(allCategories) { index, category ->
+					val selected = selectedCategories.contains(category)
+					if (selected) {
+						Button(
+							modifier = Modifier.padding(
+								start = if (index == 0) 16.dp else 0.dp,
+								end = if (index == lastIndex) 16.dp else 6.dp
+							),
+							contentPadding = PaddingValues(4.dp),
+							onClick = { onCategoryToggle(category) }
+						) {
+							Text(text = category.asText(), style = MaterialTheme.typography.button)
+						}
+					} else {
+						OutlinedButton(
+							modifier = Modifier.padding(
+								start = if (index == 0) 16.dp else 0.dp,
+								end = if (index == lastIndex) 16.dp else 6.dp,
+							),
+							contentPadding = PaddingValues(4.dp),
+							onClick = { onCategoryToggle(category) },
+							border = BorderStroke(ButtonDefaults.OutlinedBorderSize, MaterialTheme.colors.primary)
+						) {
+							Text(text = category.asText(), style = MaterialTheme.typography.button, color = MaterialTheme.colors.primary)
+						}
 					}
 				}
 			}
+			Divider()
 		}
-		Divider()
 	}
 }
 
