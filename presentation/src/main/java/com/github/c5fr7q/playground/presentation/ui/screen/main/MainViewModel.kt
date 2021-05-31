@@ -5,6 +5,8 @@ import com.github.c5fr7q.playground.domain.entity.UpdatedPlacesStatus
 import com.github.c5fr7q.playground.domain.repository.PlaceRepository
 import com.github.c5fr7q.playground.presentation.ui.base.BaseIntent
 import com.github.c5fr7q.playground.presentation.ui.base.BaseViewModel
+import com.github.c5fr7q.playground.presentation.util.combine
+import com.github.c5fr7q.playground.presentation.util.flatMapLatestOnTrue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -26,7 +28,7 @@ class MainViewModel @Inject constructor(
 			placesSource
 				.map { it == MainState.ContentType.PREVIOUS }
 				.distinctUntilChanged()
-				.flatMapLatest { if (it) placeRepository.getPreviousPlaces() else emptyFlow() }
+				.flatMapLatestOnTrue(placeRepository.getPreviousPlaces())
 				.flatMapLatest { places ->
 					state
 						.map { it.selectedCategories }
@@ -43,7 +45,7 @@ class MainViewModel @Inject constructor(
 			placesSource
 				.map { it == MainState.ContentType.FAVORITE }
 				.distinctUntilChanged()
-				.flatMapLatest { if (it) placeRepository.getFavoritePlaces() else emptyFlow() }
+				.flatMapLatestOnTrue(placeRepository.getFavoritePlaces())
 				.flatMapLatest { places ->
 					state
 						.map { it.selectedCategories }
@@ -60,8 +62,8 @@ class MainViewModel @Inject constructor(
 			placesSource
 				.map { it == MainState.ContentType.NEAR }
 				.distinctUntilChanged()
-				.flatMapLatest { if (it) placeRepository.getUpdatedPlacesStatus() else emptyFlow() }
-				.combine(placeRepository.getUpdatedPlaces()) { status, places -> status to places }
+				.flatMapLatestOnTrue(placeRepository.getUpdatedPlacesStatus())
+				.combine(placeRepository.getUpdatedPlaces())
 				.onEach { (status, places) ->
 					when (status) {
 						UpdatedPlacesStatus.LOADED -> {
