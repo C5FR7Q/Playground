@@ -12,4 +12,5 @@ sealed class MainIntent : BaseIntent {
 	object ClickRefresh : MainIntent()
 	data class ToggleCategory(val category: Place.Category) : MainIntent()
 	data class ToggleItemFavorite(val place: Place) : MainIntent()
+	data class ClickBlock(val place: Place) : MainIntent()
 }

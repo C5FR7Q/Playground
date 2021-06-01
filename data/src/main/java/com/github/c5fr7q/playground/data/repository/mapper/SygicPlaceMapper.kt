@@ -19,7 +19,8 @@ class SygicPlaceMapper @Inject constructor() {
 					tags = tags,
 					imageUrl = thumbnailUrl ?: "",
 					position = place.location.run { Position(lon, lat) },
-					false
+					isFavorite = false,
+					isBlocked = false
 				)
 			}
 		}

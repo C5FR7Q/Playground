@@ -14,4 +14,8 @@ interface PlaceRepository {
 
 	fun toggleFavoriteState(place: Place)
 	fun getFavoritePlaces(): Flow<List<Place>>
+
+	fun blockPlace(place: Place)
+	fun unblockPlaces(places: List<Place>)
+	fun getBlockedPlaces(): Flow<List<Place>>
 }

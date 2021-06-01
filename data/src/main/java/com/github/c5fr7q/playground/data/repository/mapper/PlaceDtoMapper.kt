@@ -20,7 +20,8 @@ class PlaceDtoMapper @Inject constructor() {
 				lat = position.lat,
 				lon = position.lon,
 				createdDate = Date.from(Instant.now()).time,
-				isFavorite = isFavorite
+				isFavorite = isFavorite,
+				isBlocked = isBlocked
 			)
 		}
 	}
@@ -35,7 +36,8 @@ class PlaceDtoMapper @Inject constructor() {
 				tags = mapStringToTags(tags),
 				imageUrl = imageUrl,
 				position = Position(lon, lat),
-				isFavorite = isFavorite
+				isFavorite = isFavorite,
+				isBlocked = isBlocked
 			)
 		}
 	}

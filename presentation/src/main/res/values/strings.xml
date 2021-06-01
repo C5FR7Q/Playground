@@ -16,4 +16,5 @@
 	<string name = "traveling">Traveling</string>
 	<string name = "favorite">Favorite</string>
 	<string name = "blocked">Blocked</string>
+	<string name = "block">Block</string>
 </resources>

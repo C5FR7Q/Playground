@@ -134,6 +134,9 @@ class MainViewModel @Inject constructor(
 			is MainIntent.ToggleItemFavorite -> {
 				placeRepository.toggleFavoriteState(intent.place)
 			}
+			is MainIntent.ClickBlock -> {
+				placeRepository.blockPlace(intent.place)
+			}
 		}
 	}
 }

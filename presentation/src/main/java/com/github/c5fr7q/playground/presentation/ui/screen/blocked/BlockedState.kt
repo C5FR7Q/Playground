@@ -1,3 +1,9 @@
 package com.github.c5fr7q.playground.presentation.ui.screen.blocked
 
-data class BlockedState(val a: Int = 0)
+import com.github.c5fr7q.playground.domain.entity.Place
+
+data class BlockedState(
+	val places: List<Place> = emptyList(),
+	val selectedPlaces: List<Place> = emptyList(),
+	val selectedCategories: List<Place.Category> = emptyList()
+)

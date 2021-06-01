@@ -23,4 +23,10 @@ interface PlaceDao {
 
 	@Query("UPDATE place SET isFavorite = 0 WHERE id == :placeId")
 	suspend fun removePlaceFromFavorite(placeId: String)
+
+	@Query("UPDATE place SET isBlocked = 1 WHERE id == :placeId")
+	suspend fun addPlaceToBlocked(placeId: String)
+
+	@Query("UPDATE place SET isBlocked = 0 WHERE id IN (:placeIds)")
+	suspend fun removePlacesFromBlocked(placeIds: List<String>)
 }

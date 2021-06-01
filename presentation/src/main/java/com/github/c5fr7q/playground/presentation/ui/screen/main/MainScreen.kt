@@ -20,10 +20,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.github.c5fr7q.playground.domain.entity.Place
-import com.github.c5fr7q.playground.domain.entity.Position
 import com.github.c5fr7q.playground.presentation.R
 import com.github.c5fr7q.playground.presentation.ui.theme.Purple900
 import com.github.c5fr7q.playground.presentation.ui.util.TagRow
+import com.github.c5fr7q.playground.presentation.ui.util.asText
 import com.google.accompanist.coil.rememberCoilPainter
 import com.google.accompanist.insets.navigationBarsHeight
 import com.google.accompanist.insets.statusBarsHeight
@@ -42,6 +42,7 @@ fun MainScreen(viewModel: MainViewModel) {
 		onRefreshClick = { viewModel.produceIntent(MainIntent.ClickRefresh) },
 		onCategoryToggle = { viewModel.produceIntent(MainIntent.ToggleCategory(it)) },
 		onToggleItemFavorite = { viewModel.produceIntent(MainIntent.ToggleItemFavorite(it)) },
+		onBlockClick = { viewModel.produceIntent(MainIntent.ClickBlock(it)) },
 	)
 }
 
@@ -55,7 +56,8 @@ private fun MainScreen(
 	onSettingsClick: () -> Unit,
 	onRefreshClick: () -> Unit,
 	onCategoryToggle: (Place.Category) -> Unit,
-	onToggleItemFavorite: (Place) -> Unit
+	onToggleItemFavorite: (Place) -> Unit,
+	onBlockClick: (Place) -> Unit
 ) {
 	Scaffold(
 		topBar = {
@@ -102,7 +104,8 @@ private fun MainScreen(
 						PlaceItem(
 							contentType = state.contentType,
 							place = item,
-							onToggleFavoriteClick = { onToggleItemFavorite(item) }
+							onToggleFavoriteClick = { onToggleItemFavorite(item) },
+							onBlockClick = { onBlockClick(item) }
 						)
 					}
 				}
@@ -122,7 +125,8 @@ private fun MainScreen(
 private fun PlaceItem(
 	contentType: MainState.ContentType,
 	place: Place,
-	onToggleFavoriteClick: () -> Unit
+	onToggleFavoriteClick: () -> Unit,
+	onBlockClick: () -> Unit
 ) {
 	Column {
 		Surface {
@@ -134,13 +138,30 @@ private fun PlaceItem(
 						.fillMaxWidth(),
 					verticalAlignment = Alignment.CenterVertically
 				) {
+					var showMenu by remember { mutableStateOf(false) }
 					IconButton(onClick = onToggleFavoriteClick) {
 						Icon(if (place.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder, contentDescription = null)
 					}
-					Spacer(modifier = Modifier.height(6.dp))
+					Spacer(modifier = Modifier.size(6.dp))
 					CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
-						Text(text = place.name, style = MaterialTheme.typography.h4)
+						Text(modifier = Modifier.weight(1f), text = place.name, style = MaterialTheme.typography.h4)
 					}
+					Spacer(modifier = Modifier.size(6.dp))
+					IconButton(onClick = { showMenu = true }) {
+						Icon(Icons.Default.MoreVert, contentDescription = null)
+						DropdownMenu(
+							expanded = showMenu,
+							onDismissRequest = { showMenu = false })
+						{
+							DropdownMenuItem(onClick = {
+								showMenu = false
+								onBlockClick()
+							}) {
+								Text(text = stringResource(id = R.string.block))
+							}
+						}
+					}
+
 				}
 				CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
 					Text(
@@ -356,25 +377,4 @@ private fun BottomBar(
 				.background(MaterialTheme.colors.primary)
 		)
 	}
-}
-
-private fun Position.asText() = "%.5f".format(Locale.US, lon) + "," + "%.5f".format(Locale.US, lat)
-
-@Composable
-private fun Place.Category.asText(): String {
-	return stringResource(
-		when (this) {
-			Place.Category.DISCOVERING -> R.string.discovering
-			Place.Category.EATING -> R.string.eating
-			Place.Category.GOING_OUT -> R.string.going_out
-			Place.Category.HIKING -> R.string.hiking
-			Place.Category.PLAYING -> R.string.playing
-			Place.Category.RELAXING -> R.string.relaxing
-			Place.Category.SHOPPING -> R.string.shopping
-			Place.Category.SIGHTSEEING -> R.string.sightseeing
-			Place.Category.SLEEPING -> R.string.sleeping
-			Place.Category.DOING_SPORTS -> R.string.doing_sports
-			Place.Category.TRAVELING -> R.string.traveling
-		}
-	)
 }

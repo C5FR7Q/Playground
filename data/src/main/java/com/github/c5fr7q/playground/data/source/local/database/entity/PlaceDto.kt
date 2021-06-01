@@ -17,5 +17,7 @@ data class PlaceDto(
 	val lon: Float,
 	val createdDate: Long,
 	@ColumnInfo(defaultValue = "0")
-	val isFavorite: Boolean
+	val isFavorite: Boolean,
+	@ColumnInfo(defaultValue = "0")
+	val isBlocked: Boolean
 )

@@ -52,7 +52,9 @@ class PlaceRepositoryImpl @Inject constructor(
 			.launchIn(generalScope)
 	}
 
-	override fun getPreviousPlaces() = placeDao.getAllPlaces().map { list -> list.map { placeDtoMapper.mapDtoToPlace(it) } }
+	override fun getPreviousPlaces() = placeDao.getAllPlaces().map { list ->
+		list.map { placeDtoMapper.mapDtoToPlace(it) }.filter { !it.isBlocked }
+	}
 
 	override fun updatePlaces(categories: List<Place.Category>) {
 		val canRefreshPlaces = requestedCategories == null ||
@@ -83,6 +85,9 @@ class PlaceRepositoryImpl @Inject constructor(
 				val favoritePlacesIds = previousPlaces.filter { it.isFavorite }.map { it.id }
 				places.updateFavorites(favoritePlacesIds)
 			}
+		}.combine(getBlockedPlaces()) { places, blockedPlaces ->
+			val blockedPlacesIds = blockedPlaces.map { it.id }
+			places.filter { !blockedPlacesIds.contains(it.id) }
 		}
 	}
 
@@ -127,6 +132,22 @@ class PlaceRepositoryImpl @Inject constructor(
 			requestedPlaces.emit(emptyList())
 			placesStatus.value = UpdatedPlacesStatus.FAILED
 		}
+	}
+
+	override fun blockPlace(place: Place) {
+		generalScope.launch {
+			placeDao.addPlaceToBlocked(place.id)
+		}
+	}
+
+	override fun unblockPlaces(places: List<Place>) {
+		generalScope.launch {
+			placeDao.removePlacesFromBlocked(places.map { it.id })
+		}
+	}
+
+	override fun getBlockedPlaces(): Flow<List<Place>> = placeDao.getAllPlaces().map { list ->
+		list.map { placeDtoMapper.mapDtoToPlace(it) }.filter { it.isBlocked }
 	}
 
 	private fun List<Place>.updateFavorites(favoritePlacesIds: List<String>): List<Place> {

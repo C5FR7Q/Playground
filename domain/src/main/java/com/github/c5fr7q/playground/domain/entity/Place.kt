@@ -8,7 +8,8 @@ data class Place(
 	val tags: List<String>,
 	val imageUrl: String,
 	val position: Position,
-	val isFavorite: Boolean
+	val isFavorite: Boolean,
+	val isBlocked: Boolean,
 ) {
 	enum class Category {
 		DISCOVERING,
