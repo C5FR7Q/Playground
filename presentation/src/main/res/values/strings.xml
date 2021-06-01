@@ -17,4 +17,11 @@
 	<string name = "favorite">Favorite</string>
 	<string name = "blocked">Blocked</string>
 	<string name = "block">Block</string>
+	<string name = "places">Places</string>
+	<string name = "pack_count">Pack count</string>
+	<string name = "caching_days">Caching days</string>
+	<string name = "radius">Radius</string>
+	<string name = "n_meters">%d meters</string>
+	<string name = "apply">Apply</string>
+	<string name = "cancel">Cancel</string>
 </resources>
