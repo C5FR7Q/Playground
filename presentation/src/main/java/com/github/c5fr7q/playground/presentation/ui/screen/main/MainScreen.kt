@@ -1,5 +1,6 @@
 package com.github.c5fr7q.playground.presentation.ui.screen.main
 
+import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -90,7 +91,7 @@ private fun MainScreen(
 		floatingActionButtonPosition = FabPosition.Center,
 		isFloatingActionButtonDocked = true
 	) { innerPadding ->
-		Box {
+		Box(modifier = Modifier.padding(innerPadding)) {
 			LazyColumn(modifier = Modifier.fillMaxSize()) {
 				val places = state.places
 				if (places.isNotEmpty()) {
