@@ -388,7 +388,7 @@ private fun BottomBar(
 			modifier = Modifier
 				.fillMaxWidth()
 				.navigationBarsHeight()
-				.background(MaterialTheme.colors.primary)
+				.background(MaterialTheme.colors.primarySurface)
 		)
 	}
 }
