@@ -101,9 +101,7 @@ private fun PlaceItem(
 			Spacer(modifier = Modifier.size(16.dp))
 
 			Column {
-				CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
-					Text(text = place.name, style = MaterialTheme.typography.h4)
-				}
+				Text(text = place.name, style = MaterialTheme.typography.h4)
 				CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
 					Text(
 						text = place.position.asText(),
@@ -113,18 +111,16 @@ private fun PlaceItem(
 				Spacer(modifier = Modifier.size(2.dp))
 				Column(modifier = Modifier.wrapContentWidth()) {
 					TagRow(tags = place.categories.map { it.asText() }) {
-						CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
-							Text(
-								text = it,
-								maxLines = 1,
-								overflow = TextOverflow.Ellipsis,
-								modifier = Modifier
-									.background(Purple900, RoundedCornerShape(4.dp)) // TODO: 28.05.2021 Rework
-									.padding(4.dp),
-								style = MaterialTheme.typography.caption,
-								color = MaterialTheme.colors.onPrimary.copy(alpha = ContentAlpha.high)
-							)
-						}
+						Text(
+							text = it,
+							maxLines = 1,
+							overflow = TextOverflow.Ellipsis,
+							modifier = Modifier
+								.background(Purple900, RoundedCornerShape(4.dp)) // TODO: 28.05.2021 Rework
+								.padding(4.dp),
+							style = MaterialTheme.typography.caption,
+							color = MaterialTheme.colors.onPrimary.copy(alpha = ContentAlpha.high)
+						)
 					}
 				}
 			}

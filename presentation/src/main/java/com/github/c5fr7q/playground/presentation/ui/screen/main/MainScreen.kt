@@ -143,9 +143,7 @@ private fun PlaceItem(
 						Icon(if (place.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder, contentDescription = null)
 					}
 					Spacer(modifier = Modifier.size(6.dp))
-					CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
-						Text(modifier = Modifier.weight(1f), text = place.name, style = MaterialTheme.typography.h4)
-					}
+					Text(modifier = Modifier.weight(1f), text = place.name, style = MaterialTheme.typography.h4)
 					Spacer(modifier = Modifier.size(6.dp))
 					IconButton(onClick = { showMenu = true }) {
 						Icon(Icons.Default.MoreVert, contentDescription = null)
@@ -178,35 +176,31 @@ private fun PlaceItem(
 							.wrapContentWidth()
 					) {
 						TagRow(tags = place.categories.map { it.asText() }) {
-							CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
-								Text(
-									text = it,
-									maxLines = 1,
-									overflow = TextOverflow.Ellipsis,
-									modifier = Modifier
-										.background(Purple900, RoundedCornerShape(4.dp)) // TODO: 28.05.2021 Rework
-										.padding(4.dp),
-									style = MaterialTheme.typography.caption,
-									color = MaterialTheme.colors.onPrimary.copy(alpha = ContentAlpha.high)
-								)
-							}
+							Text(
+								text = it,
+								maxLines = 1,
+								overflow = TextOverflow.Ellipsis,
+								modifier = Modifier
+									.background(Purple900, RoundedCornerShape(4.dp)) // TODO: 28.05.2021 Rework
+									.padding(4.dp),
+								style = MaterialTheme.typography.caption,
+								color = MaterialTheme.colors.onPrimary
+							)
 						}
 					}
 					Spacer(modifier = Modifier.height(6.dp))
 				}
 				TagRow(modifier = Modifier.padding(horizontal = 16.dp), tags = place.tags) {
-					CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
-						Text(
-							text = it,
-							maxLines = 1,
-							overflow = TextOverflow.Ellipsis,
-							modifier = Modifier
-								.background(MaterialTheme.colors.onSurface, RoundedCornerShape(4.dp))
-								.padding(4.dp),
-							style = MaterialTheme.typography.caption,
-							color = MaterialTheme.colors.onPrimary.copy(alpha = ContentAlpha.high)
-						)
-					}
+					Text(
+						text = it,
+						maxLines = 1,
+						overflow = TextOverflow.Ellipsis,
+						modifier = Modifier
+							.background(MaterialTheme.colors.onSurface, RoundedCornerShape(4.dp))
+							.padding(4.dp),
+						style = MaterialTheme.typography.caption,
+						color = MaterialTheme.colors.onPrimary
+					)
 				}
 				Spacer(modifier = Modifier.height(6.dp))
 				PlaceImage(modifier = Modifier.padding(horizontal = 16.dp), url = place.imageUrl, rating = place.rating)
