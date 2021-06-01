@@ -92,28 +92,40 @@ private fun MainScreen(
 		floatingActionButtonPosition = FabPosition.Center,
 		isFloatingActionButtonDocked = true
 	) { innerPadding ->
-		Box(modifier = Modifier.padding(innerPadding)) {
-			val listState = rememberLazyListState()
-			LaunchedEffect(state.contentType) {
-				launch {
-					listState.scrollToItem(0)
+		Box(
+			modifier = Modifier
+				.padding(innerPadding)
+				.fillMaxSize()
+		) {
+			if (state.places.isEmpty()) {
+				Text(
+					modifier = Modifier.align(Alignment.Center),
+					text = stringResource(id = R.string.nothing_found),
+					style = MaterialTheme.typography.h5
+				)
+			} else {
+				val listState = rememberLazyListState()
+				LaunchedEffect(state.contentType) {
+					launch {
+						listState.scrollToItem(0)
+					}
 				}
-			}
-			LazyColumn(modifier = Modifier.fillMaxSize(), state = listState) {
-				val places = state.places
-				if (places.isNotEmpty()) {
-					val lastIndex = places.lastIndex
-					itemsIndexed(places) { index, item ->
-						if (index == lastIndex) {
-							LaunchedEffect(null) {
-								onLoadMore()
+				LazyColumn(modifier = Modifier.fillMaxSize(), state = listState) {
+					val places = state.places
+					if (places.isNotEmpty()) {
+						val lastIndex = places.lastIndex
+						itemsIndexed(places) { index, item ->
+							if (index == lastIndex) {
+								LaunchedEffect(null) {
+									onLoadMore()
+								}
 							}
+							PlaceItem(
+								place = item,
+								onToggleFavoriteClick = { onToggleItemFavorite(item) },
+								onBlockClick = { onBlockClick(item) }
+							)
 						}
-						PlaceItem(
-							place = item,
-							onToggleFavoriteClick = { onToggleItemFavorite(item) },
-							onBlockClick = { onBlockClick(item) }
-						)
 					}
 				}
 			}

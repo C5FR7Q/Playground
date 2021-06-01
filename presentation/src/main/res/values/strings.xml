@@ -24,4 +24,5 @@
 	<string name = "n_meters">%d meters</string>
 	<string name = "apply">Apply</string>
 	<string name = "cancel">Cancel</string>
+	<string name = "nothing_found">Nothing found</string>
 </resources>

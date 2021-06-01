@@ -62,13 +62,27 @@ private fun BlockedScreen(
 			)
 		}
 	) { innerPadding ->
-		LazyColumn {
-			items(state.places) { place ->
-				PlaceItem(
-					place = place,
-					isSelected = state.selectedPlaces.contains(place),
-					onPlaceClick = { onPlaceSelectionToggle(place) }
+		Box(
+			modifier = Modifier
+				.padding(innerPadding)
+				.fillMaxSize()
+		) {
+			if (state.places.isEmpty()) {
+				Text(
+					modifier = Modifier.align(Alignment.Center),
+					text = stringResource(id = R.string.nothing_found),
+					style = MaterialTheme.typography.h5
 				)
+			} else {
+				LazyColumn {
+					items(state.places) { place ->
+						PlaceItem(
+							place = place,
+							isSelected = state.selectedPlaces.contains(place),
+							onPlaceClick = { onPlaceSelectionToggle(place) }
+						)
+					}
+				}
 			}
 		}
 	}

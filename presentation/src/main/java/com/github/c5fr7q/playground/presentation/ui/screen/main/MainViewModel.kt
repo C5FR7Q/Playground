@@ -39,7 +39,6 @@ class MainViewModel @Inject constructor(
 					updateState {
 						copy(places = it, contentType = MainState.ContentType.PREVIOUS, isLoading = false)
 					}
-					// TODO: 21.05.2021 Display nothing prev found?
 				}.launchIn(viewModelScope)
 
 			placesSource
@@ -56,7 +55,6 @@ class MainViewModel @Inject constructor(
 					updateState {
 						copy(places = it, contentType = MainState.ContentType.FAVORITE, isLoading = false)
 					}
-					// TODO: 21.05.2021 Display nothing favorite found?
 				}.launchIn(viewModelScope)
 
 			placesSource
@@ -72,7 +70,6 @@ class MainViewModel @Inject constructor(
 									isLoading = false,
 									places = places,
 									contentType = MainState.ContentType.NEAR
-									// TODO: 21.05.2021 Show empty results if need
 								)
 							}
 						}
