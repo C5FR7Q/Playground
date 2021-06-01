@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -81,7 +82,7 @@ private fun PlaceItem(
 ) {
 	val backgroundColor = when {
 		isSelected -> MaterialTheme.colors.primary.copy(alpha = CustomContentAlpha.pressed)
-		else -> MaterialTheme.colors.surface
+		else -> Color.Transparent
 	}
 	Box(
 		modifier = Modifier
@@ -193,7 +194,7 @@ private fun TopBar(
 					}
 				}
 			},
-			backgroundColor = backgroundColor,
+			backgroundColor = Color.Transparent,
 			contentColor = contentColor,
 			elevation = 0.dp,
 		)
@@ -233,7 +234,7 @@ private fun TopBar(
 							onClick = { onCategoryToggle(category) },
 							colors = ButtonDefaults.outlinedButtonColors(
 								contentColor = buttonsColor,
-								backgroundColor = backgroundColor
+								backgroundColor = Color.Transparent
 							),
 							border = BorderStroke(
 								ButtonDefaults.OutlinedBorderSize,

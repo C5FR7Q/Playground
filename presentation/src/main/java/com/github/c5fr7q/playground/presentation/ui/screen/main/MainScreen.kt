@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -254,12 +255,13 @@ private fun TopBar(
 	onCategoryToggle: (Place.Category) -> Unit
 ) {
 	var filterIsActive by remember { mutableStateOf(true) }
-	Column {
+	Column(
+		modifier = Modifier.background(MaterialTheme.colors.surface)
+	) {
 		Box(
 			modifier = Modifier
 				.fillMaxWidth()
 				.statusBarsHeight()
-				.background(MaterialTheme.colors.surface)
 		)
 		TopAppBar(
 			title = {
@@ -275,7 +277,7 @@ private fun TopBar(
 					Icon(Icons.Default.FilterList, contentDescription = null)
 				}
 			},
-			backgroundColor = MaterialTheme.colors.surface,
+			backgroundColor = Color.Transparent,
 			contentColor = MaterialTheme.colors.onSurface,
 			elevation = 0.dp
 		)
