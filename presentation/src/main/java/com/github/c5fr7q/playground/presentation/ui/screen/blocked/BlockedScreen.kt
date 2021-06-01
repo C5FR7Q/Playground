@@ -24,7 +24,6 @@ import androidx.compose.ui.unit.dp
 import com.github.c5fr7q.playground.domain.entity.Place
 import com.github.c5fr7q.playground.presentation.R
 import com.github.c5fr7q.playground.presentation.ui.base.BaseIntent
-import com.github.c5fr7q.playground.presentation.ui.theme.Purple900
 import com.github.c5fr7q.playground.presentation.ui.util.CustomContentAlpha
 import com.github.c5fr7q.playground.presentation.ui.util.TagRow
 import com.github.c5fr7q.playground.presentation.ui.util.asText
@@ -116,7 +115,10 @@ private fun PlaceItem(
 							maxLines = 1,
 							overflow = TextOverflow.Ellipsis,
 							modifier = Modifier
-								.background(Purple900, RoundedCornerShape(4.dp)) // TODO: 28.05.2021 Rework
+								.background(
+									color = MaterialTheme.colors.primaryVariant,
+									shape = RoundedCornerShape(4.dp)
+								)
 								.padding(4.dp),
 							style = MaterialTheme.typography.caption,
 							color = MaterialTheme.colors.onPrimary.copy(alpha = ContentAlpha.high)
