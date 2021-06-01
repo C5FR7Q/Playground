@@ -102,7 +102,6 @@ private fun MainScreen(
 							}
 						}
 						PlaceItem(
-							contentType = state.contentType,
 							place = item,
 							onToggleFavoriteClick = { onToggleItemFavorite(item) },
 							onBlockClick = { onBlockClick(item) }
@@ -123,7 +122,6 @@ private fun MainScreen(
 
 @Composable
 private fun PlaceItem(
-	contentType: MainState.ContentType,
 	place: Place,
 	onToggleFavoriteClick: () -> Unit,
 	onBlockClick: () -> Unit
@@ -169,30 +167,28 @@ private fun PlaceItem(
 					)
 				}
 				Spacer(modifier = Modifier.height(2.dp))
-				if (contentType != MainState.ContentType.NEAR) {
-					Column(
-						modifier = Modifier
-							.padding(horizontal = 16.dp)
-							.wrapContentWidth()
-					) {
-						TagRow(tags = place.categories.map { it.asText() }) {
-							Text(
-								text = it,
-								maxLines = 1,
-								overflow = TextOverflow.Ellipsis,
-								modifier = Modifier
-									.background(
-										color = MaterialTheme.colors.primaryVariant,
-										shape = RoundedCornerShape(4.dp)
-									)
-									.padding(4.dp),
-								style = MaterialTheme.typography.caption,
-								color = MaterialTheme.colors.onPrimary
-							)
-						}
+				Column(
+					modifier = Modifier
+						.padding(horizontal = 16.dp)
+						.wrapContentWidth()
+				) {
+					TagRow(tags = place.categories.map { it.asText() }) {
+						Text(
+							text = it,
+							maxLines = 1,
+							overflow = TextOverflow.Ellipsis,
+							modifier = Modifier
+								.background(
+									color = MaterialTheme.colors.primaryVariant,
+									shape = RoundedCornerShape(4.dp)
+								)
+								.padding(4.dp),
+							style = MaterialTheme.typography.caption,
+							color = MaterialTheme.colors.onPrimary
+						)
 					}
-					Spacer(modifier = Modifier.height(6.dp))
 				}
+				Spacer(modifier = Modifier.height(6.dp))
 				TagRow(modifier = Modifier.padding(horizontal = 16.dp), tags = place.tags) {
 					Text(
 						text = it,
