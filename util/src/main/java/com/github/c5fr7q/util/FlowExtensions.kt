@@ -13,6 +13,11 @@ fun <R> Flow<Boolean>.flatMapLatestOnFalse(flow: Flow<R>): Flow<R> {
 	return transformLatest { if (!it) emitAll(flow) else emptyFlow<R>() }
 }
 
+@ExperimentalCoroutinesApi
+fun <T, R> Flow<T>.flatMapLatestWith(flow: Flow<R>): Flow<NTuple2<T, R>> {
+	return flatMapLatest { t -> flow.map { t then it } }
+}
+
 @JvmName("flowCombine")
 fun <T1, T2> Flow<T1>.combine(flow: Flow<T2>): Flow<NTuple2<T1, T2>> {
 	return combine(flow) { t1, t2 -> t1 then t2 }

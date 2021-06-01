@@ -5,25 +5,24 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.c5fr7q.playground.presentation.manager.NavigationManager
 import kotlinx.coroutines.cancelChildren
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.lang.reflect.ParameterizedType
 import javax.inject.Inject
 
 @Suppress("UNCHECKED_CAST")
-abstract class BaseViewModel<State, Intent : BaseIntent> : ViewModel() {
+abstract class BaseViewModel<State, SideEffect, Intent : BaseIntent> : ViewModel() {
 	@Inject
 	lateinit var navigationManager: NavigationManager
 
 	private val intentFlow = MutableSharedFlow<BaseIntent>()
+	private val sideEffectFlow = MutableSharedFlow<SideEffect>()
 
 	private val stateType = (javaClass.genericSuperclass as ParameterizedType).actualTypeArguments[0] as Class<State>
 	private val mutableState = MutableStateFlow(Class.forName(stateType.name).newInstance() as State)
 
-	val state: StateFlow<State> get() = mutableState
+	val state: StateFlow<State> get() = mutableState.asStateFlow()
+	val sideEffect: SharedFlow<SideEffect> get() = sideEffectFlow.asSharedFlow()
 
 	@CallSuper
 	open fun attach() {
@@ -56,6 +55,12 @@ abstract class BaseViewModel<State, Intent : BaseIntent> : ViewModel() {
 	fun produceIntent(intent: BaseIntent.Default) {
 		viewModelScope.launch {
 			intentFlow.emit(intent)
+		}
+	}
+
+	protected fun produceSideEffect(sideEffect: SideEffect) {
+		viewModelScope.launch {
+			sideEffectFlow.emit(sideEffect)
 		}
 	}
 

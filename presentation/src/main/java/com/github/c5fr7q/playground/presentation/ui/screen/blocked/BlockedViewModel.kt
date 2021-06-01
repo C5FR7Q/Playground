@@ -11,7 +11,7 @@ import javax.inject.Inject
 @HiltViewModel
 class BlockedViewModel @Inject constructor(
 	private val placeRepository: PlaceRepository
-) : BaseViewModel<BlockedState, BlockedIntent>() {
+) : BaseViewModel<BlockedState, Unit, BlockedIntent>() {
 	override fun handleIntent(intent: BaseIntent.Default) {
 		super.handleIntent(intent)
 		if (intent is BaseIntent.Default.Init) {

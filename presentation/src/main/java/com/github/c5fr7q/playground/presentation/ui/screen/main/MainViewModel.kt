@@ -3,10 +3,12 @@ package com.github.c5fr7q.playground.presentation.ui.screen.main
 import androidx.lifecycle.viewModelScope
 import com.github.c5fr7q.playground.domain.entity.UpdatedPlacesStatus
 import com.github.c5fr7q.playground.domain.repository.PlaceRepository
+import com.github.c5fr7q.playground.presentation.R
 import com.github.c5fr7q.playground.presentation.ui.base.BaseIntent
 import com.github.c5fr7q.playground.presentation.ui.base.BaseViewModel
-import com.github.c5fr7q.playground.presentation.util.combine
 import com.github.c5fr7q.playground.presentation.util.flatMapLatestOnTrue
+import com.github.c5fr7q.playground.presentation.util.flatMapLatestWith
+import com.github.c5fr7q.util.ResourceHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -14,8 +16,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-	private val placeRepository: PlaceRepository
-) : BaseViewModel<MainState, MainIntent>() {
+	private val placeRepository: PlaceRepository,
+	private val resourceHelper: ResourceHelper
+) : BaseViewModel<MainState, MainSideEffect, MainIntent>() {
 	private val placesSource = MutableStateFlow(MainState.ContentType.PREVIOUS)
 
 	override fun handleIntent(intent: BaseIntent.Default) {
@@ -37,6 +40,9 @@ class MainViewModel @Inject constructor(
 				}
 				.onEach {
 					updateState {
+						if (contentType != MainState.ContentType.PREVIOUS) {
+							produceSideEffect(MainSideEffect.ScrollToTop)
+						}
 						copy(places = it, contentType = MainState.ContentType.PREVIOUS, isLoading = false)
 					}
 				}.launchIn(viewModelScope)
@@ -53,6 +59,9 @@ class MainViewModel @Inject constructor(
 				}
 				.onEach {
 					updateState {
+						if (contentType != MainState.ContentType.FAVORITE) {
+							produceSideEffect(MainSideEffect.ScrollToTop)
+						}
 						copy(places = it, contentType = MainState.ContentType.FAVORITE, isLoading = false)
 					}
 				}.launchIn(viewModelScope)
@@ -61,11 +70,14 @@ class MainViewModel @Inject constructor(
 				.map { it == MainState.ContentType.NEAR }
 				.distinctUntilChanged()
 				.flatMapLatestOnTrue(placeRepository.getUpdatedPlacesStatus())
-				.combine(placeRepository.getUpdatedPlaces())
+				.flatMapLatestWith(placeRepository.getUpdatedPlaces())
 				.onEach { (status, places) ->
 					when (status) {
 						UpdatedPlacesStatus.LOADED -> {
 							updateState {
+								if (contentType != MainState.ContentType.NEAR) {
+									produceSideEffect(MainSideEffect.ScrollToTop)
+								}
 								copy(
 									isLoading = false,
 									places = places,
@@ -76,7 +88,7 @@ class MainViewModel @Inject constructor(
 						UpdatedPlacesStatus.FAILED -> {
 							updateState { copy(isLoading = false) }
 							placesSource.value = state.value.contentType
-							// TODO: 21.05.2021 Show something went wrong
+							produceSideEffect(MainSideEffect.ShowError(resourceHelper.getString(R.string.something_went_wrong)))
 						}
 						UpdatedPlacesStatus.LOADING -> Unit
 					}

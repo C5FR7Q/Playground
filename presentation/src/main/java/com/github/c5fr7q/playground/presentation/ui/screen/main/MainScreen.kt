@@ -28,6 +28,8 @@ import com.github.c5fr7q.playground.presentation.ui.util.asText
 import com.google.accompanist.coil.rememberCoilPainter
 import com.google.accompanist.insets.navigationBarsHeight
 import com.google.accompanist.insets.statusBarsHeight
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -36,6 +38,7 @@ fun MainScreen(viewModel: MainViewModel) {
 	val state by viewModel.state.collectAsState()
 	MainScreen(
 		state = state,
+		sideEffectFlow = viewModel.sideEffect,
 		onLoadMore = { viewModel.produceIntent(MainIntent.LoadMore) },
 		onLikeClick = { viewModel.produceIntent(MainIntent.ClickLike) },
 		onPreviousClick = { viewModel.produceIntent(MainIntent.ClickPrevious) },
@@ -51,6 +54,7 @@ fun MainScreen(viewModel: MainViewModel) {
 @Composable
 private fun MainScreen(
 	state: MainState,
+	sideEffectFlow: Flow<MainSideEffect>,
 	onLoadMore: () -> Unit,
 	onLikeClick: () -> Unit,
 	onPreviousClick: () -> Unit,
@@ -61,7 +65,24 @@ private fun MainScreen(
 	onToggleItemFavorite: (Place) -> Unit,
 	onBlockClick: (Place) -> Unit
 ) {
+	val listState = rememberLazyListState()
+	val scaffoldState = rememberScaffoldState()
+
+	LaunchedEffect(null) {
+		sideEffectFlow.collect { sideEffect ->
+			when (sideEffect) {
+				MainSideEffect.ScrollToTop -> {
+					launch { listState.scrollToItem(0) }
+				}
+				is MainSideEffect.ShowError -> {
+					launch { scaffoldState.snackbarHostState.showSnackbar(message = sideEffect.text) }
+				}
+			}
+		}
+	}
+
 	Scaffold(
+		scaffoldState = scaffoldState,
 		topBar = {
 			TopBar(
 				titleRes = when (state.contentType) {
@@ -104,12 +125,6 @@ private fun MainScreen(
 					style = MaterialTheme.typography.h5
 				)
 			} else {
-				val listState = rememberLazyListState()
-				LaunchedEffect(state.contentType) {
-					launch {
-						listState.scrollToItem(0)
-					}
-				}
 				LazyColumn(modifier = Modifier.fillMaxSize(), state = listState) {
 					val places = state.places
 					if (places.isNotEmpty()) {

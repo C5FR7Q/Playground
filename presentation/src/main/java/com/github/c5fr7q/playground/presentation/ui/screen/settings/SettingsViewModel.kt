@@ -13,7 +13,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
 	private val settingsRepository: SettingsRepository
-) : BaseViewModel<SettingsState, SettingsIntent>() {
+) : BaseViewModel<SettingsState, Unit, SettingsIntent>() {
 	override fun handleIntent(intent: BaseIntent.Default) {
 		super.handleIntent(intent)
 		if (intent is BaseIntent.Default.Init) {

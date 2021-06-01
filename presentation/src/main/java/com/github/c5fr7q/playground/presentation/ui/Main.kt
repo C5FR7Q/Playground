@@ -73,7 +73,7 @@ fun OnLifecycleEvent(onEvent: (event: Lifecycle.Event) -> Unit) {
 }
 
 @Composable
-inline fun <reified VM : BaseViewModel<*, *>> baseViewModel(): VM {
+inline fun <reified VM : BaseViewModel<*, *, *>> baseViewModel(): VM {
 	val viewModel = hiltNavGraphViewModel<VM>()
 	OnLifecycleEvent { event ->
 		when (event) {
