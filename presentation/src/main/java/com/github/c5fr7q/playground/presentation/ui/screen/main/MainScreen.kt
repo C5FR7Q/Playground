@@ -1,6 +1,5 @@
 package com.github.c5fr7q.playground.presentation.ui.screen.main
 
-import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -9,6 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -28,6 +28,7 @@ import com.github.c5fr7q.playground.presentation.ui.util.asText
 import com.google.accompanist.coil.rememberCoilPainter
 import com.google.accompanist.insets.navigationBarsHeight
 import com.google.accompanist.insets.statusBarsHeight
+import kotlinx.coroutines.launch
 import java.util.*
 
 @Composable
@@ -92,7 +93,13 @@ private fun MainScreen(
 		isFloatingActionButtonDocked = true
 	) { innerPadding ->
 		Box(modifier = Modifier.padding(innerPadding)) {
-			LazyColumn(modifier = Modifier.fillMaxSize()) {
+			val listState = rememberLazyListState()
+			LaunchedEffect(state.contentType) {
+				launch {
+					listState.scrollToItem(0)
+				}
+			}
+			LazyColumn(modifier = Modifier.fillMaxSize(), state = listState) {
 				val places = state.places
 				if (places.isNotEmpty()) {
 					val lastIndex = places.lastIndex
