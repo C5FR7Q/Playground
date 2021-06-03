@@ -1,4 +1,4 @@
-package com.github.c5fr7q.playground.presentation.util
+package com.github.c5fr7q.util
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*

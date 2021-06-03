@@ -6,8 +6,8 @@ import com.github.c5fr7q.playground.domain.repository.PlaceRepository
 import com.github.c5fr7q.playground.presentation.R
 import com.github.c5fr7q.playground.presentation.ui.base.BaseIntent
 import com.github.c5fr7q.playground.presentation.ui.base.BaseViewModel
-import com.github.c5fr7q.playground.presentation.util.flatMapLatestOnTrue
-import com.github.c5fr7q.playground.presentation.util.flatMapLatestWith
+import com.github.c5fr7q.util.flatMapLatestOnTrue
+import com.github.c5fr7q.util.flatMapLatestWith
 import com.github.c5fr7q.util.ResourceHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
