@@ -88,3 +88,4 @@ lint/tmp/
 *.hprof
 
 app/src/main/java/com/github/c5fr7q/playground/di/module/Keys.kt
+.idea/
