@@ -1,9 +1,6 @@
 package com.github.c5fr7q.playground.data.source.local.database.dao
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import com.github.c5fr7q.playground.data.source.local.database.entity.PlaceDto
 import kotlinx.coroutines.flow.Flow
 
@@ -29,4 +26,7 @@ interface PlaceDao {
 
 	@Query("UPDATE place SET isBlocked = 0 WHERE id IN (:placeIds)")
 	suspend fun removePlacesFromBlocked(placeIds: List<String>)
+
+	@Update
+	suspend fun updatePlaces(places: List<PlaceDto>)
 }

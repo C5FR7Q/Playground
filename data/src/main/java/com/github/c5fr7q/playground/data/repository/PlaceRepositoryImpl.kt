@@ -5,6 +5,7 @@ import com.github.c5fr7q.playground.data.repository.mapper.PlaceDtoMapper
 import com.github.c5fr7q.playground.data.repository.mapper.SygicPlaceMapper
 import com.github.c5fr7q.playground.data.source.local.Storage
 import com.github.c5fr7q.playground.data.source.local.database.dao.PlaceDao
+import com.github.c5fr7q.playground.data.source.local.database.entity.PlaceDto
 import com.github.c5fr7q.playground.data.source.remote.sygic.SygicService
 import com.github.c5fr7q.playground.data.source.remote.unsplash.UnsplashPhotoProvider
 import com.github.c5fr7q.playground.domain.entity.Place
@@ -51,6 +52,15 @@ class PlaceRepositoryImpl @Inject constructor(
 		storage.getDataCachingTime()
 			.take(1)
 			.onEach { placeDao.deleteOutdated(Date.from(Instant.now()).time - it.toMillis()) }
+			.launchIn(generalScope)
+
+		placeDao.getAllPlaces()
+			.take(1)
+			.onEach { places ->
+				if (places.indexOfFirst { it.imageUrl.isEmpty() } == -1) return@onEach
+
+				placeDao.updatePlaces(places.populateWithPhotos())
+			}
 			.launchIn(generalScope)
 	}
 
@@ -168,7 +178,20 @@ class PlaceRepositoryImpl @Inject constructor(
 		val photos = unsplashPhotoProvider.getPhotos(placesPackCount).toMutableList()
 		return map { place ->
 			when {
-				place.imageUrl.isEmpty() -> place.copy(imageUrl = photos.removeFirst())
+				place.imageUrl.isEmpty() -> place.copy(imageUrl = photos.removeFirstOrNull() ?: "")
+				else -> place
+			}
+		}
+	}
+
+	@JvmName("populateWithPhotosPlaceDto")
+	private suspend fun List<PlaceDto>.populateWithPhotos(): List<PlaceDto> {
+		val countToRequest = count { it.imageUrl.isEmpty() }
+		if (countToRequest == 0) return this
+		val photos = unsplashPhotoProvider.getPhotos(placesPackCount).toMutableList()
+		return map { place ->
+			when {
+				place.imageUrl.isEmpty() -> place.copy(imageUrl = photos.removeFirstOrNull() ?: "")
 				else -> place
 			}
 		}
