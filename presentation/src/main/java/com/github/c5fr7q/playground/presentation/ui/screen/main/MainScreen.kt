@@ -17,7 +17,9 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -249,11 +251,14 @@ private fun PlaceItem(
 private fun PlaceImage(modifier: Modifier = Modifier, url: String, rating: Float) {
 	Box(
 		modifier = modifier
-			.background(color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.medium), RoundedCornerShape(4.dp))
+			.clip(RoundedCornerShape(4.dp))
+			.background(color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.medium))
 			.aspectRatio(4f / 3f)
 			.fillMaxWidth()
 	) {
 		Image(
+			modifier = Modifier.fillMaxSize(),
+			contentScale = ContentScale.Crop,
 			painter = rememberCoilPainter(
 				request = url,
 				fadeIn = true,
