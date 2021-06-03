@@ -12,7 +12,7 @@ interface PlaceDao {
 	@Query("SELECT * FROM place")
 	fun getAllPlaces(): Flow<List<PlaceDto>>
 
-	@Insert(onConflict = OnConflictStrategy.IGNORE)
+	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	suspend fun addPlaces(places: List<PlaceDto>)
 
 	@Query("DELETE FROM place WHERE createdDate < :minDate AND isFavorite = 0")

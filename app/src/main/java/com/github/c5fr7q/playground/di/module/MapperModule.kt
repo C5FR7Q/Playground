@@ -2,6 +2,7 @@ package com.github.c5fr7q.playground.di.module
 
 import com.github.c5fr7q.playground.data.repository.mapper.PlaceDtoMapper
 import com.github.c5fr7q.playground.data.repository.mapper.SygicPlaceMapper
+import com.github.c5fr7q.playground.data.source.remote.unsplash.UnsplashPhotoMapper
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,6 +16,10 @@ abstract class MapperModule {
 		@Singleton
 		@Provides
 		fun provideSygicPlaceMapper() = SygicPlaceMapper()
+
+		@Singleton
+		@Provides
+		fun provideUnsplashPhotoMapper() = UnsplashPhotoMapper()
 
 		@Singleton
 		@Provides

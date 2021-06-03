@@ -6,6 +6,7 @@ import com.github.c5fr7q.playground.data.repository.mapper.SygicPlaceMapper
 import com.github.c5fr7q.playground.data.source.local.Storage
 import com.github.c5fr7q.playground.data.source.local.database.dao.PlaceDao
 import com.github.c5fr7q.playground.data.source.remote.sygic.SygicService
+import com.github.c5fr7q.playground.data.source.remote.unsplash.UnsplashPhotoProvider
 import com.github.c5fr7q.playground.domain.entity.Place
 import com.github.c5fr7q.playground.domain.entity.Position
 import com.github.c5fr7q.playground.domain.entity.UpdatedPlacesStatus
@@ -19,6 +20,7 @@ import javax.inject.Inject
 
 class PlaceRepositoryImpl @Inject constructor(
 	private val sygicService: SygicService,
+	private val unsplashPhotoProvider: UnsplashPhotoProvider,
 	private val sygicPlaceMapper: SygicPlaceMapper,
 	private val placeDtoMapper: PlaceDtoMapper,
 	private val placeDao: PlaceDao,
@@ -116,7 +118,7 @@ class PlaceRepositoryImpl @Inject constructor(
 				placesPackCount,
 				offset
 			)
-			val places = sygicPlaceMapper.mapResponse(placesResponse)
+			val places = sygicPlaceMapper.mapResponse(placesResponse).populateWithPhotos()
 			places.map { placeDtoMapper.mapPlaceToDto(it) }.let { placeDao.addPlaces(it) }
 			requestedPlaces.emit(
 				when {
@@ -156,6 +158,18 @@ class PlaceRepositoryImpl @Inject constructor(
 				place.copy(isFavorite = true)
 			} else {
 				place
+			}
+		}
+	}
+
+	private suspend fun List<Place>.populateWithPhotos(): List<Place> {
+		val countToRequest = count { it.imageUrl.isEmpty() }
+		if (countToRequest == 0) return this
+		val photos = unsplashPhotoProvider.getPhotos(placesPackCount).toMutableList()
+		return map { place ->
+			when {
+				place.imageUrl.isEmpty() -> place.copy(imageUrl = photos.removeFirst())
+				else -> place
 			}
 		}
 	}
