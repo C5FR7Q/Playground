@@ -6,9 +6,9 @@ import com.github.c5fr7q.playground.domain.repository.PlaceRepository
 import com.github.c5fr7q.playground.presentation.R
 import com.github.c5fr7q.playground.presentation.ui.base.BaseIntent
 import com.github.c5fr7q.playground.presentation.ui.base.BaseViewModel
+import com.github.c5fr7q.util.ResourceHelper
 import com.github.c5fr7q.util.flatMapLatestOnTrue
 import com.github.c5fr7q.util.flatMapLatestWith
-import com.github.c5fr7q.util.ResourceHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -31,13 +31,15 @@ class MainViewModel @Inject constructor(
 			placesSource
 				.map { it == MainState.ContentType.PREVIOUS }
 				.distinctUntilChanged()
-				.flatMapLatestOnTrue(placeRepository.getPreviousPlaces())
-				.flatMapLatest { places ->
-					state
-						.map { it.selectedCategories }
-						.distinctUntilChanged()
-						.map { categories -> places.filter { it.categories.containsAll(categories) } }
-				}
+				.flatMapLatestOnTrue(
+					placeRepository
+						.getPreviousPlaces()
+						.flatMapLatest { places ->
+							state
+								.map { it.selectedCategories }
+								.distinctUntilChanged()
+								.map { categories -> places.filter { it.categories.containsAll(categories) } }
+						})
 				.onEach {
 					updateState {
 						if (contentType != MainState.ContentType.PREVIOUS) {
@@ -50,13 +52,16 @@ class MainViewModel @Inject constructor(
 			placesSource
 				.map { it == MainState.ContentType.FAVORITE }
 				.distinctUntilChanged()
-				.flatMapLatestOnTrue(placeRepository.getFavoritePlaces())
-				.flatMapLatest { places ->
-					state
-						.map { it.selectedCategories }
-						.distinctUntilChanged()
-						.map { categories -> places.filter { it.categories.containsAll(categories) } }
-				}
+				.flatMapLatestOnTrue(
+					placeRepository
+						.getFavoritePlaces()
+						.flatMapLatest { places ->
+							state
+								.map { it.selectedCategories }
+								.distinctUntilChanged()
+								.map { categories -> places.filter { it.categories.containsAll(categories) } }
+						}
+				)
 				.onEach {
 					updateState {
 						if (contentType != MainState.ContentType.FAVORITE) {
@@ -69,8 +74,11 @@ class MainViewModel @Inject constructor(
 			placesSource
 				.map { it == MainState.ContentType.NEAR }
 				.distinctUntilChanged()
-				.flatMapLatestOnTrue(placeRepository.getUpdatedPlacesStatus())
-				.flatMapLatestWith(placeRepository.getUpdatedPlaces())
+				.flatMapLatestOnTrue(
+					placeRepository
+						.getUpdatedPlacesStatus()
+						.flatMapLatestWith(placeRepository.getUpdatedPlaces())
+				)
 				.onEach { (status, places) ->
 					when (status) {
 						UpdatedPlacesStatus.LOADED -> {
