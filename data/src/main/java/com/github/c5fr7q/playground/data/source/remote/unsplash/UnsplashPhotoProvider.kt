@@ -2,8 +2,10 @@ package com.github.c5fr7q.playground.data.source.remote.unsplash
 
 import com.github.c5fr7q.playground.data.source.remote.unsplash.entity.UnsplashPhoto
 import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.math.ceil
 
+@Singleton
 class UnsplashPhotoProvider @Inject constructor(
 	private val unsplashService: UnsplashService,
 	private val unsplashPhotoMapper: UnsplashPhotoMapper

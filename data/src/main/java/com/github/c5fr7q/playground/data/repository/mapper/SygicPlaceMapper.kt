@@ -4,7 +4,9 @@ import com.github.c5fr7q.playground.data.source.remote.sygic.entity.SygicPlacesR
 import com.github.c5fr7q.playground.domain.entity.Place
 import com.github.c5fr7q.playground.domain.entity.Position
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class SygicPlaceMapper @Inject constructor() {
 	fun mapArea(lat: Float, lon: Float, radius: Int) = "$lat,$lon,$radius"
 

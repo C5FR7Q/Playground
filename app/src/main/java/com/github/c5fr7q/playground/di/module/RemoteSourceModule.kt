@@ -1,13 +1,10 @@
 package com.github.c5fr7q.playground.di.module
 
 import com.github.c5fr7q.playground.data.source.remote.sygic.SygicService
-import com.github.c5fr7q.playground.data.source.remote.unsplash.UnsplashPhotoMapper
-import com.github.c5fr7q.playground.data.source.remote.unsplash.UnsplashPhotoProvider
 import com.github.c5fr7q.playground.data.source.remote.unsplash.UnsplashService
 import com.github.c5fr7q.playground.di.SygicClient
 import com.github.c5fr7q.playground.di.UnsplashClient
 import com.squareup.moshi.Moshi
-import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -82,15 +79,6 @@ abstract class RemoteSourceModule {
 					chain.proceed(newRequest)
 				}
 				.build()
-		}
-
-		@Singleton
-		@Provides
-		fun provideUnsplashPhotoProvider(
-			unsplashService: UnsplashService,
-			unsplashPhotoMapper: UnsplashPhotoMapper
-		): UnsplashPhotoProvider {
-			return UnsplashPhotoProvider(unsplashService, unsplashPhotoMapper)
 		}
 	}
 }

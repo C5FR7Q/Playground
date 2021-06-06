@@ -6,7 +6,9 @@ import com.github.c5fr7q.playground.domain.entity.Position
 import java.time.Instant
 import java.util.*
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class PlaceDtoMapper @Inject constructor() {
 	fun mapPlaceToDto(place: Place): PlaceDto {
 		return place.run {
