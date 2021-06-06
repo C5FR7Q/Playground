@@ -114,10 +114,9 @@ private fun MainScreen(
 		},
 		floatingActionButtonPosition = FabPosition.Center,
 		isFloatingActionButtonDocked = true
-	) { innerPadding ->
+	) { innerPadding: PaddingValues ->
 		Box(
 			modifier = Modifier
-				.padding(innerPadding)
 				.fillMaxSize()
 		) {
 			if (state.places.isEmpty()) {
@@ -132,16 +131,27 @@ private fun MainScreen(
 					if (places.isNotEmpty()) {
 						val lastIndex = places.lastIndex
 						itemsIndexed(places) { index, item ->
-							if (index == lastIndex) {
+							val isFirst = index == 0
+							val isLast = index == lastIndex
+							if (isLast) {
 								LaunchedEffect(null) {
 									onLoadMore()
 								}
 							}
+							val modifier = when {
+								isFirst -> Modifier.padding(top = innerPadding.calculateTopPadding())
+								isLast -> Modifier.padding(bottom = innerPadding.calculateBottomPadding())
+								else -> Modifier
+							}
 							PlaceItem(
+								modifier = modifier,
 								place = item,
 								onToggleFavoriteClick = { onToggleItemFavorite(item) },
 								onBlockClick = { onBlockClick(item) }
 							)
+							if (!isLast) {
+								Divider()
+							}
 						}
 					}
 				}
@@ -159,91 +169,89 @@ private fun MainScreen(
 
 @Composable
 private fun PlaceItem(
+	modifier: Modifier = Modifier,
 	place: Place,
 	onToggleFavoriteClick: () -> Unit,
 	onBlockClick: () -> Unit
 ) {
-	Column {
-		Surface {
-			Column {
-				Spacer(modifier = Modifier.height(16.dp))
-				Row(
-					modifier = Modifier
-						.padding(horizontal = 4.dp)
-						.fillMaxWidth(),
-					verticalAlignment = Alignment.CenterVertically
-				) {
-					var showMenu by remember { mutableStateOf(false) }
-					IconButton(onClick = onToggleFavoriteClick) {
-						Icon(if (place.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder, contentDescription = null)
-					}
-					Spacer(modifier = Modifier.size(6.dp))
-					Text(modifier = Modifier.weight(1f), text = place.name, style = MaterialTheme.typography.h4)
-					Spacer(modifier = Modifier.size(6.dp))
-					IconButton(onClick = { showMenu = true }) {
-						Icon(Icons.Default.MoreVert, contentDescription = null)
-						DropdownMenu(
-							expanded = showMenu,
-							onDismissRequest = { showMenu = false })
-						{
-							DropdownMenuItem(onClick = {
-								showMenu = false
-								onBlockClick()
-							}) {
-								Text(text = stringResource(id = R.string.block))
-							}
+	Surface(modifier = modifier) {
+		Column {
+			Spacer(modifier = Modifier.height(16.dp))
+			Row(
+				modifier = Modifier
+					.padding(horizontal = 4.dp)
+					.fillMaxWidth(),
+				verticalAlignment = Alignment.CenterVertically
+			) {
+				var showMenu by remember { mutableStateOf(false) }
+				IconButton(onClick = onToggleFavoriteClick) {
+					Icon(if (place.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder, contentDescription = null)
+				}
+				Spacer(modifier = Modifier.size(6.dp))
+				Text(modifier = Modifier.weight(1f), text = place.name, style = MaterialTheme.typography.h4)
+				Spacer(modifier = Modifier.size(6.dp))
+				IconButton(onClick = { showMenu = true }) {
+					Icon(Icons.Default.MoreVert, contentDescription = null)
+					DropdownMenu(
+						expanded = showMenu,
+						onDismissRequest = { showMenu = false })
+					{
+						DropdownMenuItem(onClick = {
+							showMenu = false
+							onBlockClick()
+						}) {
+							Text(text = stringResource(id = R.string.block))
 						}
 					}
+				}
 
-				}
-				CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-					Text(
-						modifier = Modifier.padding(horizontal = 16.dp),
-						text = place.position.asText(),
-						style = MaterialTheme.typography.overline
-					)
-				}
-				Spacer(modifier = Modifier.height(2.dp))
-				Column(
-					modifier = Modifier
-						.padding(horizontal = 16.dp)
-						.wrapContentWidth()
-				) {
-					TagRow(tags = place.categories.map { it.asText() }) {
-						Text(
-							text = it,
-							maxLines = 1,
-							overflow = TextOverflow.Ellipsis,
-							modifier = Modifier
-								.background(
-									color = MaterialTheme.colors.primaryVariant,
-									shape = RoundedCornerShape(4.dp)
-								)
-								.padding(4.dp),
-							style = MaterialTheme.typography.caption,
-							color = MaterialTheme.colors.onPrimary
-						)
-					}
-				}
-				Spacer(modifier = Modifier.height(6.dp))
-				TagRow(modifier = Modifier.padding(horizontal = 16.dp), tags = place.tags) {
+			}
+			CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+				Text(
+					modifier = Modifier.padding(horizontal = 16.dp),
+					text = place.position.asText(),
+					style = MaterialTheme.typography.overline
+				)
+			}
+			Spacer(modifier = Modifier.height(2.dp))
+			Column(
+				modifier = Modifier
+					.padding(horizontal = 16.dp)
+					.wrapContentWidth()
+			) {
+				TagRow(tags = place.categories.map { it.asText() }) {
 					Text(
 						text = it,
 						maxLines = 1,
 						overflow = TextOverflow.Ellipsis,
 						modifier = Modifier
-							.background(MaterialTheme.colors.onSurface, RoundedCornerShape(4.dp))
+							.background(
+								color = MaterialTheme.colors.primaryVariant,
+								shape = RoundedCornerShape(4.dp)
+							)
 							.padding(4.dp),
 						style = MaterialTheme.typography.caption,
 						color = MaterialTheme.colors.onPrimary
 					)
 				}
-				Spacer(modifier = Modifier.height(6.dp))
-				PlaceImage(modifier = Modifier.padding(horizontal = 16.dp), url = place.imageUrl, rating = place.rating)
-				Spacer(modifier = Modifier.height(16.dp))
 			}
+			Spacer(modifier = Modifier.height(6.dp))
+			TagRow(modifier = Modifier.padding(horizontal = 16.dp), tags = place.tags) {
+				Text(
+					text = it,
+					maxLines = 1,
+					overflow = TextOverflow.Ellipsis,
+					modifier = Modifier
+						.background(MaterialTheme.colors.onSurface, RoundedCornerShape(4.dp))
+						.padding(4.dp),
+					style = MaterialTheme.typography.caption,
+					color = MaterialTheme.colors.onPrimary
+				)
+			}
+			Spacer(modifier = Modifier.height(6.dp))
+			PlaceImage(modifier = Modifier.padding(horizontal = 16.dp), url = place.imageUrl, rating = place.rating)
+			Spacer(modifier = Modifier.height(16.dp))
 		}
-		Divider()
 	}
 }
 
