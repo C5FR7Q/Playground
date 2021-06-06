@@ -1,7 +1,10 @@
 package com.github.c5fr7q.playground.presentation.manager
 
+import android.content.Intent
+import android.net.Uri
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.navigate
+import com.github.c5fr7q.playground.domain.entity.Position
 import com.github.c5fr7q.playground.presentation.ui.Navigation
 import com.github.c5fr7q.playground.presentation.ui.createRoute
 import com.github.c5fr7q.playground.presentation.ui.dialog.ConfirmationDialogModel
@@ -13,12 +16,19 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class NavigationManager @Inject constructor() {
+class NavigationManager @Inject constructor() : BaseManager() {
 	private val dialogs = MutableStateFlow(emptyList<DialogModel>())
 
 	val dialog = dialogs.map { it.firstOrNull() }
 
 	var navController: NavHostController? = null
+
+	fun openMaps(position: Position) {
+		val intent = Intent(Intent.ACTION_VIEW, Uri.parse("geo:${position.lat},${position.lon}"))
+		if (intent.resolveActivity(activity.packageManager) != null) {
+			activity.startActivity(intent)
+		}
+	}
 
 	fun openSettings() {
 		navController?.navigate(Navigation.Settings.createRoute())

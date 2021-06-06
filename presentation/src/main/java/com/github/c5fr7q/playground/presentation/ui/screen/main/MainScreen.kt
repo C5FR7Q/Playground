@@ -50,6 +50,7 @@ fun MainScreen(viewModel: MainViewModel) {
 		onCategoryToggle = { viewModel.produceIntent(MainIntent.ToggleCategory(it)) },
 		onToggleItemFavorite = { viewModel.produceIntent(MainIntent.ToggleItemFavorite(it)) },
 		onBlockClick = { viewModel.produceIntent(MainIntent.ClickBlock(it)) },
+		onShowInMapsClick = { viewModel.produceIntent(MainIntent.ClickShowInMaps(it)) },
 	)
 }
 
@@ -65,7 +66,8 @@ private fun MainScreen(
 	onRefreshClick: () -> Unit,
 	onCategoryToggle: (Place.Category) -> Unit,
 	onToggleItemFavorite: (Place) -> Unit,
-	onBlockClick: (Place) -> Unit
+	onBlockClick: (Place) -> Unit,
+	onShowInMapsClick: (Place) -> Unit
 ) {
 	val listState = rememberLazyListState()
 	val scaffoldState = rememberScaffoldState()
@@ -147,7 +149,8 @@ private fun MainScreen(
 								modifier = modifier,
 								place = item,
 								onToggleFavoriteClick = { onToggleItemFavorite(item) },
-								onBlockClick = { onBlockClick(item) }
+								onBlockClick = { onBlockClick(item) },
+								onShowInMapsClick = { onShowInMapsClick(item) }
 							)
 							if (!isLast) {
 								Divider()
@@ -172,7 +175,8 @@ private fun PlaceItem(
 	modifier: Modifier = Modifier,
 	place: Place,
 	onToggleFavoriteClick: () -> Unit,
-	onBlockClick: () -> Unit
+	onBlockClick: () -> Unit,
+	onShowInMapsClick: () -> Unit
 ) {
 	Surface(modifier = modifier) {
 		Column {
@@ -201,6 +205,12 @@ private fun PlaceItem(
 							onBlockClick()
 						}) {
 							Text(text = stringResource(id = R.string.block))
+						}
+						DropdownMenuItem(onClick = {
+							showMenu = false
+							onShowInMapsClick()
+						}) {
+							Text(text = stringResource(id = R.string.show_in_maps))
 						}
 					}
 				}

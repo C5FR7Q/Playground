@@ -16,8 +16,14 @@ class MainActivity : ComponentActivity() {
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
+		navigationManager.attachActivity(this)
 		setContent {
 			Main(navigationManager)
 		}
+	}
+
+	override fun onDestroy() {
+		navigationManager.detachActivity()
+		super.onDestroy()
 	}
 }

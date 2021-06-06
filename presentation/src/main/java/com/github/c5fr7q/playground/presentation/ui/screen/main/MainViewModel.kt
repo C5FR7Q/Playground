@@ -154,6 +154,9 @@ class MainViewModel @Inject constructor(
 			is MainIntent.ClickBlock -> {
 				placeRepository.blockPlace(intent.place)
 			}
+			is MainIntent.ClickShowInMaps -> {
+				navigationManager.openMaps(intent.place.position)
+			}
 		}
 	}
 }
