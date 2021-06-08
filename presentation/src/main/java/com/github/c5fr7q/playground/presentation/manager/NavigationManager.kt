@@ -24,7 +24,7 @@ class NavigationManager @Inject constructor() : BaseManager() {
 	var navController: NavHostController? = null
 
 	fun openMaps(position: Position) {
-		val intent = Intent(Intent.ACTION_VIEW, Uri.parse("geo:${position.lat},${position.lon}"))
+		val intent = Intent(Intent.ACTION_VIEW, Uri.parse("geo:0,0?q=${position.lat},${position.lon}"))
 		if (intent.resolveActivity(activity.packageManager) != null) {
 			activity.startActivity(intent)
 		}
