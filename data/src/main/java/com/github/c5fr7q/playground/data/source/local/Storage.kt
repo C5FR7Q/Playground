@@ -7,13 +7,16 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.time.Duration
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class Storage @Inject constructor(
-	context: Context
+	@ApplicationContext context: Context
 ) {
 	private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "storage")
 	private val dataStore = context.dataStore

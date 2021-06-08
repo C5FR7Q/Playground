@@ -19,12 +19,6 @@ abstract class LocalSourceModule {
 	companion object {
 		@Singleton
 		@Provides
-		fun provideStorage(@ApplicationContext context: Context): Storage {
-			return Storage(context)
-		}
-
-		@Singleton
-		@Provides
 		fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase {
 			return Room.databaseBuilder(context, AppDatabase::class.java, "app_db")
 				.addMigrations(*migrations)
