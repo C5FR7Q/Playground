@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.github.c5fr7q.playground.domain.entity.UpdatedPlacesStatus
 import com.github.c5fr7q.playground.domain.repository.PlaceRepository
 import com.github.c5fr7q.playground.presentation.R
+import com.github.c5fr7q.playground.presentation.manager.PermissionManager
 import com.github.c5fr7q.playground.presentation.ui.base.BaseIntent
 import com.github.c5fr7q.playground.presentation.ui.base.BaseViewModel
 import com.github.c5fr7q.util.ResourceHelper
@@ -17,7 +18,8 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
 	private val placeRepository: PlaceRepository,
-	private val resourceHelper: ResourceHelper
+	private val permissionManager: PermissionManager,
+	private val resourceHelper: ResourceHelper,
 ) : BaseViewModel<MainState, MainSideEffect, MainIntent>() {
 	private val placesSource = MutableStateFlow(MainState.ContentType.PREVIOUS)
 
@@ -126,11 +128,19 @@ class MainViewModel @Inject constructor(
 			}
 			MainIntent.ClickRefresh -> {
 				viewModelScope.launch {
-					val selectedCategories = state.value.selectedCategories
-					if (selectedCategories.isNotEmpty()) {
-						placeRepository.updatePlaces(selectedCategories)
-						updateState { copy(isLoading = true) }
-						placesSource.value = MainState.ContentType.NEAR
+					val permissionsGranted = permissionManager.requestPermission(
+						permission = android.Manifest.permission.ACCESS_FINE_LOCATION,
+						rationaleMessage = resourceHelper.getString(R.string.refresh_rationale_message),
+						createFallbackMessage = { resourceHelper.getString(R.string.refresh_fallback_message) }
+					)
+
+					if (permissionsGranted) {
+						val selectedCategories = state.value.selectedCategories
+						if (selectedCategories.isNotEmpty()) {
+							placeRepository.updatePlaces(selectedCategories)
+							updateState { copy(isLoading = true) }
+							placesSource.value = MainState.ContentType.NEAR
+						}
 					}
 				}
 			}

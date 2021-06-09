@@ -1,16 +1,19 @@
 package com.github.c5fr7q.playground.presentation.manager
 
-import android.app.Activity
+import androidx.annotation.CallSuper
+import androidx.appcompat.app.AppCompatActivity
 
 abstract class BaseManager {
-	private var _activity: Activity? = null
-	protected val activity: Activity get() = _activity!!
+	private var _activity: AppCompatActivity? = null
+	protected val activity: AppCompatActivity get() = _activity!!
 
-	fun attachActivity(activity: Activity) {
+	@CallSuper
+	open fun attachActivity(activity: AppCompatActivity) {
 		_activity = activity
 	}
 
-	fun detachActivity() {
+	@CallSuper
+	open fun detachActivity() {
 		_activity = null
 	}
 }

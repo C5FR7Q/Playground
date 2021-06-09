@@ -27,4 +27,7 @@
 	<string name = "nothing_found">Nothing found</string>
 	<string name = "something_went_wrong">Something went wrong</string>
 	<string name = "show_in_maps">Show in maps</string>
+	<string name = "ok">OK</string>
+	<string name = "refresh_rationale_message">To refresh items we\'ll need to know your current location</string>
+	<string name = "refresh_fallback_message">Sorry, refresh is unavailable without location permission</string>
 </resources>

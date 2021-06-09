@@ -11,6 +11,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.github.c5fr7q.playground.presentation.manager.NavigationManager
 import com.github.c5fr7q.playground.presentation.ui.base.BaseViewModel
+import com.github.c5fr7q.playground.presentation.ui.dialog.ConfirmationDialog
+import com.github.c5fr7q.playground.presentation.ui.dialog.ConfirmationDialogModel
 import com.github.c5fr7q.playground.presentation.ui.screen.blocked.BlockedScreen
 import com.github.c5fr7q.playground.presentation.ui.screen.main.MainScreen
 import com.github.c5fr7q.playground.presentation.ui.screen.settings.SettingsScreen
@@ -45,7 +47,7 @@ fun Main(navigationManager: NavigationManager) {
 				val dialog by navigationManager.dialog.collectAsState(initial = null)
 				dialog?.let {
 					when (it) {
-//						is ConfirmationDialogModel -> ConfirmationDialog(it)
+						is ConfirmationDialogModel -> ConfirmationDialog(it)
 						else -> Log.d("Main", "Unknown dialog $it")
 					}
 				}
