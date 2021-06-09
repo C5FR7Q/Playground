@@ -42,8 +42,24 @@ class NavigationManager @Inject constructor() : BaseManager() {
 		navController?.navigate(ProfileNavigation.createRoute(userId = userId))
 	}
 
-	fun openConfirmationDialog(model: ConfirmationDialogModel) {
-		addDialog(model)
+	fun openConfirmationDialog(
+		text: String,
+		title: String = "",
+		confirmButtonText: String = "",
+		isCancelable: Boolean = true,
+		onDismissRequest: () -> Unit = {},
+		onConfirmed: () -> Unit = {}
+	) {
+		addDialog(
+			ConfirmationDialogModel(
+				text = text,
+				title = title,
+				confirmButtonText = confirmButtonText,
+				isCancelable = isCancelable,
+				onDismissRequest = onDismissRequest,
+				onConfirmed = onConfirmed
+			)
+		)
 	}
 
 	fun closeDialog() {

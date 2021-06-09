@@ -10,11 +10,11 @@ import com.github.c5fr7q.playground.presentation.ui.LocalOnDismissRequest
 
 data class ConfirmationDialogModel(
 	val text: String,
-	val title: String = "",
-	val confirmButtonText: String = "",
-	val isCancelable: Boolean = true,
-	val onDismissRequest: () -> Unit = {},
-	val onConfirmed: () -> Unit = {},
+	val title: String,
+	val confirmButtonText: String,
+	val isCancelable: Boolean,
+	val onDismissRequest: () -> Unit,
+	val onConfirmed: () -> Unit
 ) : DialogModel
 
 @Composable

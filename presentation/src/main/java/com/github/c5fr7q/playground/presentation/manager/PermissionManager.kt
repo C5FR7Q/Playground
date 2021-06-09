@@ -5,7 +5,6 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import com.github.c5fr7q.playground.presentation.ui.dialog.ConfirmationDialogModel
 import dagger.Lazy
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -61,7 +60,7 @@ class PermissionManager @Inject constructor(
 					val fallbackMessage = createFallbackMessage(grantedMap.filter { !it.value }.keys.toList())
 					if (fallbackMessage.isNotEmpty()) {
 						navigationManager.openConfirmationDialog(
-							ConfirmationDialogModel(text = fallbackMessage)
+							text = fallbackMessage
 						)
 					}
 				}
@@ -74,11 +73,9 @@ class PermissionManager @Inject constructor(
 	private suspend fun showRationale(rationaleMessage: String): Boolean {
 		return suspendCoroutine { cont ->
 			navigationManager.openConfirmationDialog(
-				ConfirmationDialogModel(
-					text = rationaleMessage,
-					onDismissRequest = { cont.resume(false) },
-					onConfirmed = { cont.resume(true) }
-				)
+				text = rationaleMessage,
+				onDismissRequest = { cont.resume(false) },
+				onConfirmed = { cont.resume(true) }
 			)
 		}
 	}
