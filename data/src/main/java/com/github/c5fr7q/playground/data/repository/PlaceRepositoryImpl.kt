@@ -1,6 +1,7 @@
 package com.github.c5fr7q.playground.data.repository
 
 import com.github.c5fr7q.playground.data.GeneralCoroutineScope
+import com.github.c5fr7q.playground.data.manager.ILocationManager
 import com.github.c5fr7q.playground.data.repository.mapper.PlaceDtoMapper
 import com.github.c5fr7q.playground.data.repository.mapper.SygicPlaceMapper
 import com.github.c5fr7q.playground.data.source.local.Storage
@@ -18,10 +19,12 @@ import kotlinx.coroutines.launch
 import java.time.Instant
 import java.util.*
 import javax.inject.Inject
+import kotlin.math.round
 
 class PlaceRepositoryImpl @Inject constructor(
 	private val sygicService: SygicService,
 	private val unsplashPhotoProvider: UnsplashPhotoProvider,
+	private val locationManager: ILocationManager,
 	private val sygicPlaceMapper: SygicPlaceMapper,
 	private val placeDtoMapper: PlaceDtoMapper,
 	private val placeDao: PlaceDao,
@@ -29,9 +32,9 @@ class PlaceRepositoryImpl @Inject constructor(
 	@GeneralCoroutineScope private val generalScope: CoroutineScope
 ) : PlaceRepository {
 
-	private val currentPosition = MutableStateFlow(Position(84.98107413147059f, 56.481796f)) // TODO: 10.05.2021 0f, 0f
+	private var currentPosition = Position(0f, 0f)
 	private val requestedPlaces = MutableSharedFlow<List<Place>>(1)
-	private val placesStatus = MutableStateFlow(UpdatedPlacesStatus.LOADED)
+	private val placesStatus = MutableSharedFlow<UpdatedPlacesStatus>(1).apply { tryEmit(UpdatedPlacesStatus.LOADED) }
 
 	private var requestedPosition: Position? = null
 	private var requestedCategories: List<Place.Category>? = null
@@ -69,18 +72,21 @@ class PlaceRepositoryImpl @Inject constructor(
 	}
 
 	override fun updatePlaces(categories: List<Place.Category>) {
-		val canRefreshPlaces = requestedCategories == null ||
-				requestedRadius == null ||
-				requestedPosition == null ||
-				requestedCategories != categories ||
-				requestedRadius != placesMetersRadius ||
-				requestedPosition != currentPosition.value
-		if (canRefreshPlaces) {
-			requestedCategories = categories
-			requestedRadius = placesMetersRadius
-			requestedPosition = currentPosition.value
-			generalScope.launch {
+		generalScope.launch {
+			currentPosition = locationManager.getLastKnownLocation() ?: currentPosition
+			val canRefreshPlaces = requestedCategories == null ||
+					requestedRadius == null ||
+					requestedPosition == null ||
+					requestedCategories != categories ||
+					requestedRadius != placesMetersRadius ||
+					!(requestedPosition!!.almostTheSameAs(currentPosition))
+			if (canRefreshPlaces) {
+				requestedCategories = categories
+				requestedRadius = placesMetersRadius
+				requestedPosition = currentPosition
 				fetchPlaces(categories, placesMetersRadius, 0)
+			} else {
+				placesStatus.emit(placesStatus.replayCache[0])
 			}
 		}
 	}
@@ -103,7 +109,7 @@ class PlaceRepositoryImpl @Inject constructor(
 		}
 	}
 
-	override fun getUpdatedPlacesStatus() = placesStatus.asStateFlow()
+	override fun getUpdatedPlacesStatus() = placesStatus.asSharedFlow()
 
 	override fun toggleFavoriteState(place: Place) {
 		generalScope.launch {
@@ -121,10 +127,10 @@ class PlaceRepositoryImpl @Inject constructor(
 
 	private suspend fun fetchPlaces(categories: List<Place.Category>, radius: Int, offset: Int) {
 		try {
-			placesStatus.value = UpdatedPlacesStatus.LOADING
+			placesStatus.emit(UpdatedPlacesStatus.LOADING)
 			val placesResponse = sygicService.getPlaces(
 				sygicPlaceMapper.mapCategoriesToString(categories),
-				sygicPlaceMapper.mapArea(currentPosition.value.lat, currentPosition.value.lon, radius),
+				sygicPlaceMapper.mapArea(currentPosition.lat, currentPosition.lon, radius),
 				placesPackCount,
 				offset
 			)
@@ -136,13 +142,13 @@ class PlaceRepositoryImpl @Inject constructor(
 					else -> places
 				}
 			)
-			placesStatus.value = UpdatedPlacesStatus.LOADED
+			placesStatus.emit(UpdatedPlacesStatus.LOADED)
 		} catch (e: Exception) {
 			requestedCategories = null
 			requestedRadius = null
 			requestedPosition = null
 			requestedPlaces.emit(emptyList())
-			placesStatus.value = UpdatedPlacesStatus.FAILED
+			placesStatus.emit(UpdatedPlacesStatus.FAILED)
 		}
 	}
 
@@ -195,6 +201,17 @@ class PlaceRepositoryImpl @Inject constructor(
 				else -> place
 			}
 		}
+	}
+
+	private fun Position.almostTheSameAs(other: Position): Boolean {
+		fun Position.dropDigits(): Position {
+			return Position(
+				lon = round(lon * 100.0f) / 100.0f,
+				lat = round(lat * 100.0f) / 100.0f
+			)
+		}
+
+		return dropDigits() == other.dropDigits()
 	}
 
 }

@@ -128,15 +128,18 @@ class MainViewModel @Inject constructor(
 			}
 			MainIntent.ClickRefresh -> {
 				viewModelScope.launch {
-					val permissionsGranted = permissionManager.requestPermission(
-						permission = android.Manifest.permission.ACCESS_FINE_LOCATION,
-						rationaleMessage = resourceHelper.getString(R.string.refresh_rationale_message),
-						createFallbackMessage = { resourceHelper.getString(R.string.refresh_fallback_message) }
-					)
+					val selectedCategories = state.value.selectedCategories
+					if (selectedCategories.isNotEmpty()) {
+						val permissionsGranted = permissionManager.requestPermissions(
+							permissions = arrayOf(
+								android.Manifest.permission.ACCESS_FINE_LOCATION,
+								android.Manifest.permission.ACCESS_COARSE_LOCATION
+							),
+							rationaleMessage = resourceHelper.getString(R.string.refresh_rationale_message),
+							createFallbackMessage = { resourceHelper.getString(R.string.refresh_fallback_message) }
+						)
 
-					if (permissionsGranted) {
-						val selectedCategories = state.value.selectedCategories
-						if (selectedCategories.isNotEmpty()) {
+						if (permissionsGranted) {
 							placeRepository.updatePlaces(selectedCategories)
 							updateState { copy(isLoading = true) }
 							placesSource.value = MainState.ContentType.NEAR

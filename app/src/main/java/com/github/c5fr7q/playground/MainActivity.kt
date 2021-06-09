@@ -3,6 +3,7 @@ package com.github.c5fr7q.playground
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import com.github.c5fr7q.playground.presentation.manager.LocationManager
 import com.github.c5fr7q.playground.presentation.manager.NavigationManager
 import com.github.c5fr7q.playground.presentation.manager.PermissionManager
 import com.github.c5fr7q.playground.presentation.ui.Main
@@ -17,6 +18,9 @@ class MainActivity : AppCompatActivity() {
 
 	@Inject
 	lateinit var permissionManager: PermissionManager
+
+	@Inject
+	lateinit var locationManager: LocationManager
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -38,10 +42,12 @@ class MainActivity : AppCompatActivity() {
 	private fun attachManagers() {
 		navigationManager.attachActivity(this)
 		permissionManager.attachActivity(this)
+		locationManager.attachActivity(this)
 	}
 
 	private fun detachManagers() {
 		navigationManager.detachActivity()
 		permissionManager.detachActivity()
+		locationManager.detachActivity()
 	}
 }
