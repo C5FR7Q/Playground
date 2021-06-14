@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.github.c5fr7q.playground.domain.entity.UpdatedPlacesStatus
 import com.github.c5fr7q.playground.domain.repository.PlaceRepository
 import com.github.c5fr7q.playground.presentation.R
+import com.github.c5fr7q.playground.presentation.manager.NetworkStateManager
 import com.github.c5fr7q.playground.presentation.manager.PermissionManager
 import com.github.c5fr7q.playground.presentation.ui.base.BaseIntent
 import com.github.c5fr7q.playground.presentation.ui.base.BaseViewModel
@@ -19,6 +20,7 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
 	private val placeRepository: PlaceRepository,
 	private val permissionManager: PermissionManager,
+	private val networkStateManager: NetworkStateManager,
 	private val resourceHelper: ResourceHelper,
 ) : BaseViewModel<MainState, MainSideEffect, MainIntent>() {
 	private val placesSource = MutableStateFlow(MainState.ContentType.PREVIOUS)
@@ -128,23 +130,31 @@ class MainViewModel @Inject constructor(
 			}
 			MainIntent.ClickRefresh -> {
 				viewModelScope.launch {
-					val selectedCategories = state.value.selectedCategories
-					if (selectedCategories.isNotEmpty()) {
-						val permissionsGranted = permissionManager.requestPermissions(
-							permissions = arrayOf(
-								android.Manifest.permission.ACCESS_FINE_LOCATION,
-								android.Manifest.permission.ACCESS_COARSE_LOCATION
-							),
-							rationaleMessage = resourceHelper.getString(R.string.refresh_rationale_message),
-							createFallbackMessage = { resourceHelper.getString(R.string.refresh_fallback_message) }
-						)
+					networkStateManager.isConnected
+						.take(1).onEach { hasNetworkConnection ->
+							if (!hasNetworkConnection) {
+								produceSideEffect(MainSideEffect.ShowError(resourceHelper.getString(R.string.no_internet_connection)))
+								return@onEach
+							}
+							val selectedCategories = state.value.selectedCategories
+							if (selectedCategories.isNotEmpty()) {
+								val permissionsGranted = permissionManager.requestPermissions(
+									permissions = arrayOf(
+										android.Manifest.permission.ACCESS_FINE_LOCATION,
+										android.Manifest.permission.ACCESS_COARSE_LOCATION
+									),
+									rationaleMessage = resourceHelper.getString(R.string.refresh_rationale_message),
+									createFallbackMessage = { resourceHelper.getString(R.string.refresh_fallback_message) }
+								)
 
-						if (permissionsGranted) {
-							placeRepository.updatePlaces(selectedCategories)
-							updateState { copy(isLoading = true) }
-							placesSource.value = MainState.ContentType.NEAR
+								if (permissionsGranted) {
+									placeRepository.updatePlaces(selectedCategories)
+									updateState { copy(isLoading = true) }
+									placesSource.value = MainState.ContentType.NEAR
+								}
+							}
 						}
-					}
+						.launchIn(viewModelScope)
 				}
 			}
 			is MainIntent.ToggleCategory -> {

@@ -5,6 +5,7 @@ import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import com.github.c5fr7q.playground.presentation.manager.LocationManager
 import com.github.c5fr7q.playground.presentation.manager.NavigationManager
+import com.github.c5fr7q.playground.presentation.manager.NetworkStateManager
 import com.github.c5fr7q.playground.presentation.manager.PermissionManager
 import com.github.c5fr7q.playground.presentation.ui.Main
 import dagger.hilt.android.AndroidEntryPoint
@@ -21,6 +22,9 @@ class MainActivity : AppCompatActivity() {
 
 	@Inject
 	lateinit var locationManager: LocationManager
+
+	@Inject
+	lateinit var networkStateManager: NetworkStateManager
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
@@ -43,11 +47,13 @@ class MainActivity : AppCompatActivity() {
 		navigationManager.attachActivity(this)
 		permissionManager.attachActivity(this)
 		locationManager.attachActivity(this)
+		networkStateManager.attachActivity(this)
 	}
 
 	private fun detachManagers() {
 		navigationManager.detachActivity()
 		permissionManager.detachActivity()
 		locationManager.detachActivity()
+		networkStateManager.detachActivity()
 	}
 }
