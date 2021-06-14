@@ -26,7 +26,13 @@ class LocationManager @Inject constructor() : BaseManager(), ILocationManager {
 	override suspend fun getLastKnownLocation(): Position? {
 		return suspendCoroutine { cont ->
 			fusedLocationClient!!.lastLocation
-				.addOnSuccessListener(activity) { cont.resume(Position(it.longitude.toFloat(), it.latitude.toFloat())) }
+				.addOnSuccessListener(activity) { location ->
+					cont.resume(
+						location?.let {
+							Position(it.longitude.toFloat(), it.latitude.toFloat())
+						}
+					)
+				}
 				.addOnFailureListener(activity) { cont.resume(null) }
 		}
 	}
