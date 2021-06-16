@@ -15,34 +15,39 @@ data class ConfirmationDialogModel(
 	val isCancelable: Boolean,
 	val onDismissRequest: () -> Unit,
 	val onConfirmed: () -> Unit
-) : DialogModel
-
-@Composable
-fun ConfirmationDialog(
-	model: ConfirmationDialogModel,
-	onDismissRequest: () -> Unit = LocalOnDismissRequest.current,
-	title: @Composable () -> Unit = { Text(text = model.title) },
-	text: @Composable () -> Unit = { Text(text = model.text) },
-	button: @Composable () -> Unit = {
-		Button(onClick = {
-			model.onConfirmed()
-			onDismissRequest()
-		}) {
-			Text(text = model.confirmButtonText
-				.takeIf { it.isNotEmpty() }
-				?: stringResource(id = R.string.ok))
-		}
+) : DialogModel {
+	@Composable
+	override fun draw() {
+		ConfirmationDialog(this)
 	}
-) {
-	AlertDialog(
-		onDismissRequest = {
-			if (model.isCancelable) {
-				model.onDismissRequest()
+
+	@Composable
+	private fun ConfirmationDialog(
+		model: ConfirmationDialogModel,
+		onDismissRequest: () -> Unit = LocalOnDismissRequest.current,
+		title: @Composable () -> Unit = { Text(text = model.title) },
+		text: @Composable () -> Unit = { Text(text = model.text) },
+		button: @Composable () -> Unit = {
+			Button(onClick = {
+				model.onConfirmed()
 				onDismissRequest()
+			}) {
+				Text(text = model.confirmButtonText
+					.takeIf { it.isNotEmpty() }
+					?: stringResource(id = R.string.ok))
 			}
-		},
-		title = if (model.title.isNotEmpty()) title else null,
-		text = text,
-		confirmButton = button
-	)
+		}
+	) {
+		AlertDialog(
+			onDismissRequest = {
+				if (model.isCancelable) {
+					model.onDismissRequest()
+					onDismissRequest()
+				}
+			},
+			title = if (model.title.isNotEmpty()) title else null,
+			text = text,
+			confirmButton = button
+		)
+	}
 }
