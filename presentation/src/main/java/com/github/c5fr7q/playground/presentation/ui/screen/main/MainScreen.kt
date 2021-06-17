@@ -76,7 +76,11 @@ private fun MainScreen(
 		sideEffectFlow.collect { sideEffect ->
 			when (sideEffect) {
 				MainSideEffect.ScrollToTop -> {
-					launch { listState.scrollToItem(0) }
+					launch {
+						if (listState.layoutInfo.visibleItemsInfo.isNotEmpty()) {
+							listState.scrollToItem(0)
+						}
+					}
 				}
 				is MainSideEffect.ShowError -> {
 					launch { scaffoldState.snackbarHostState.showSnackbar(message = sideEffect.text) }
