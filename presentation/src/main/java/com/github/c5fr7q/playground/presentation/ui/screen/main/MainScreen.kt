@@ -1,6 +1,8 @@
 package com.github.c5fr7q.playground.presentation.ui.screen.main
 
 import androidx.annotation.StringRes
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -17,8 +19,10 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -112,9 +116,39 @@ private fun MainScreen(
 			)
 		},
 		floatingActionButton = {
-			if (state.selectedCategories.isNotEmpty()) {
-				FloatingActionButton(onClick = onRefreshClick) {
-					Icon(Icons.Default.Refresh, contentDescription = null)
+			var transitionState by remember { mutableStateOf(FabTransitionState.HIDDEN) }
+			transitionState = when {
+				state.selectedCategories.isNotEmpty() -> FabTransitionState.SHOWN
+				else -> FabTransitionState.HIDDEN
+			}
+			val transition = updateTransition(transitionState, label = "FabTransition")
+
+			val fabSize by transition.animateDp(label = "FabTransition_fabSize") { state ->
+				when (state) {
+					FabTransitionState.SHOWN -> 56.dp
+					FabTransitionState.HIDDEN -> 0.dp
+				}
+			}
+
+			// TODO: 20.06.2021 Use custom BottomAppBar to avoid visibility change jump 
+			if (fabSize.value != 0f) {
+				val rotation = when {
+					state.isLoading -> {
+						val infiniteTransition = rememberInfiniteTransition()
+						infiniteTransition.animateFloat(
+							initialValue = 0f,
+							targetValue = 360f,
+							animationSpec = infiniteRepeatable(animation = tween(durationMillis = 1000, easing = LinearEasing))
+						).value
+					}
+					else -> 0f
+				}
+				FloatingActionButton(onClick = onRefreshClick, modifier = Modifier.size(fabSize)) {
+					Icon(
+						modifier = Modifier.graphicsLayer(rotationZ = rotation),
+						imageVector = Icons.Default.Refresh,
+						contentDescription = null
+					)
 				}
 			}
 		},
@@ -149,16 +183,41 @@ private fun MainScreen(
 								isLast -> Modifier.padding(bottom = innerPadding.calculateBottomPadding())
 								else -> Modifier
 							}
+
+							var transitionState by remember { mutableStateOf(PlaceItemTransitionState.INITIAL) }
+
+							val transition = updateTransition(targetState = transitionState, label = "PlaceItemTransition")
+
+							val alpha by transition.animateFloat(label = "PlaceItemTransition_alpha") { state ->
+								when (state) {
+									PlaceItemTransitionState.INITIAL -> 0f
+									PlaceItemTransitionState.FINAL -> 1f
+								}
+							}
+
+							val scale by transition.animateFloat(label = "PlaceItemTransition_scale") { state ->
+								when (state) {
+									PlaceItemTransitionState.INITIAL -> 0.5f
+									PlaceItemTransitionState.FINAL -> 1f
+								}
+							}
+
 							PlaceItem(
-								modifier = modifier,
+								modifier = modifier.graphicsLayer(
+									alpha = alpha,
+									scaleX = scale,
+									scaleY = scale
+								),
 								place = item,
 								onToggleFavoriteClick = { onToggleItemFavorite(item) },
 								onBlockClick = { onBlockClick(item) },
 								onShowInMapsClick = { onShowInMapsClick(item) }
 							)
 							if (!isLast) {
-								Divider()
+								Divider(modifier = Modifier.alpha(alpha))
 							}
+
+							transitionState = PlaceItemTransitionState.FINAL
 						}
 					}
 				}
@@ -314,7 +373,9 @@ private fun TopBar(
 ) {
 	var filterIsActive by remember { mutableStateOf(true) }
 	Column(
-		modifier = Modifier.background(MaterialTheme.colors.surface)
+		modifier = Modifier
+			.background(MaterialTheme.colors.surface)
+			.animateContentSize()
 	) {
 		Box(
 			modifier = Modifier
@@ -433,4 +494,14 @@ private fun BottomBar(
 				.background(MaterialTheme.colors.primarySurface)
 		)
 	}
+}
+
+private enum class PlaceItemTransitionState {
+	INITIAL,
+	FINAL
+}
+
+private enum class FabTransitionState {
+	SHOWN,
+	HIDDEN
 }

@@ -1,5 +1,7 @@
 package com.github.c5fr7q.playground.presentation.ui.screen.blocked
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -180,11 +182,11 @@ private fun TopBar(
 	onCategoryToggle: (Place.Category) -> Unit
 ) {
 	var filterIsActive by remember { mutableStateOf(true) }
-	val backgroundColor = if (placesSelected) MaterialTheme.colors.onSurface else MaterialTheme.colors.surface
-	val contentColor = if (placesSelected) MaterialTheme.colors.surface else MaterialTheme.colors.onSurface
-	val buttonsColor = if (placesSelected) MaterialTheme.colors.surface else MaterialTheme.colors.primary
+	val backgroundColor by animateColorAsState(if (placesSelected) MaterialTheme.colors.onSurface else MaterialTheme.colors.surface)
+	val contentColor by animateColorAsState(if (placesSelected) MaterialTheme.colors.surface else MaterialTheme.colors.onSurface)
+	val buttonsColor by animateColorAsState(if (placesSelected) MaterialTheme.colors.surface else MaterialTheme.colors.primary)
 	Column(
-		modifier = Modifier.background(color = backgroundColor)
+		modifier = Modifier.background(color = backgroundColor).animateContentSize()
 	) {
 		Box(
 			modifier = Modifier
