@@ -1,4 +1,4 @@
-package com.github.c5fr7q.playground.presentation.ui.util
+package com.github.c5fr7q.playground.presentation.ui.widget
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment

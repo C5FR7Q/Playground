@@ -4,20 +4,19 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.github.c5fr7q.playground.presentation.R
 import com.github.c5fr7q.playground.presentation.ui.base.BaseIntent
+import com.github.c5fr7q.playground.presentation.ui.widget.dialog.InputDialog
 import com.google.accompanist.insets.statusBarsHeight
 
 @Composable
@@ -151,42 +150,6 @@ private fun SettingsCategoryItem(text: String) {
 			style = MaterialTheme.typography.h5.copy(color = MaterialTheme.colors.primaryVariant)
 		)
 	}
-}
-
-@Composable
-fun InputDialog(
-	title: String,
-	defaultValue: Int,
-	onDismissDialog: () -> Unit,
-	onInputValue: (Int) -> Unit
-) {
-	var inputValue by remember { mutableStateOf(defaultValue.toString()) }
-	val submit = {
-		inputValue.takeIf { it.isNotEmpty() }?.let { onInputValue(it.toInt()) }
-		onDismissDialog()
-	}
-	AlertDialog(
-		onDismissRequest = onDismissDialog,
-		title = { Text(text = title) },
-		confirmButton = {
-			Button(onClick = submit) {
-				Text(text = stringResource(id = R.string.apply))
-			}
-		},
-		dismissButton = {
-			Button(onClick = onDismissDialog) {
-				Text(text = stringResource(id = R.string.cancel))
-			}
-		},
-		text = {
-			TextField(
-				value = inputValue,
-				onValueChange = { inputValue = it },
-				keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
-				keyboardActions = KeyboardActions(onDone = { submit() })
-			)
-		}
-	)
 }
 
 @Composable

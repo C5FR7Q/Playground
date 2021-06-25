@@ -3,41 +3,36 @@ package com.github.c5fr7q.playground.presentation.ui.screen.main
 import androidx.annotation.StringRes
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.*
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.github.c5fr7q.playground.domain.entity.Place
 import com.github.c5fr7q.playground.presentation.R
-import com.github.c5fr7q.playground.presentation.ui.util.TagRow
-import com.github.c5fr7q.playground.presentation.ui.util.asText
-import com.google.accompanist.coil.rememberCoilPainter
+import com.github.c5fr7q.playground.presentation.ui.widget.OptionsMenu
+import com.github.c5fr7q.playground.presentation.ui.widget.OptionsMenuItemModel
+import com.github.c5fr7q.playground.presentation.ui.widget.PlaceItem
+import com.github.c5fr7q.playground.presentation.ui.widget.SelectCategoriesRow
 import com.google.accompanist.insets.navigationBarsHeight
 import com.google.accompanist.insets.statusBarsHeight
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import java.util.*
 
 @Composable
 fun MainScreen(viewModel: MainViewModel) {
@@ -234,138 +229,6 @@ private fun MainScreen(
 }
 
 @Composable
-private fun PlaceItem(
-	modifier: Modifier = Modifier,
-	place: Place,
-	onToggleFavoriteClick: () -> Unit,
-	onBlockClick: () -> Unit,
-	onShowInMapsClick: () -> Unit
-) {
-	Surface(modifier = modifier) {
-		Column {
-			Spacer(modifier = Modifier.height(16.dp))
-			Row(
-				modifier = Modifier
-					.padding(horizontal = 4.dp)
-					.fillMaxWidth(),
-				verticalAlignment = Alignment.CenterVertically
-			) {
-				var showMenu by remember { mutableStateOf(false) }
-				IconButton(onClick = onToggleFavoriteClick) {
-					Icon(if (place.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder, contentDescription = null)
-				}
-				Spacer(modifier = Modifier.size(6.dp))
-				Text(modifier = Modifier.weight(1f), text = place.name, style = MaterialTheme.typography.h4)
-				Spacer(modifier = Modifier.size(6.dp))
-				IconButton(onClick = { showMenu = true }) {
-					Icon(Icons.Default.MoreVert, contentDescription = null)
-					DropdownMenu(
-						expanded = showMenu,
-						onDismissRequest = { showMenu = false })
-					{
-						DropdownMenuItem(onClick = {
-							showMenu = false
-							onBlockClick()
-						}) {
-							Text(text = stringResource(id = R.string.block))
-						}
-						DropdownMenuItem(onClick = {
-							showMenu = false
-							onShowInMapsClick()
-						}) {
-							Text(text = stringResource(id = R.string.show_in_maps))
-						}
-					}
-				}
-
-			}
-			CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-				Text(
-					modifier = Modifier.padding(horizontal = 16.dp),
-					text = place.position.asText(),
-					style = MaterialTheme.typography.overline
-				)
-			}
-			Spacer(modifier = Modifier.height(2.dp))
-			Column(
-				modifier = Modifier
-					.padding(horizontal = 16.dp)
-					.wrapContentWidth()
-			) {
-				TagRow(tags = place.categories.map { it.asText() }) {
-					Text(
-						text = it,
-						maxLines = 1,
-						overflow = TextOverflow.Ellipsis,
-						modifier = Modifier
-							.background(
-								color = MaterialTheme.colors.primaryVariant,
-								shape = RoundedCornerShape(4.dp)
-							)
-							.padding(4.dp),
-						style = MaterialTheme.typography.caption,
-						color = MaterialTheme.colors.onPrimary
-					)
-				}
-			}
-			Spacer(modifier = Modifier.height(6.dp))
-			TagRow(modifier = Modifier.padding(horizontal = 16.dp), tags = place.tags) {
-				Text(
-					text = it,
-					maxLines = 1,
-					overflow = TextOverflow.Ellipsis,
-					modifier = Modifier
-						.background(MaterialTheme.colors.onSurface, RoundedCornerShape(4.dp))
-						.padding(4.dp),
-					style = MaterialTheme.typography.caption,
-					color = MaterialTheme.colors.onPrimary
-				)
-			}
-			Spacer(modifier = Modifier.height(6.dp))
-			PlaceImage(modifier = Modifier.padding(horizontal = 16.dp), url = place.imageUrl, rating = place.rating)
-			Spacer(modifier = Modifier.height(16.dp))
-		}
-	}
-}
-
-@Composable
-private fun PlaceImage(modifier: Modifier = Modifier, url: String, rating: Float) {
-	Box(
-		modifier = modifier
-			.clip(RoundedCornerShape(4.dp))
-			.background(color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.medium))
-			.aspectRatio(4f / 3f)
-			.fillMaxWidth()
-	) {
-		Image(
-			modifier = Modifier.fillMaxSize(),
-			contentScale = ContentScale.Crop,
-			painter = rememberCoilPainter(
-				request = url,
-				fadeIn = true,
-				shouldRefetchOnSizeChange = { _, _ -> false },
-			),
-			contentDescription = null,
-		)
-
-		Box(
-			modifier = Modifier
-				.background(
-					color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.high),
-					shape = RoundedCornerShape(topStart = 4.dp, bottomEnd = 4.dp)
-				)
-				.padding(4.dp)
-		) {
-			Text(
-				text = "R:" + "%.2f".format(Locale.US, rating),
-				style = MaterialTheme.typography.overline,
-				color = MaterialTheme.colors.onPrimary.copy(alpha = ContentAlpha.high)
-			)
-		}
-	}
-}
-
-@Composable
 private fun TopBar(
 	@StringRes titleRes: Int,
 	selectedCategories: List<Place.Category>,
@@ -402,37 +265,7 @@ private fun TopBar(
 		)
 		Divider()
 		if (filterIsActive) {
-			LazyRow(modifier = Modifier.padding(vertical = 6.dp)) {
-				val allCategories = Place.Category.values()
-				val lastIndex = allCategories.lastIndex
-				itemsIndexed(allCategories) { index, category ->
-					val selected = selectedCategories.contains(category)
-					if (selected) {
-						Button(
-							modifier = Modifier.padding(
-								start = if (index == 0) 16.dp else 0.dp,
-								end = if (index == lastIndex) 16.dp else 6.dp
-							),
-							contentPadding = PaddingValues(4.dp),
-							onClick = { onCategoryToggle(category) }
-						) {
-							Text(text = category.asText(), style = MaterialTheme.typography.button)
-						}
-					} else {
-						OutlinedButton(
-							modifier = Modifier.padding(
-								start = if (index == 0) 16.dp else 0.dp,
-								end = if (index == lastIndex) 16.dp else 6.dp,
-							),
-							contentPadding = PaddingValues(4.dp),
-							onClick = { onCategoryToggle(category) },
-							border = BorderStroke(ButtonDefaults.OutlinedBorderSize, MaterialTheme.colors.primary)
-						) {
-							Text(text = category.asText(), style = MaterialTheme.typography.button, color = MaterialTheme.colors.primary)
-						}
-					}
-				}
-			}
+			SelectCategoriesRow(selectedCategories = selectedCategories, onCategoryToggle = onCategoryToggle)
 			Divider()
 		}
 	}
@@ -446,7 +279,6 @@ private fun BottomBar(
 	onBlockedClick: () -> Unit,
 	onSettingsClick: () -> Unit
 ) {
-	var showMenu by remember { mutableStateOf(false) }
 	Column {
 		BottomAppBar(
 			cutoutShape = CircleShape
@@ -457,34 +289,13 @@ private fun BottomBar(
 						Icon(Icons.Default.Favorite, contentDescription = null)
 					}
 				}
-				IconButton(onClick = { showMenu = true }) {
-					Icon(Icons.Default.MoreVert, contentDescription = null)
-					DropdownMenu(
-						expanded = showMenu,
-						onDismissRequest = { showMenu = false })
-					{
-						if (contentType != MainState.ContentType.PREVIOUS) {
-							DropdownMenuItem(onClick = {
-								showMenu = false
-								onPreviousClick()
-							}) {
-								Text(text = stringResource(id = R.string.previous))
-							}
-						}
-						DropdownMenuItem(onClick = {
-							showMenu = false
-							onBlockedClick()
-						}) {
-							Text(text = stringResource(id = R.string.blocked))
-						}
-						DropdownMenuItem(onClick = {
-							showMenu = false
-							onSettingsClick()
-						}) {
-							Text(text = stringResource(id = R.string.settings))
-						}
+				OptionsMenu(mutableListOf<OptionsMenuItemModel>().apply {
+					if (contentType != MainState.ContentType.PREVIOUS) {
+						add(OptionsMenuItemModel(OptionsMenuItemModel.Title.Res(R.string.previous), onPreviousClick))
 					}
-				}
+					add(OptionsMenuItemModel(OptionsMenuItemModel.Title.Res(R.string.blocked), onBlockedClick))
+					add(OptionsMenuItemModel(OptionsMenuItemModel.Title.Res(R.string.settings), onSettingsClick))
+				})
 			}
 		}
 		Box(

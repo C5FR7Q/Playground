@@ -3,15 +3,12 @@ package com.github.c5fr7q.playground.presentation.ui.screen.blocked
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -20,19 +17,14 @@ import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.github.c5fr7q.playground.domain.entity.Place
 import com.github.c5fr7q.playground.presentation.R
 import com.github.c5fr7q.playground.presentation.ui.base.BaseIntent
-import com.github.c5fr7q.playground.presentation.ui.util.CustomContentAlpha
-import com.github.c5fr7q.playground.presentation.ui.util.TagRow
 import com.github.c5fr7q.playground.presentation.ui.util.asText
-import com.google.accompanist.coil.rememberCoilPainter
+import com.github.c5fr7q.playground.presentation.ui.widget.SelectablePlaceItem
 import com.google.accompanist.insets.statusBarsHeight
 
 @Composable
@@ -80,7 +72,7 @@ private fun BlockedScreen(
 			} else {
 				LazyColumn {
 					items(state.places) { place ->
-						PlaceItem(
+						SelectablePlaceItem(
 							place = place,
 							isSelected = state.selectedPlaces.contains(place),
 							onPlaceClick = { onPlaceSelectionToggle(place) }
@@ -91,87 +83,6 @@ private fun BlockedScreen(
 		}
 	}
 }
-
-@Composable
-private fun PlaceItem(
-	place: Place,
-	isSelected: Boolean,
-	onPlaceClick: () -> Unit
-) {
-	val backgroundColor = when {
-		isSelected -> MaterialTheme.colors.primary.copy(alpha = CustomContentAlpha.pressed)
-		else -> Color.Transparent
-	}
-	Box(
-		modifier = Modifier
-			.background(color = backgroundColor)
-			.clickable(onClick = onPlaceClick)
-	) {
-		Row(
-			modifier = Modifier.padding(16.dp),
-			verticalAlignment = Alignment.CenterVertically
-		) {
-			PlaceImage(
-				modifier = Modifier.width(88.dp),
-				url = place.imageUrl
-			)
-
-			Spacer(modifier = Modifier.size(16.dp))
-
-			Column {
-				Text(text = place.name, style = MaterialTheme.typography.h4)
-				CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-					Text(
-						text = place.position.asText(),
-						style = MaterialTheme.typography.overline
-					)
-				}
-				Spacer(modifier = Modifier.size(2.dp))
-				Column(modifier = Modifier.wrapContentWidth()) {
-					TagRow(tags = place.categories.map { it.asText() }) {
-						Text(
-							text = it,
-							maxLines = 1,
-							overflow = TextOverflow.Ellipsis,
-							modifier = Modifier
-								.background(
-									color = MaterialTheme.colors.primaryVariant,
-									shape = RoundedCornerShape(4.dp)
-								)
-								.padding(4.dp),
-							style = MaterialTheme.typography.caption,
-							color = MaterialTheme.colors.onPrimary.copy(alpha = ContentAlpha.high)
-						)
-					}
-				}
-			}
-		}
-		Divider(modifier = Modifier.align(Alignment.BottomCenter))
-	}
-}
-
-@Composable
-private fun PlaceImage(modifier: Modifier = Modifier, url: String) {
-	Box(
-		modifier = modifier
-			.clip(RoundedCornerShape(4.dp))
-			.background(color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.medium))
-			.aspectRatio(4f / 3f)
-			.fillMaxWidth()
-	) {
-		Image(
-			modifier = Modifier.fillMaxSize(),
-			contentScale = ContentScale.Crop,
-			painter = rememberCoilPainter(
-				request = url,
-				fadeIn = true,
-				shouldRefetchOnSizeChange = { _, _ -> false },
-			),
-			contentDescription = null,
-		)
-	}
-}
-
 
 @Composable
 private fun TopBar(
@@ -186,7 +97,9 @@ private fun TopBar(
 	val contentColor by animateColorAsState(if (placesSelected) MaterialTheme.colors.surface else MaterialTheme.colors.onSurface)
 	val buttonsColor by animateColorAsState(if (placesSelected) MaterialTheme.colors.surface else MaterialTheme.colors.primary)
 	Column(
-		modifier = Modifier.background(color = backgroundColor).animateContentSize()
+		modifier = Modifier
+			.background(color = backgroundColor)
+			.animateContentSize()
 	) {
 		Box(
 			modifier = Modifier
@@ -225,6 +138,7 @@ private fun TopBar(
 			Divider()
 		}
 		if (filterIsActive) {
+			// TODO: 25.06.2021 Reuse SelectCategoriesRow
 			LazyRow(modifier = Modifier.padding(vertical = 6.dp)) {
 				val allCategories = Place.Category.values()
 				val lastIndex = allCategories.lastIndex

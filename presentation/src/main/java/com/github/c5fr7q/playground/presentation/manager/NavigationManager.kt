@@ -7,8 +7,8 @@ import androidx.navigation.compose.navigate
 import com.github.c5fr7q.playground.domain.entity.Position
 import com.github.c5fr7q.playground.presentation.ui.Navigation
 import com.github.c5fr7q.playground.presentation.ui.createRoute
-import com.github.c5fr7q.playground.presentation.ui.dialog.ConfirmationDialogModel
-import com.github.c5fr7q.playground.presentation.ui.dialog.DialogModel
+import com.github.c5fr7q.playground.presentation.ui.widget.dialog.ConfirmationDialogModel
+import com.github.c5fr7q.playground.presentation.ui.widget.dialog.DialogModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
