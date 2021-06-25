@@ -42,7 +42,7 @@ fun Main(navigationManager: NavigationManager) {
 
 			CompositionLocalProvider(LocalOnDismissRequest provides { navigationManager.closeDialog() }) {
 				val dialog by navigationManager.dialog.collectAsState(initial = null)
-				dialog?.draw()
+				dialog?.Draw()
 			}
 		}
 	}

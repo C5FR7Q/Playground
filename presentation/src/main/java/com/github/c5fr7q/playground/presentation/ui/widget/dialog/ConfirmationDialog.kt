@@ -17,7 +17,7 @@ data class ConfirmationDialogModel(
 	val onConfirmed: () -> Unit
 ) : DialogModel {
 	@Composable
-	override fun draw() {
+	override fun Draw() {
 		ConfirmationDialog(this)
 	}
 
