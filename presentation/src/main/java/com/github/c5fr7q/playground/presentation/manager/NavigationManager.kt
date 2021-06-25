@@ -9,7 +9,6 @@ import com.github.c5fr7q.playground.presentation.ui.Navigation
 import com.github.c5fr7q.playground.presentation.ui.createRoute
 import com.github.c5fr7q.playground.presentation.ui.dialog.ConfirmationDialogModel
 import com.github.c5fr7q.playground.presentation.ui.dialog.DialogModel
-import com.github.c5fr7q.playground.presentation.ui.screen.profile.ProfileNavigation
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -36,10 +35,6 @@ class NavigationManager @Inject constructor() : BaseManager() {
 
 	fun openBlocked() {
 		navController?.navigate(Navigation.Blocked.createRoute())
-	}
-
-	fun openProfile(userId: String) {
-		navController?.navigate(ProfileNavigation.createRoute(userId = userId))
 	}
 
 	fun openConfirmationDialog(
