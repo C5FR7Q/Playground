@@ -16,7 +16,11 @@ import com.google.accompanist.coil.rememberCoilPainter
 import java.util.*
 
 @Composable
-fun RatedImage(modifier: Modifier = Modifier, url: String, rating: Float) {
+fun RatedImage(
+	modifier: Modifier = Modifier,
+	url: String,
+	rating: Float
+) {
 	Box(
 		modifier = modifier
 			.clip(RoundedCornerShape(4.dp))
