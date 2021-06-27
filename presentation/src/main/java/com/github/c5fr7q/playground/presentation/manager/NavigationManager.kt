@@ -43,7 +43,7 @@ class NavigationManager @Inject constructor() : BaseManager() {
 		confirmButtonText: String = "",
 		isCancelable: Boolean = true,
 		onDismissRequest: () -> Unit = {},
-		onConfirmed: () -> Unit = {}
+		onConfirmClick: () -> Unit = {}
 	) {
 		addDialog(
 			ConfirmationDialogModel(
@@ -52,7 +52,7 @@ class NavigationManager @Inject constructor() : BaseManager() {
 				confirmButtonText = confirmButtonText,
 				isCancelable = isCancelable,
 				onDismissRequest = onDismissRequest,
-				onConfirmed = onConfirmed
+				onConfirmClick = onConfirmClick
 			)
 		)
 	}

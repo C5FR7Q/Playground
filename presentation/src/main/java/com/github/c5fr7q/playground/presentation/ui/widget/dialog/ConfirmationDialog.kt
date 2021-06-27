@@ -14,7 +14,7 @@ data class ConfirmationDialogModel(
 	val confirmButtonText: String,
 	val isCancelable: Boolean,
 	val onDismissRequest: () -> Unit,
-	val onConfirmed: () -> Unit
+	val onConfirmClick: () -> Unit
 ) : DialogModel {
 	@Composable
 	override fun Draw() {
@@ -29,7 +29,7 @@ data class ConfirmationDialogModel(
 		text: @Composable () -> Unit = { Text(text = model.text) },
 		button: @Composable () -> Unit = {
 			Button(onClick = {
-				model.onConfirmed()
+				model.onConfirmClick()
 				onDismissRequest()
 			}) {
 				Text(text = model.confirmButtonText

@@ -75,7 +75,7 @@ class PermissionManager @Inject constructor(
 			navigationManager.openConfirmationDialog(
 				text = rationaleMessage,
 				onDismissRequest = { cont.resume(false) },
-				onConfirmed = { cont.resume(true) }
+				onConfirmClick = { cont.resume(true) }
 			)
 		}
 	}
