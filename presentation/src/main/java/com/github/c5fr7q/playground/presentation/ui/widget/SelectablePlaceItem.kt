@@ -5,9 +5,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.ContentAlpha
+import androidx.compose.material.Divider
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -48,12 +50,12 @@ fun SelectablePlaceItem(
 
 			Column {
 				Text(text = place.name, style = MaterialTheme.typography.h4)
-				CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-					Text(
-						text = place.position.asText(),
-						style = MaterialTheme.typography.overline
+				Text(
+					text = place.position.asText(),
+					style = MaterialTheme.typography.overline.copy(
+						color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.medium)
 					)
-				}
+				)
 				Spacer(modifier = Modifier.size(2.dp))
 				PlaceCategoryRow(modifier = Modifier.wrapContentWidth(), place = place)
 			}

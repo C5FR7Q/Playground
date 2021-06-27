@@ -8,7 +8,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
@@ -45,13 +44,13 @@ fun PlaceItem(
 					add(OptionsMenuItemModel(OptionsMenuItemModel.Title.Res(R.string.show_in_maps), onShowInMapsClick))
 				})
 			}
-			CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-				Text(
-					modifier = Modifier.padding(horizontal = 16.dp),
-					text = place.position.asText(),
-					style = MaterialTheme.typography.overline
+			Text(
+				modifier = Modifier.padding(horizontal = 16.dp),
+				text = place.position.asText(),
+				style = MaterialTheme.typography.overline.copy(
+					color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.medium)
 				)
-			}
+			)
 			Spacer(modifier = Modifier.height(2.dp))
 			PlaceCategoryRow(
 				modifier = Modifier

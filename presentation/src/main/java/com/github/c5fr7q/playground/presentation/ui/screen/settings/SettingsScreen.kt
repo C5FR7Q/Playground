@@ -124,11 +124,13 @@ private fun SettingsValueItem(
 		) {
 			Text(
 				text = title,
-				style = MaterialTheme.typography.subtitle1.copy(color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.high))
+				style = MaterialTheme.typography.subtitle1.copy(color = MaterialTheme.colors.onSurface)
 			)
 			Text(
 				text = value,
-				style = MaterialTheme.typography.body2.copy(color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.medium))
+				style = MaterialTheme.typography.body2.copy(
+					color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.medium)
+				)
 			)
 		}
 		Divider(modifier = Modifier.padding(start = 16.dp))

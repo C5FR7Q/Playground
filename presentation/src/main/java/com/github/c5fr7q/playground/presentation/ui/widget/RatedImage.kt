@@ -42,7 +42,7 @@ fun RatedImage(
 		Box(
 			modifier = Modifier
 				.background(
-					color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.high),
+					color = MaterialTheme.colors.onSurface,
 					shape = RoundedCornerShape(topStart = 4.dp, bottomEnd = 4.dp)
 				)
 				.padding(4.dp)
@@ -50,7 +50,7 @@ fun RatedImage(
 			Text(
 				text = "R:" + "%.2f".format(Locale.US, rating),
 				style = MaterialTheme.typography.overline,
-				color = MaterialTheme.colors.onPrimary.copy(alpha = ContentAlpha.high)
+				color = MaterialTheme.colors.onPrimary
 			)
 		}
 	}
