@@ -286,10 +286,10 @@ private fun BottomBar(
 				}
 				OptionsMenu(mutableListOf<OptionsMenuItemModel>().apply {
 					if (contentType != MainState.ContentType.PREVIOUS) {
-						add(OptionsMenuItemModel(OptionsMenuItemModel.Title.Res(R.string.previous), onPreviousClick))
+						add(OptionsMenuItemModel(stringResource(id = R.string.previous), onPreviousClick))
 					}
-					add(OptionsMenuItemModel(OptionsMenuItemModel.Title.Res(R.string.blocked), onBlockedClick))
-					add(OptionsMenuItemModel(OptionsMenuItemModel.Title.Res(R.string.settings), onSettingsClick))
+					add(OptionsMenuItemModel(stringResource(id = R.string.blocked), onBlockedClick))
+					add(OptionsMenuItemModel(stringResource(id = R.string.settings), onSettingsClick))
 				})
 			}
 		}

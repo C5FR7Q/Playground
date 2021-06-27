@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.github.c5fr7q.playground.domain.entity.Place
@@ -40,8 +41,8 @@ fun PlaceItem(
 				Text(modifier = Modifier.weight(1f), text = place.name, style = MaterialTheme.typography.h4)
 				Spacer(modifier = Modifier.size(6.dp))
 				OptionsMenu(options = mutableListOf<OptionsMenuItemModel>().apply {
-					add(OptionsMenuItemModel(OptionsMenuItemModel.Title.Res(R.string.block), onBlockClick))
-					add(OptionsMenuItemModel(OptionsMenuItemModel.Title.Res(R.string.show_in_maps), onShowInMapsClick))
+					add(OptionsMenuItemModel(stringResource(id = R.string.block), onBlockClick))
+					add(OptionsMenuItemModel(stringResource(id = R.string.show_in_maps), onShowInMapsClick))
 				})
 			}
 			Text(

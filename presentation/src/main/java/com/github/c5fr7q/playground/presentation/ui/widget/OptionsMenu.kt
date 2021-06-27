@@ -4,7 +4,6 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.*
-import androidx.compose.ui.res.stringResource
 
 @Composable
 fun OptionsMenu(options: List<OptionsMenuItemModel>) {
@@ -20,12 +19,7 @@ fun OptionsMenu(options: List<OptionsMenuItemModel>) {
 					showMenu = false
 					option.onClick()
 				}) {
-					Text(
-						text = when (option.title) {
-							is OptionsMenuItemModel.Title.Res -> stringResource(option.title.stringRes)
-							is OptionsMenuItemModel.Title.Str -> option.title.string
-						}
-					)
+					Text(text = option.title)
 				}
 			}
 		}
@@ -33,11 +27,6 @@ fun OptionsMenu(options: List<OptionsMenuItemModel>) {
 }
 
 data class OptionsMenuItemModel(
-	val title: Title,
+	val title: String,
 	val onClick: () -> Unit
-) {
-	sealed class Title {
-		data class Res(val stringRes: Int) : Title()
-		data class Str(val string: String) : Title()
-	}
-}
+)
