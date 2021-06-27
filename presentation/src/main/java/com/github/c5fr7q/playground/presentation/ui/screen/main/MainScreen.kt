@@ -150,10 +150,7 @@ private fun MainScreen(
 		floatingActionButtonPosition = FabPosition.Center,
 		isFloatingActionButtonDocked = true
 	) { innerPadding: PaddingValues ->
-		Box(
-			modifier = Modifier
-				.fillMaxSize()
-		) {
+		Box(modifier = Modifier.fillMaxSize()) {
 			if (state.places.isEmpty()) {
 				Text(
 					modifier = Modifier.align(Alignment.Center),
@@ -280,9 +277,7 @@ private fun BottomBar(
 	onSettingsClick: () -> Unit
 ) {
 	Column {
-		BottomAppBar(
-			cutoutShape = CircleShape
-		) {
+		BottomAppBar(cutoutShape = CircleShape) {
 			Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
 				if (contentType != MainState.ContentType.FAVORITE) {
 					IconButton(onClick = onLikeClick) {

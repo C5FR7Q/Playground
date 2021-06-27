@@ -32,9 +32,10 @@ class PlaceRepositoryImpl @Inject constructor(
 	@GeneralCoroutineScope private val generalScope: CoroutineScope
 ) : PlaceRepository {
 
-	private var currentPosition = Position(0f, 0f)
 	private val requestedPlaces = MutableSharedFlow<List<Place>>(1)
 	private val placesStatus = MutableSharedFlow<UpdatedPlacesStatus>(1).apply { tryEmit(UpdatedPlacesStatus.LOADED) }
+
+	private var currentPosition = Position(0f, 0f)
 
 	private var requestedPosition: Position? = null
 	private var requestedCategories: List<Place.Category>? = null
@@ -67,8 +68,14 @@ class PlaceRepositoryImpl @Inject constructor(
 			.launchIn(generalScope)
 	}
 
-	override fun getPreviousPlaces() = placeDao.getAllPlaces().map { list ->
-		list.map { placeDtoMapper.mapDtoToPlace(it) }.filter { !it.isBlocked }
+	override fun getPreviousPlaces(): Flow<List<Place>> {
+		return placeDao
+			.getAllPlaces()
+			.map { list ->
+				list
+					.map { placeDtoMapper.mapDtoToPlace(it) }
+					.filter { !it.isBlocked }
+			}
 	}
 
 	override fun updatePlaces(categories: List<Place.Category>) {
@@ -93,7 +100,11 @@ class PlaceRepositoryImpl @Inject constructor(
 
 	override fun loadMorePlaces() {
 		generalScope.launch {
-			fetchPlaces(requestedCategories!!, requestedRadius!!, requestedPlaces.replayCache[0].size)
+			fetchPlaces(
+				requestedCategories!!,
+				requestedRadius!!,
+				requestedPlaces.replayCache[0].size
+			)
 		}
 	}
 
@@ -164,8 +175,14 @@ class PlaceRepositoryImpl @Inject constructor(
 		}
 	}
 
-	override fun getBlockedPlaces(): Flow<List<Place>> = placeDao.getAllPlaces().map { list ->
-		list.map { placeDtoMapper.mapDtoToPlace(it) }.filter { it.isBlocked }
+	override fun getBlockedPlaces(): Flow<List<Place>> {
+		return placeDao
+			.getAllPlaces()
+			.map { list ->
+				list
+					.map { placeDtoMapper.mapDtoToPlace(it) }
+					.filter { it.isBlocked }
+			}
 	}
 
 	private fun List<Place>.updateFavorites(favoritePlacesIds: List<String>): List<Place> {
