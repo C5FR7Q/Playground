@@ -6,6 +6,4 @@ sealed class SettingsIntent : BaseIntent {
 	object ClickPackCount : SettingsIntent()
 	object ClickCachingDays : SettingsIntent()
 	object ClickRadius : SettingsIntent()
-	object DismissDialog: SettingsIntent()
-	data class InputValue(val value: Int) : SettingsIntent()
 }

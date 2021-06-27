@@ -2,6 +2,7 @@ package com.github.c5fr7q.playground.presentation.manager
 
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.navigate
 import com.github.c5fr7q.playground.domain.entity.Position
@@ -9,6 +10,7 @@ import com.github.c5fr7q.playground.presentation.ui.Navigation
 import com.github.c5fr7q.playground.presentation.ui.createRoute
 import com.github.c5fr7q.playground.presentation.ui.widget.dialog.ConfirmationDialogModel
 import com.github.c5fr7q.playground.presentation.ui.widget.dialog.DialogModel
+import com.github.c5fr7q.playground.presentation.ui.widget.dialog.InputDialogModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -41,18 +43,40 @@ class NavigationManager @Inject constructor() : BaseManager() {
 		text: String,
 		title: String = "",
 		confirmButtonText: String = "",
-		isCancelable: Boolean = true,
 		onDismissRequest: () -> Unit = {},
-		onConfirmClick: () -> Unit = {}
+		onConfirmClick: () -> Unit = {},
+		dialogProperties: DialogProperties = DialogProperties()
 	) {
 		addDialog(
 			ConfirmationDialogModel(
 				text = text,
 				title = title,
 				confirmButtonText = confirmButtonText,
-				isCancelable = isCancelable,
 				onDismissRequest = onDismissRequest,
-				onConfirmClick = onConfirmClick
+				onConfirmClick = onConfirmClick,
+				dialogProperties = dialogProperties
+			)
+		)
+	}
+
+	fun openInputDialog(
+		title: String,
+		onApplyValue: (Int) -> Unit,
+		defaultValue: Int = 0,
+		confirmButtonText: String = "",
+		dismissButtonText: String = "",
+		onDismissRequest: () -> Unit = {},
+		dialogProperties: DialogProperties = DialogProperties()
+	) {
+		addDialog(
+			InputDialogModel(
+				title = title,
+				defaultValue = defaultValue,
+				onApplyValue = onApplyValue,
+				confirmButtonText = confirmButtonText,
+				dismissButtonText = dismissButtonText,
+				onDismissRequest = onDismissRequest,
+				dialogProperties = dialogProperties
 			)
 		)
 	}

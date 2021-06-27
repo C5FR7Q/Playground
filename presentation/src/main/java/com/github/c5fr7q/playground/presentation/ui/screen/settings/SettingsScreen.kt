@@ -16,7 +16,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.github.c5fr7q.playground.presentation.R
 import com.github.c5fr7q.playground.presentation.ui.base.BaseIntent
-import com.github.c5fr7q.playground.presentation.ui.widget.dialog.InputDialog
 import com.google.accompanist.insets.statusBarsHeight
 
 @Composable
@@ -28,8 +27,6 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
 		onPackCountClick = { viewModel.produceIntent(SettingsIntent.ClickPackCount) },
 		onCachingDaysClick = { viewModel.produceIntent(SettingsIntent.ClickCachingDays) },
 		onRadiusClick = { viewModel.produceIntent(SettingsIntent.ClickRadius) },
-		onDismissDialog = { viewModel.produceIntent(SettingsIntent.DismissDialog) },
-		onInputValue = { viewModel.produceIntent(SettingsIntent.InputValue(it)) }
 	)
 }
 
@@ -39,9 +36,7 @@ private fun SettingsScreen(
 	onBackClick: () -> Unit,
 	onPackCountClick: () -> Unit,
 	onCachingDaysClick: () -> Unit,
-	onRadiusClick: () -> Unit,
-	onDismissDialog: () -> Unit,
-	onInputValue: (Int) -> Unit,
+	onRadiusClick: () -> Unit
 ) {
 	Scaffold(
 		topBar = {
@@ -71,33 +66,6 @@ private fun SettingsScreen(
 					title = stringResource(id = R.string.radius),
 					value = state.radius.takeIf { it != 0 }?.let { stringResource(id = R.string.n_meters, it) } ?: "",
 					itemClick = onRadiusClick
-				)
-			}
-		}
-		when (state.inputReceiver) {
-			InputReceiver.NONE -> Unit
-			InputReceiver.CACHING_DAYS -> {
-				InputDialog(
-					title = stringResource(id = R.string.caching_days),
-					defaultValue = state.cachingDays,
-					onDismissDialog = onDismissDialog,
-					onInputValue = onInputValue
-				)
-			}
-			InputReceiver.PACK_COUNT -> {
-				InputDialog(
-					title = stringResource(id = R.string.pack_count),
-					defaultValue = state.packCount,
-					onDismissDialog = onDismissDialog,
-					onInputValue = onInputValue
-				)
-			}
-			InputReceiver.RADIUS -> {
-				InputDialog(
-					title = stringResource(id = R.string.radius),
-					defaultValue = state.radius,
-					onDismissDialog = onDismissDialog,
-					onInputValue = onInputValue
 				)
 			}
 		}
@@ -184,12 +152,4 @@ private fun TopBar(
 		Divider()
 	}
 }
-
-enum class InputReceiver {
-	NONE,
-	CACHING_DAYS,
-	PACK_COUNT,
-	RADIUS
-}
-
 
