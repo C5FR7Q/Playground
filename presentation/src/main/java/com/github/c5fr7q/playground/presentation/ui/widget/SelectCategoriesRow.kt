@@ -14,10 +14,11 @@ import com.github.c5fr7q.playground.presentation.ui.util.asText
 
 @Composable
 fun SelectCategoriesRow(
+	modifier: Modifier = Modifier.padding(vertical = 6.dp),
 	selectedCategories: List<Place.Category>,
 	onCategoryToggle: (Place.Category) -> Unit
 ) {
-	LazyRow(modifier = Modifier.padding(vertical = 6.dp)) {
+	LazyRow(modifier = modifier) {
 		val allCategories = Place.Category.values()
 		val lastIndex = allCategories.lastIndex
 		itemsIndexed(allCategories) { index, category ->

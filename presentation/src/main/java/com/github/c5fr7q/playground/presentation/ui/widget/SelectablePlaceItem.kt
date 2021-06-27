@@ -21,6 +21,7 @@ import com.google.accompanist.coil.rememberCoilPainter
 
 @Composable
 fun SelectablePlaceItem(
+	modifier: Modifier = Modifier,
 	place: Place,
 	isSelected: Boolean,
 	onPlaceClick: () -> Unit
@@ -30,7 +31,7 @@ fun SelectablePlaceItem(
 		else -> Color.Transparent
 	}
 	Box(
-		modifier = Modifier
+		modifier = modifier
 			.background(color = backgroundColor)
 			.clickable(onClick = onPlaceClick)
 	) {
