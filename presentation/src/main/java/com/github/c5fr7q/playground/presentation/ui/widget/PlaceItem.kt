@@ -61,18 +61,6 @@ fun PlaceItem(
 			)
 			Spacer(modifier = Modifier.height(6.dp))
 			PlaceTagRow(modifier = Modifier.padding(horizontal = 16.dp), place = place)
-			TagRow(modifier = Modifier.padding(horizontal = 16.dp), tags = place.tags) {
-				Text(
-					text = it,
-					maxLines = 1,
-					overflow = TextOverflow.Ellipsis,
-					modifier = Modifier
-						.background(MaterialTheme.colors.onSurface, RoundedCornerShape(4.dp))
-						.padding(4.dp),
-					style = MaterialTheme.typography.caption,
-					color = MaterialTheme.colors.onPrimary
-				)
-			}
 			Spacer(modifier = Modifier.height(6.dp))
 			RatedImage(modifier = Modifier.padding(horizontal = 16.dp), url = place.imageUrl, rating = place.rating)
 			Spacer(modifier = Modifier.height(16.dp))
