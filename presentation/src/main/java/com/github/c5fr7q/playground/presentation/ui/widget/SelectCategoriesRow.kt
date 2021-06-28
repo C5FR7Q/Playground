@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.github.c5fr7q.playground.domain.entity.Place
 import com.github.c5fr7q.playground.presentation.ui.util.asText
@@ -30,7 +31,10 @@ fun SelectCategoriesRow(
 						end = if (index == lastIndex) 16.dp else 6.dp
 					),
 					contentPadding = PaddingValues(4.dp),
-					onClick = { onCategoryToggle(category) }
+					onClick = { onCategoryToggle(category) },
+					colors = ButtonDefaults.buttonColors(
+						contentColor = MaterialTheme.colors.surface
+					)
 				) {
 					Text(text = category.asText(), style = MaterialTheme.typography.button)
 				}
@@ -42,6 +46,9 @@ fun SelectCategoriesRow(
 					),
 					contentPadding = PaddingValues(4.dp),
 					onClick = { onCategoryToggle(category) },
+					colors = ButtonDefaults.outlinedButtonColors(
+						backgroundColor = Color.Transparent
+					),
 					border = BorderStroke(ButtonDefaults.OutlinedBorderSize, MaterialTheme.colors.primary)
 				) {
 					Text(text = category.asText(), style = MaterialTheme.typography.button, color = MaterialTheme.colors.primary)

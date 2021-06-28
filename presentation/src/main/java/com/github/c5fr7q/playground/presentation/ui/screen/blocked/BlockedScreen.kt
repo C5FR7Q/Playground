@@ -2,13 +2,10 @@ package com.github.c5fr7q.playground.presentation.ui.screen.blocked
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -23,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import com.github.c5fr7q.playground.domain.entity.Place
 import com.github.c5fr7q.playground.presentation.R
 import com.github.c5fr7q.playground.presentation.ui.base.BaseIntent
-import com.github.c5fr7q.playground.presentation.ui.util.asText
+import com.github.c5fr7q.playground.presentation.ui.widget.SelectCategoriesRow
 import com.github.c5fr7q.playground.presentation.ui.widget.SelectablePlaceItem
 import com.google.accompanist.insets.statusBarsHeight
 
@@ -93,101 +90,52 @@ private fun TopBar(
 	onCategoryToggle: (Place.Category) -> Unit
 ) {
 	var filterIsActive by remember { mutableStateOf(true) }
-	val backgroundColor by animateColorAsState(if (placesSelected) MaterialTheme.colors.onSurface else MaterialTheme.colors.surface)
-	val contentColor by animateColorAsState(if (placesSelected) MaterialTheme.colors.surface else MaterialTheme.colors.onSurface)
-	val buttonsColor by animateColorAsState(if (placesSelected) MaterialTheme.colors.surface else MaterialTheme.colors.primary)
-	Column(
-		modifier = Modifier
-			.background(color = backgroundColor)
-			.animateContentSize()
+	MaterialTheme(
+		colors = MaterialTheme.colors.copy(
+			surface = animateColorAsState(if (placesSelected) MaterialTheme.colors.onSurface else MaterialTheme.colors.surface).value,
+			onSurface = animateColorAsState(if (placesSelected) MaterialTheme.colors.surface else MaterialTheme.colors.onSurface).value,
+			primary = animateColorAsState(if (placesSelected) MaterialTheme.colors.surface else MaterialTheme.colors.primary).value
+		)
 	) {
-		Box(
+		Column(
 			modifier = Modifier
-				.fillMaxWidth()
-				.statusBarsHeight()
-		)
-		TopAppBar(
-			navigationIcon = {
-				IconButton(onClick = onBackClick) {
-					Icon(Icons.Default.ArrowBack, contentDescription = null)
-				}
-			},
-			title = {
-				Text(
-					text = stringResource(R.string.blocked),
-					style = MaterialTheme.typography.h5
-				)
-			},
-			actions = {
-				IconButton(onClick = { filterIsActive = !filterIsActive }) {
-					Icon(Icons.Default.FilterList, contentDescription = null)
-				}
-				if (placesSelected) {
-					IconButton(onClick = onDeleteSelectedPlacesClick) {
-						Icon(Icons.Default.Delete, contentDescription = null)
+				.background(color = MaterialTheme.colors.surface)
+				.animateContentSize()
+		) {
+			Box(
+				modifier = Modifier
+					.fillMaxWidth()
+					.statusBarsHeight()
+			)
+			TopAppBar(
+				navigationIcon = {
+					IconButton(onClick = onBackClick) {
+						Icon(Icons.Default.ArrowBack, contentDescription = null)
 					}
-				}
-			},
-			backgroundColor = Color.Transparent,
-			contentColor = contentColor,
-			elevation = 0.dp,
-		)
-		if (placesSelected) {
-			Divider(color = contentColor)
-		} else {
+				},
+				title = {
+					Text(
+						text = stringResource(R.string.blocked),
+						style = MaterialTheme.typography.h5
+					)
+				},
+				actions = {
+					IconButton(onClick = { filterIsActive = !filterIsActive }) {
+						Icon(Icons.Default.FilterList, contentDescription = null)
+					}
+					if (placesSelected) {
+						IconButton(onClick = onDeleteSelectedPlacesClick) {
+							Icon(Icons.Default.Delete, contentDescription = null)
+						}
+					}
+				},
+				backgroundColor = Color.Transparent,
+				contentColor = MaterialTheme.colors.onSurface,
+				elevation = 0.dp,
+			)
 			Divider()
-		}
-		if (filterIsActive) {
-			// TODO: 25.06.2021 Reuse SelectCategoriesRow
-			LazyRow(modifier = Modifier.padding(vertical = 6.dp)) {
-				val allCategories = Place.Category.values()
-				val lastIndex = allCategories.lastIndex
-				itemsIndexed(allCategories) { index, category ->
-					val selected = selectedCategories.contains(category)
-					if (selected) {
-						Button(
-							modifier = Modifier.padding(
-								start = if (index == 0) 16.dp else 0.dp,
-								end = if (index == lastIndex) 16.dp else 6.dp
-							),
-							contentPadding = PaddingValues(4.dp),
-							onClick = { onCategoryToggle(category) },
-							colors = ButtonDefaults.buttonColors(
-								contentColor = backgroundColor,
-								backgroundColor = buttonsColor
-							)
-						) {
-							Text(text = category.asText(), style = MaterialTheme.typography.button)
-						}
-					} else {
-						OutlinedButton(
-							modifier = Modifier.padding(
-								start = if (index == 0) 16.dp else 0.dp,
-								end = if (index == lastIndex) 16.dp else 6.dp,
-							),
-							contentPadding = PaddingValues(4.dp),
-							onClick = { onCategoryToggle(category) },
-							colors = ButtonDefaults.outlinedButtonColors(
-								contentColor = buttonsColor,
-								backgroundColor = Color.Transparent
-							),
-							border = BorderStroke(
-								ButtonDefaults.OutlinedBorderSize,
-								buttonsColor
-							)
-						) {
-							Text(
-								text = category.asText(),
-								style = MaterialTheme.typography.button,
-								color = buttonsColor
-							)
-						}
-					}
-				}
-			}
-			if (placesSelected) {
-				Divider(color = contentColor)
-			} else {
+			if (filterIsActive) {
+				SelectCategoriesRow(selectedCategories = selectedCategories, onCategoryToggle = onCategoryToggle)
 				Divider()
 			}
 		}
