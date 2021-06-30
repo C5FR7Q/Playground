@@ -13,7 +13,6 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
-import retrofit2.converter.scalars.ScalarsConverterFactory
 import javax.inject.Singleton
 
 @Module
@@ -26,7 +25,6 @@ abstract class RemoteSourceModule {
 			return Retrofit.Builder()
 				.client(client)
 				.baseUrl("https://api.sygictravelapi.com/1.2/en/")
-				.addConverterFactory(ScalarsConverterFactory.create())
 				.addConverterFactory(MoshiConverterFactory.create(moshi))
 				.build()
 				.create(SygicService::class.java)
@@ -37,7 +35,6 @@ abstract class RemoteSourceModule {
 		@Provides
 		fun provideSygicClient(): OkHttpClient {
 			return OkHttpClient.Builder()
-				.addInterceptor(HttpLoggingInterceptor())
 				.addInterceptor { chain ->
 					val original = chain.request()
 
@@ -46,6 +43,7 @@ abstract class RemoteSourceModule {
 						.build()
 					chain.proceed(newRequest)
 				}
+				.addInterceptor(HttpLoggingInterceptor().apply { setLevel(HttpLoggingInterceptor.Level.BODY) })
 				.build()
 		}
 
@@ -55,7 +53,6 @@ abstract class RemoteSourceModule {
 			return Retrofit.Builder()
 				.client(client)
 				.baseUrl("https://api.unsplash.com/")
-				.addConverterFactory(ScalarsConverterFactory.create())
 				.addConverterFactory(MoshiConverterFactory.create(moshi))
 				.build()
 				.create(UnsplashService::class.java)
@@ -66,7 +63,6 @@ abstract class RemoteSourceModule {
 		@Provides
 		fun provideUnsplashClient(): OkHttpClient {
 			return OkHttpClient.Builder()
-				.addInterceptor(HttpLoggingInterceptor())
 				.addInterceptor { chain ->
 					val original = chain.request()
 					val originalUrl = original.url
@@ -78,6 +74,7 @@ abstract class RemoteSourceModule {
 					val newRequest = original.newBuilder().url(newUrl).build()
 					chain.proceed(newRequest)
 				}
+				.addInterceptor(HttpLoggingInterceptor().apply { setLevel(HttpLoggingInterceptor.Level.BODY) })
 				.build()
 		}
 	}
