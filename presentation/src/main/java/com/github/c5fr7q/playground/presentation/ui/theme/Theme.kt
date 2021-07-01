@@ -18,8 +18,8 @@ private val LightColorPalette = lightColors(
 	primaryVariant = FountainBlue900,
 	secondary = Tamarillo300,
 	secondaryVariant = OrangePeel500,
-	surface = Mercury,
-	background = Mercury
+	surface = FountainBlue50,
+	background = FountainBlue50
 
 	/* Other default colors to override
     background = Color.White,
