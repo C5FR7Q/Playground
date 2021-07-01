@@ -7,6 +7,7 @@ import com.github.c5fr7q.playground.presentation.manager.NavigationManager
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.lang.reflect.ParameterizedType
 import javax.inject.Inject
 
@@ -28,6 +29,7 @@ abstract class BaseViewModel<State, SideEffect, Intent : BaseIntent> : ViewModel
 	open fun attach() {
 		viewModelScope.launch {
 			intentFlow.collect { intent ->
+				Timber.v("handleIntent: $intent")
 				try {
 					(intent as? BaseIntent.Default)?.let { handleIntent(intent) }
 				} catch (ignored: Exception) {
@@ -59,13 +61,16 @@ abstract class BaseViewModel<State, SideEffect, Intent : BaseIntent> : ViewModel
 	}
 
 	protected fun produceSideEffect(sideEffect: SideEffect) {
+		Timber.v("produceSideEffect: $sideEffect")
 		viewModelScope.launch {
 			sideEffectFlow.emit(sideEffect)
 		}
 	}
 
 	protected fun updateState(update: State.() -> State) {
-		mutableState.value = mutableState.value.update()
+		mutableState.value = mutableState.value
+			.update()
+			.also { Timber.v("updateState: $it") }
 	}
 
 	protected open fun handleIntent(intent: Intent) {}

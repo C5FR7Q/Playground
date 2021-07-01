@@ -79,4 +79,6 @@ dependencies {
 	kapt("com.squareup.moshi:moshi-kotlin-codegen:$moshi_version")
 
 	implementation("com.squareup.okhttp3:logging-interceptor:$okhttp_logging_version")
+
+	implementation "com.jakewharton.timber:timber:$timber_version"
 }
