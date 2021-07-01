@@ -3,6 +3,7 @@ package com.github.c5fr7q.playground.presentation.ui
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.hilt.navigation.compose.hiltNavGraphViewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.compose.NavHost
@@ -68,7 +69,7 @@ fun OnLifecycleEvent(onEvent: (event: Lifecycle.Event) -> Unit) {
 
 @Composable
 inline fun <reified VM : BaseViewModel<*, *, *>> baseViewModel(): VM {
-	val viewModel = hiltNavGraphViewModel<VM>()
+	val viewModel = hiltViewModel<VM>()
 	OnLifecycleEvent { event ->
 		when (event) {
 			Lifecycle.Event.ON_START -> viewModel.attach()

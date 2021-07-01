@@ -4,7 +4,6 @@ import android.content.Intent
 import android.net.Uri
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.navigate
 import com.github.c5fr7q.playground.domain.entity.Position
 import com.github.c5fr7q.playground.presentation.ui.Navigation
 import com.github.c5fr7q.playground.presentation.ui.createRoute
