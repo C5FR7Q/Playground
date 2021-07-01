@@ -94,7 +94,7 @@ private fun TopBar(
 		colors = MaterialTheme.colors.copy(
 			surface = animateColorAsState(if (placesSelected) MaterialTheme.colors.onSurface else MaterialTheme.colors.surface).value,
 			onSurface = animateColorAsState(if (placesSelected) MaterialTheme.colors.surface else MaterialTheme.colors.onSurface).value,
-			primary = animateColorAsState(if (placesSelected) MaterialTheme.colors.surface else MaterialTheme.colors.primary).value
+			secondaryVariant = animateColorAsState(if (placesSelected) MaterialTheme.colors.surface else MaterialTheme.colors.secondaryVariant).value
 		)
 	) {
 		Column(

@@ -33,7 +33,8 @@ fun SelectCategoriesRow(
 					contentPadding = PaddingValues(4.dp),
 					onClick = { onCategoryToggle(category) },
 					colors = ButtonDefaults.buttonColors(
-						contentColor = MaterialTheme.colors.surface
+						contentColor = MaterialTheme.colors.surface,
+						backgroundColor = MaterialTheme.colors.secondaryVariant
 					)
 				) {
 					Text(text = category.asText(), style = MaterialTheme.typography.button)
@@ -49,9 +50,9 @@ fun SelectCategoriesRow(
 					colors = ButtonDefaults.outlinedButtonColors(
 						backgroundColor = Color.Transparent
 					),
-					border = BorderStroke(ButtonDefaults.OutlinedBorderSize, MaterialTheme.colors.primary)
+					border = BorderStroke(ButtonDefaults.OutlinedBorderSize, MaterialTheme.colors.secondaryVariant)
 				) {
-					Text(text = category.asText(), style = MaterialTheme.typography.button, color = MaterialTheme.colors.primary)
+					Text(text = category.asText(), style = MaterialTheme.typography.button, color = MaterialTheme.colors.secondaryVariant)
 				}
 			}
 		}
