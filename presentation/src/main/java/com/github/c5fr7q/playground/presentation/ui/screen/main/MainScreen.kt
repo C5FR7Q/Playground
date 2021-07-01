@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
@@ -138,7 +137,11 @@ private fun MainScreen(
 					}
 					else -> 0f
 				}
-				FloatingActionButton(onClick = onRefreshClick, modifier = Modifier.size(fabSize)) {
+				FloatingActionButton(
+					modifier = Modifier.size(fabSize),
+					shape = MaterialTheme.shapes.small,
+					onClick = onRefreshClick
+				) {
 					Icon(
 						modifier = Modifier.graphicsLayer(rotationZ = rotation),
 						imageVector = Icons.Default.Refresh,
@@ -277,7 +280,7 @@ private fun BottomBar(
 	onSettingsClick: () -> Unit
 ) {
 	Column {
-		BottomAppBar(cutoutShape = CircleShape) {
+		BottomAppBar {
 			Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
 				if (contentType != MainState.ContentType.FAVORITE) {
 					IconButton(onClick = onLikeClick) {
