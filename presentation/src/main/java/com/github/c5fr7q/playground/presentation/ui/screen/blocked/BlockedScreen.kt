@@ -92,9 +92,7 @@ private fun TopBar(
 	var filterIsActive by remember { mutableStateOf(true) }
 	MaterialTheme(
 		colors = MaterialTheme.colors.copy(
-			surface = animateColorAsState(if (placesSelected) MaterialTheme.colors.onSurface else MaterialTheme.colors.surface).value,
-			onSurface = animateColorAsState(if (placesSelected) MaterialTheme.colors.surface else MaterialTheme.colors.onSurface).value,
-			secondaryVariant = animateColorAsState(if (placesSelected) MaterialTheme.colors.surface else MaterialTheme.colors.secondaryVariant).value
+			secondaryVariant = animateColorAsState(if (placesSelected) MaterialTheme.colors.secondary else MaterialTheme.colors.secondaryVariant).value
 		)
 	) {
 		Column(
