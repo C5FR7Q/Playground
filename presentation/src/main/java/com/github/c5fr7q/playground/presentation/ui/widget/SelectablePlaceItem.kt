@@ -1,5 +1,6 @@
 package com.github.c5fr7q.playground.presentation.ui.widget
 
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -11,11 +12,9 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import com.github.c5fr7q.playground.domain.entity.Place
-import com.github.c5fr7q.playground.presentation.ui.util.CustomContentAlpha
 import com.github.c5fr7q.playground.presentation.ui.util.asText
 import com.google.accompanist.coil.rememberCoilPainter
 
@@ -26,15 +25,18 @@ fun SelectablePlaceItem(
 	isSelected: Boolean,
 	onPlaceClick: () -> Unit
 ) {
-	val backgroundColor = when {
-		isSelected -> MaterialTheme.colors.primary.copy(alpha = CustomContentAlpha.pressed)
-		else -> Color.Transparent
-	}
 	Box(
 		modifier = modifier
-			.background(color = backgroundColor)
 			.clickable(onClick = onPlaceClick)
+			.height(IntrinsicSize.Max)
 	) {
+		Spacer(
+			modifier = Modifier
+				.background(color = MaterialTheme.colors.secondary)
+				.width(animateDpAsState(if (isSelected) 4.dp else 0.dp).value)
+				.fillMaxHeight()
+				.align(Alignment.CenterEnd)
+		)
 		Row(
 			modifier = Modifier.padding(16.dp),
 			verticalAlignment = Alignment.CenterVertically
@@ -59,6 +61,7 @@ fun SelectablePlaceItem(
 			}
 		}
 		Divider(modifier = Modifier.align(Alignment.BottomCenter))
+
 	}
 }
 
