@@ -2,12 +2,10 @@ package com.github.c5fr7q.playground.presentation.ui.widget
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.github.c5fr7q.playground.domain.entity.Place
@@ -32,7 +30,14 @@ fun PlaceItem(
 				verticalAlignment = Alignment.CenterVertically
 			) {
 				IconButton(onClick = onToggleFavoriteClick) {
-					Icon(if (place.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder, contentDescription = null)
+					Icon(
+						painter = painterResource(
+							id = if (place.isFavorite)
+								R.drawable.ic_favorite_24 else
+								R.drawable.ic_favorite_border_24
+						),
+						contentDescription = null
+					)
 				}
 				Spacer(modifier = Modifier.size(6.dp))
 				Text(modifier = Modifier.weight(1f), text = place.name, style = MaterialTheme.typography.h4)

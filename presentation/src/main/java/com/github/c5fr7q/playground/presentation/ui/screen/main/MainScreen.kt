@@ -9,16 +9,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FilterList
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.github.c5fr7q.playground.domain.entity.Place
@@ -144,7 +141,7 @@ private fun MainScreen(
 				) {
 					Icon(
 						modifier = Modifier.graphicsLayer(rotationZ = rotation),
-						imageVector = Icons.Default.Refresh,
+						painter = painterResource(id = R.drawable.ic_refresh_24),
 						contentDescription = null
 					)
 				}
@@ -256,7 +253,7 @@ private fun TopBar(
 			},
 			actions = {
 				IconButton(onClick = { filterIsActive = !filterIsActive }) {
-					Icon(Icons.Default.FilterList, contentDescription = null)
+					Icon(painter = painterResource(id = R.drawable.ic_filter_list_24), contentDescription = null)
 				}
 			},
 			backgroundColor = Color.Transparent,
@@ -284,7 +281,7 @@ private fun BottomBar(
 			Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
 				if (contentType != MainState.ContentType.FAVORITE) {
 					IconButton(onClick = onLikeClick) {
-						Icon(Icons.Default.Favorite, contentDescription = null)
+						Icon(painter = painterResource(id = R.drawable.ic_favorite_24), contentDescription = null)
 					}
 				}
 				OptionsMenu(mutableListOf<OptionsMenuItemModel>().apply {

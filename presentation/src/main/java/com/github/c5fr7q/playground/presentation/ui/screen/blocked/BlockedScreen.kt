@@ -7,14 +7,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.github.c5fr7q.playground.domain.entity.Place
@@ -108,7 +105,7 @@ private fun TopBar(
 			TopAppBar(
 				navigationIcon = {
 					IconButton(onClick = onBackClick) {
-						Icon(Icons.Default.ArrowBack, contentDescription = null)
+						Icon(painter = painterResource(id = R.drawable.ic_arrow_back_24), contentDescription = null)
 					}
 				},
 				title = {
@@ -119,11 +116,11 @@ private fun TopBar(
 				},
 				actions = {
 					IconButton(onClick = { filterIsActive = !filterIsActive }) {
-						Icon(Icons.Default.FilterList, contentDescription = null)
+						Icon(painter = painterResource(id = R.drawable.ic_filter_list_24), contentDescription = null)
 					}
 					if (placesSelected) {
 						IconButton(onClick = onDeleteSelectedPlacesClick) {
-							Icon(Icons.Default.Delete, contentDescription = null)
+							Icon(painter = painterResource(id = R.drawable.ic_delete_24), contentDescription = null)
 						}
 					}
 				},
