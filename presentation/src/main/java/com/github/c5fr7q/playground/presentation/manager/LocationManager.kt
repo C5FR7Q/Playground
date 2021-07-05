@@ -17,8 +17,7 @@ import kotlin.coroutines.suspendCoroutine
 class LocationManager @Inject constructor() : BaseManager(), ILocationManager {
 	private var fusedLocationClient: FusedLocationProviderClient? = null
 
-	override fun attachActivity(activity: AppCompatActivity) {
-		super.attachActivity(activity)
+	override fun onAttachActivity(activity: AppCompatActivity) {
 		fusedLocationClient = LocationServices.getFusedLocationProviderClient(activity)
 	}
 
@@ -37,8 +36,7 @@ class LocationManager @Inject constructor() : BaseManager(), ILocationManager {
 		}
 	}
 
-	override fun detachActivity() {
+	override fun onDetachActivity() {
 		fusedLocationClient = null
-		super.detachActivity()
 	}
 }

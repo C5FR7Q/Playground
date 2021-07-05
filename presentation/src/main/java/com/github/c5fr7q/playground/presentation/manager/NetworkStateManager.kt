@@ -27,8 +27,7 @@ class NetworkStateManager @Inject constructor() : BaseManager() {
 		}
 	}
 
-	override fun attachActivity(activity: AppCompatActivity) {
-		super.attachActivity(activity)
+	override fun onAttachActivity(activity: AppCompatActivity) {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
 			connectivityManager.registerDefaultNetworkCallback(networkCallback)
 		} else {
@@ -39,8 +38,7 @@ class NetworkStateManager @Inject constructor() : BaseManager() {
 		}
 	}
 
-	override fun detachActivity() {
-		super.detachActivity()
+	override fun onDetachActivity() {
 		connectivityManager.unregisterNetworkCallback(networkCallback)
 	}
 

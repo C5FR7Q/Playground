@@ -19,8 +19,7 @@ class PermissionManager @Inject constructor(
 	private var callback: (result: MutableMap<String, Boolean>) -> Unit = {}
 	private var requestPermissionLauncher: ActivityResultLauncher<Array<String>>? = null
 
-	override fun attachActivity(activity: AppCompatActivity) {
-		super.attachActivity(activity)
+	override fun onAttachActivity(activity: AppCompatActivity) {
 		requestPermissionLauncher =
 			activity.registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { callback(it) }
 	}
