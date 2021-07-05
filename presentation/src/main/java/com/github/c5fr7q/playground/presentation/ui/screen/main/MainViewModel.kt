@@ -32,6 +32,14 @@ class MainViewModel @Inject constructor(
 					copy(isLoading = true)
 				}
 			}
+
+			placeRepository
+				.getBlockedPlaces()
+				.map { it.isNotEmpty() }
+				.distinctUntilChanged()
+				.onEach { updateState { copy(hasBlockedPlaces = it) } }
+				.launchIn(viewModelScope)
+
 			placesSource
 				.map { it == MainState.ContentType.PREVIOUS }
 				.distinctUntilChanged()

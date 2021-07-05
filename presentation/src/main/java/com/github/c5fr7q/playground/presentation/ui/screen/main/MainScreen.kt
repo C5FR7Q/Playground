@@ -100,6 +100,7 @@ private fun MainScreen(
 		bottomBar = {
 			BottomBar(
 				contentType = state.contentType,
+				hasBlockedPlaces = state.hasBlockedPlaces,
 				onLikeClick = onLikeClick,
 				onPreviousClick = onPreviousClick,
 				onBlockedClick = onBlockedClick,
@@ -271,6 +272,7 @@ private fun TopBar(
 @Composable
 private fun BottomBar(
 	contentType: MainState.ContentType,
+	hasBlockedPlaces: Boolean,
 	onLikeClick: () -> Unit,
 	onPreviousClick: () -> Unit,
 	onBlockedClick: () -> Unit,
@@ -284,13 +286,22 @@ private fun BottomBar(
 						Icon(painter = painterResource(id = R.drawable.ic_favorite_24), contentDescription = null)
 					}
 				}
-				OptionsMenu(mutableListOf<OptionsMenuItemModel>().apply {
-					if (contentType != MainState.ContentType.PREVIOUS) {
-						add(OptionsMenuItemModel(stringResource(id = R.string.previous), onPreviousClick))
+				val hasPreviousOption = contentType != MainState.ContentType.PREVIOUS
+				if (hasPreviousOption || hasBlockedPlaces) {
+					OptionsMenu(mutableListOf<OptionsMenuItemModel>().apply {
+						if (hasPreviousOption) {
+							add(OptionsMenuItemModel(stringResource(id = R.string.previous), onPreviousClick))
+						}
+						if (hasBlockedPlaces) {
+							add(OptionsMenuItemModel(stringResource(id = R.string.blocked), onBlockedClick))
+						}
+						add(OptionsMenuItemModel(stringResource(id = R.string.settings), onSettingsClick))
+					})
+				} else {
+					IconButton(onClick = onSettingsClick) {
+						Icon(painter = painterResource(id = R.drawable.ic_settings_24), contentDescription = null)
 					}
-					add(OptionsMenuItemModel(stringResource(id = R.string.blocked), onBlockedClick))
-					add(OptionsMenuItemModel(stringResource(id = R.string.settings), onSettingsClick))
-				})
+				}
 			}
 		}
 		Box(
