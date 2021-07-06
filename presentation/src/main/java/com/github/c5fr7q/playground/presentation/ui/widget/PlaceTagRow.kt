@@ -2,6 +2,7 @@ package com.github.c5fr7q.playground.presentation.ui.widget
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.ContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -19,7 +20,7 @@ fun PlaceTagRow(modifier: Modifier = Modifier, place: Place) {
 			maxLines = 1,
 			overflow = TextOverflow.Ellipsis,
 			modifier = Modifier
-				.background(color = MaterialTheme.colors.onSurface)
+				.background(color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.medium))
 				.padding(4.dp),
 			style = MaterialTheme.typography.caption,
 			color = MaterialTheme.colors.onPrimary

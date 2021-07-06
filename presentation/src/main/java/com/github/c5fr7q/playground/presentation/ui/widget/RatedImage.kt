@@ -38,7 +38,7 @@ fun RatedImage(
 
 		Box(
 			modifier = Modifier
-				.background(color = MaterialTheme.colors.onSurface)
+				.background(color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.medium))
 				.padding(4.dp)
 		) {
 			Text(
