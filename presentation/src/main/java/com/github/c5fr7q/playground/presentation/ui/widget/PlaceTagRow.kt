@@ -14,16 +14,19 @@ import com.github.c5fr7q.playground.domain.entity.Place
 
 @Composable
 fun PlaceTagRow(modifier: Modifier = Modifier, place: Place) {
-	TagRow(modifier = modifier, tags = place.tags) {
-		Text(
-			text = it,
-			maxLines = 1,
-			overflow = TextOverflow.Ellipsis,
-			modifier = Modifier
-				.background(color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.medium))
-				.padding(4.dp),
-			style = MaterialTheme.typography.caption,
-			color = MaterialTheme.colors.onPrimary
-		)
+	val notEmptyTags = place.tags.filter { it.isNotEmpty() }
+	if (notEmptyTags.isNotEmpty()) {
+		TagRow(modifier = modifier, tags = notEmptyTags) {
+			Text(
+				text = it,
+				maxLines = 1,
+				overflow = TextOverflow.Ellipsis,
+				modifier = Modifier
+					.background(color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.medium))
+					.padding(4.dp),
+				style = MaterialTheme.typography.caption,
+				color = MaterialTheme.colors.onPrimary
+			)
+		}
 	}
 }
