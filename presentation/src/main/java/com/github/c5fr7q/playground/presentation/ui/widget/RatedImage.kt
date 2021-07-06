@@ -41,8 +41,13 @@ fun RatedImage(
 				.background(color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.medium))
 				.padding(4.dp)
 		) {
+			var fakeRating = rating
+			while (fakeRating < 1f) {
+				fakeRating *= 10
+			}
+
 			Text(
-				text = "R:" + "%.2f".format(Locale.US, rating),
+				text = "R:" + "%.2f".format(Locale.US, fakeRating),
 				style = MaterialTheme.typography.overline,
 				color = MaterialTheme.colors.onPrimary
 			)
