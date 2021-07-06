@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
 private val DarkColorPalette = darkColors(
-	primary = Bismark200,
+	primary = Bismark100,
 	primaryVariant = Bismark700,
 	secondary = Pomegranate,
 	secondaryVariant = OrangePeel
