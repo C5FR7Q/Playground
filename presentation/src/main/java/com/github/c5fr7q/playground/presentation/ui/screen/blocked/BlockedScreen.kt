@@ -66,11 +66,13 @@ private fun BlockedScreen(
 			} else {
 				LazyColumn {
 					items(state.places) { place ->
-						SelectablePlaceItem(
-							place = place,
-							isSelected = state.selectedPlaces.contains(place),
-							onPlaceClick = { onPlaceSelectionToggle(place) }
-						)
+						key(place.id) {
+							SelectablePlaceItem(
+								place = place,
+								isSelected = state.selectedPlaces.contains(place),
+								onPlaceClick = { onPlaceSelectionToggle(place) }
+							)
+						}
 					}
 				}
 			}

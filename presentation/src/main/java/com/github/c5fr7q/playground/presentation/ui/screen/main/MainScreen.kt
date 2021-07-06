@@ -195,17 +195,19 @@ private fun MainScreen(
 								}
 							}
 
-							PlaceItem(
-								modifier = modifier.graphicsLayer(
-									alpha = alpha,
-									scaleX = scale,
-									scaleY = scale
-								),
-								place = item,
-								onToggleFavoriteClick = { onToggleItemFavorite(item) },
-								onBlockClick = { onBlockClick(item) },
-								onShowInMapsClick = { onShowInMapsClick(item) }
-							)
+							key(item.id) {
+								PlaceItem(
+									modifier = modifier.graphicsLayer(
+										alpha = alpha,
+										scaleX = scale,
+										scaleY = scale
+									),
+									place = item,
+									onToggleFavoriteClick = { onToggleItemFavorite(item) },
+									onBlockClick = { onBlockClick(item) },
+									onShowInMapsClick = { onShowInMapsClick(item) }
+								)
+							}
 							if (!isLast) {
 								Divider(modifier = Modifier.alpha(alpha))
 							}
