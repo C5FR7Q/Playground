@@ -180,6 +180,9 @@ private fun MainScreen(
 							var transitionState by remember { mutableStateOf(PlaceItemTransitionState.INITIAL) }
 
 							val transition = updateTransition(targetState = transitionState, label = "PlaceItemTransition")
+							LaunchedEffect(null) {
+								transitionState = PlaceItemTransitionState.FINAL
+							}
 
 							val alpha by transition.animateFloat(label = "PlaceItemTransition_alpha") { state ->
 								when (state) {
@@ -212,7 +215,6 @@ private fun MainScreen(
 								Divider(modifier = Modifier.alpha(alpha))
 							}
 
-							transitionState = PlaceItemTransitionState.FINAL
 						}
 					}
 				}
