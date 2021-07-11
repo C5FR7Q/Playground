@@ -5,7 +5,10 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.*
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,38 +27,45 @@ fun SelectCategoriesRow(
 		val lastIndex = allCategories.lastIndex
 		itemsIndexed(allCategories) { index, category ->
 			val selected = selectedCategories.contains(category)
-			if (selected) {
-				Button(
-					modifier = Modifier.padding(
-						start = if (index == 0) 16.dp else 0.dp,
-						end = if (index == lastIndex) 16.dp else 6.dp
-					),
-					contentPadding = PaddingValues(4.dp),
-					onClick = { onCategoryToggle(category) },
-					colors = ButtonDefaults.buttonColors(
-						contentColor = MaterialTheme.colors.surface,
-						backgroundColor = MaterialTheme.colors.secondaryVariant
-					)
-				) {
-					Text(text = category.asText(), style = MaterialTheme.typography.button)
-				}
-			} else {
-				OutlinedButton(
-					modifier = Modifier.padding(
-						start = if (index == 0) 16.dp else 0.dp,
-						end = if (index == lastIndex) 16.dp else 6.dp,
-					),
-					contentPadding = PaddingValues(4.dp),
-					onClick = { onCategoryToggle(category) },
-					colors = ButtonDefaults.outlinedButtonColors(
-						backgroundColor = Color.Transparent
-					),
-					border = BorderStroke(ButtonDefaults.OutlinedBorderSize, MaterialTheme.colors.secondaryVariant)
-				) {
-					Text(text = category.asText(), style = MaterialTheme.typography.button, color = MaterialTheme.colors.secondaryVariant)
-				}
+
+			val colors = when {
+				selected -> ButtonDefaults.buttonColors(
+					contentColor = MaterialTheme.colors.surface,
+					backgroundColor = MaterialTheme.colors.secondaryVariant
+				)
+				else -> ButtonDefaults.outlinedButtonColors(
+					backgroundColor = Color.Transparent
+				)
+			}
+
+			val border = when {
+				selected -> null
+				else -> BorderStroke(ButtonDefaults.OutlinedBorderSize, MaterialTheme.colors.secondaryVariant)
+			}
+
+			val elevation = when {
+				selected -> ButtonDefaults.elevation()
+				else -> null
+			}
+
+			val textColor = when {
+				selected -> MaterialTheme.colors.surface
+				else -> MaterialTheme.colors.secondaryVariant
+			}
+
+			Button(
+				modifier = Modifier.padding(
+					start = if (index == 0) 16.dp else 0.dp,
+					end = if (index == lastIndex) 16.dp else 6.dp
+				),
+				contentPadding = PaddingValues(4.dp),
+				onClick = { onCategoryToggle(category) },
+				colors = colors,
+				border = border,
+				elevation = elevation
+			) {
+				Text(text = category.asText(), style = MaterialTheme.typography.button.copy(color = textColor))
 			}
 		}
 	}
-
 }
