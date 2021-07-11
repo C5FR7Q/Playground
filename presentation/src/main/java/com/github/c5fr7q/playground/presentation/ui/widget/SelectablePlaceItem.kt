@@ -1,6 +1,9 @@
 package com.github.c5fr7q.playground.presentation.ui.widget
 
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.VisibilityThreshold
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -13,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.github.c5fr7q.playground.domain.entity.Place
 import com.github.c5fr7q.playground.presentation.ui.util.asText
@@ -33,7 +37,15 @@ fun SelectablePlaceItem(
 		Spacer(
 			modifier = Modifier
 				.background(color = MaterialTheme.colors.secondary)
-				.width(animateDpAsState(if (isSelected) 4.dp else 0.dp).value)
+				.width(
+					animateDpAsState(
+						targetValue = if (isSelected) 4.dp else 0.dp,
+						animationSpec = spring(
+							visibilityThreshold = Dp.VisibilityThreshold,
+							dampingRatio = Spring.DampingRatioMediumBouncy
+						)
+					).value
+				)
 				.fillMaxHeight()
 				.align(Alignment.CenterEnd)
 		)
