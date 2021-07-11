@@ -123,7 +123,6 @@ private fun MainScreen(
 				}
 			}
 
-			// TODO: 20.06.2021 Use custom BottomAppBar to avoid visibility change jump 
 			if (fabSize.value != 0f) {
 				val rotation = when {
 					state.isLoading -> {
