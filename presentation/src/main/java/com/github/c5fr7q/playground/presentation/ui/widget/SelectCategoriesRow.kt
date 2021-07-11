@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import com.github.c5fr7q.playground.domain.entity.Place
 import com.github.c5fr7q.playground.presentation.ui.util.asText
+import com.github.c5fr7q.playground.presentation.ui.util.transition.VisibilityTransitionState
 
 @Composable
 fun SelectCategoriesRow(
@@ -56,25 +57,25 @@ fun SelectCategoriesRow(
 				else -> MaterialTheme.colors.secondaryVariant
 			}
 
-			var transitionState by remember { mutableStateOf(ToggleTransitionState.INITIAL) }
+			var transitionState by remember { mutableStateOf(VisibilityTransitionState.HIDDEN) }
 
 			LaunchedEffect(null) {
-				transitionState = ToggleTransitionState.FINAL
+				transitionState = VisibilityTransitionState.SHOWN
 			}
 
 			val transition = updateTransition(targetState = transitionState, label = "ToggleTransition")
 
 			val alpha by transition.animateFloat(label = "ToggleTransition_alpha") { state ->
 				when (state) {
-					ToggleTransitionState.INITIAL -> 0.8f
-					ToggleTransitionState.FINAL -> 1f
+					VisibilityTransitionState.HIDDEN -> 0.8f
+					VisibilityTransitionState.SHOWN -> 1f
 				}
 			}
 
 			val scale by transition.animateFloat(label = "ToggleTransition_scale") { state ->
 				when (state) {
-					ToggleTransitionState.INITIAL -> 0.5f
-					ToggleTransitionState.FINAL -> 1f
+					VisibilityTransitionState.HIDDEN -> 0.5f
+					VisibilityTransitionState.SHOWN -> 1f
 				}
 			}
 
@@ -95,9 +96,4 @@ fun SelectCategoriesRow(
 			}
 		}
 	}
-}
-
-private enum class ToggleTransitionState {
-	INITIAL,
-	FINAL
 }

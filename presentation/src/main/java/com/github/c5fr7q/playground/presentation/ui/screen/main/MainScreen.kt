@@ -20,6 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.github.c5fr7q.playground.domain.entity.Place
 import com.github.c5fr7q.playground.presentation.R
+import com.github.c5fr7q.playground.presentation.ui.util.transition.VisibilityTransitionState
 import com.github.c5fr7q.playground.presentation.ui.widget.OptionsMenu
 import com.github.c5fr7q.playground.presentation.ui.widget.OptionsMenuItemModel
 import com.github.c5fr7q.playground.presentation.ui.widget.PlaceItem
@@ -108,17 +109,17 @@ private fun MainScreen(
 			)
 		},
 		floatingActionButton = {
-			var transitionState by remember { mutableStateOf(FabTransitionState.HIDDEN) }
+			var transitionState by remember { mutableStateOf(VisibilityTransitionState.HIDDEN) }
 			transitionState = when {
-				state.selectedCategories.isNotEmpty() -> FabTransitionState.SHOWN
-				else -> FabTransitionState.HIDDEN
+				state.selectedCategories.isNotEmpty() -> VisibilityTransitionState.SHOWN
+				else -> VisibilityTransitionState.HIDDEN
 			}
 			val transition = updateTransition(transitionState, label = "FabTransition")
 
 			val fabSize by transition.animateDp(label = "FabTransition_fabSize") { state ->
 				when (state) {
-					FabTransitionState.SHOWN -> 56.dp
-					FabTransitionState.HIDDEN -> 0.dp
+					VisibilityTransitionState.SHOWN -> 56.dp
+					VisibilityTransitionState.HIDDEN -> 0.dp
 				}
 			}
 
@@ -177,24 +178,24 @@ private fun MainScreen(
 								else -> Modifier
 							}
 
-							var transitionState by remember { mutableStateOf(PlaceItemTransitionState.INITIAL) }
+							var transitionState by remember { mutableStateOf(VisibilityTransitionState.HIDDEN) }
 
 							val transition = updateTransition(targetState = transitionState, label = "PlaceItemTransition")
 							LaunchedEffect(null) {
-								transitionState = PlaceItemTransitionState.FINAL
+								transitionState = VisibilityTransitionState.SHOWN
 							}
 
 							val alpha by transition.animateFloat(label = "PlaceItemTransition_alpha") { state ->
 								when (state) {
-									PlaceItemTransitionState.INITIAL -> 0f
-									PlaceItemTransitionState.FINAL -> 1f
+									VisibilityTransitionState.HIDDEN -> 0f
+									VisibilityTransitionState.SHOWN -> 1f
 								}
 							}
 
 							val scale by transition.animateFloat(label = "PlaceItemTransition_scale") { state ->
 								when (state) {
-									PlaceItemTransitionState.INITIAL -> 0.5f
-									PlaceItemTransitionState.FINAL -> 1f
+									VisibilityTransitionState.HIDDEN -> 0.5f
+									VisibilityTransitionState.SHOWN -> 1f
 								}
 							}
 
@@ -315,14 +316,4 @@ private fun BottomBar(
 				.background(MaterialTheme.colors.primarySurface)
 		)
 	}
-}
-
-private enum class PlaceItemTransitionState {
-	INITIAL,
-	FINAL
-}
-
-private enum class FabTransitionState {
-	SHOWN,
-	HIDDEN
 }
