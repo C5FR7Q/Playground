@@ -3,6 +3,14 @@ package com.github.c5fr7q.util
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 
+fun <T> Flow<Iterable<T>>.filterIterable(filter: (T) -> Boolean): Flow<List<T>> {
+	return map { iterable -> iterable.filter { filter(it) } }
+}
+
+fun <T, R> Flow<Iterable<T>>.mapIterable(mapper: (T) -> R): Flow<List<R>> {
+	return map { iterable -> iterable.map { mapper(it) } }
+}
+
 @ExperimentalCoroutinesApi
 fun <R> Flow<Boolean>.flatMapLatestOnTrue(flow: Flow<R>): Flow<R> {
 	return transformLatest { if (it) emitAll(flow) else emptyFlow<R>() }

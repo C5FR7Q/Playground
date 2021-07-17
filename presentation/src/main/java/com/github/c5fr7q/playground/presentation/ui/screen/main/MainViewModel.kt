@@ -1,16 +1,15 @@
 package com.github.c5fr7q.playground.presentation.ui.screen.main
 
 import androidx.lifecycle.viewModelScope
-import com.github.c5fr7q.playground.domain.entity.UpdatedPlacesStatus
-import com.github.c5fr7q.playground.domain.repository.PlaceRepository
+import com.github.c5fr7q.playground.domain.entity.LoadPlacesStatus
+import com.github.c5fr7q.playground.domain.usecase.*
+import com.github.c5fr7q.playground.domain.usecase.place.*
 import com.github.c5fr7q.playground.presentation.R
 import com.github.c5fr7q.playground.presentation.manager.NetworkStateManager
 import com.github.c5fr7q.playground.presentation.manager.PermissionManager
 import com.github.c5fr7q.playground.presentation.ui.base.BaseIntent
 import com.github.c5fr7q.playground.presentation.ui.base.BaseViewModel
 import com.github.c5fr7q.util.ResourceHelper
-import com.github.c5fr7q.util.flatMapLatestOnTrue
-import com.github.c5fr7q.util.flatMapLatestWith
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -18,12 +17,19 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-	private val placeRepository: PlaceRepository,
+	private val blockPlaceUseCase: BlockPlaceUseCase,
+	private val dislikePlaceUseCase: DislikePlaceUseCase,
+	private val getAvailablePlacesForCategoriesUseCase: GetAvailablePlacesForCategoriesUseCase,
+	private val getFavoritePlacesForCategoriesUseCase: GetFavoritePlacesForCategoriesUseCase,
+	private val getLoadPlacesStatusUseCase: GetLoadPlacesStatusUseCase,
+	private val likePlaceUseCase: LikePlaceUseCase,
+	private val loadMorePlacesUseCase: LoadMorePlacesUseCase,
+	private val reloadPlacesUseCase: ReloadPlacesUseCase,
 	private val permissionManager: PermissionManager,
 	private val networkStateManager: NetworkStateManager,
 	private val resourceHelper: ResourceHelper,
 ) : BaseViewModel<MainState, MainSideEffect, MainIntent>() {
-	private val placesSource = MutableStateFlow(MainState.ContentType.PREVIOUS)
+	private var refreshing = false
 
 	override fun handleIntent(intent: BaseIntent.Default) {
 		if (intent is BaseIntent.Default.Init) {
@@ -33,111 +39,62 @@ class MainViewModel @Inject constructor(
 				}
 			}
 
-			placeRepository
-				.getBlockedPlaces()
-				.map { it.isNotEmpty() }
+			state
+				.map { it.likedOnly }
 				.distinctUntilChanged()
-				.onEach { updateState { copy(hasBlockedPlaces = it) } }
+				.shareIn(viewModelScope, SharingStarted.WhileSubscribed())
+				.onEach { produceSideEffect(MainSideEffect.ScrollToTop) }
 				.launchIn(viewModelScope)
 
-			placesSource
-				.map { it == MainState.ContentType.PREVIOUS }
+			getLoadPlacesStatusUseCase.execute()
+				.map { it == LoadPlacesStatus.LOADING }
+				.onEach { updateState { copy(isLoading = it) } }
+				.launchIn(viewModelScope)
+
+			getLoadPlacesStatusUseCase.execute()
+				.filter { it == LoadPlacesStatus.FAILED }
+				.shareIn(viewModelScope, SharingStarted.WhileSubscribed())
+				.onEach { produceSideEffect(MainSideEffect.ShowError(resourceHelper.getString(R.string.something_went_wrong))) }
+				.launchIn(viewModelScope)
+
+			getLoadPlacesStatusUseCase.execute()
+				.filter { it == LoadPlacesStatus.LOADED && refreshing }
+				.shareIn(viewModelScope, SharingStarted.WhileSubscribed())
+				.onEach { updateState { copy(likedOnly = false) } }
+				.launchIn(viewModelScope)
+
+			state.map { it.selectedCategories to it.likedOnly }
 				.distinctUntilChanged()
-				.flatMapLatestOnTrue(
-					placeRepository
-						.getPreviousPlaces()
-						.flatMapLatest { places ->
-							state
-								.map { it.selectedCategories }
-								.distinctUntilChanged()
-								.map { categories -> places.filter { it.categories.containsAll(categories) } }
-						})
+				.flatMapLatest { (categories, likedOnly) ->
+					if (likedOnly) {
+						getFavoritePlacesForCategoriesUseCase.execute(categories)
+					} else {
+						getAvailablePlacesForCategoriesUseCase.execute(categories)
+					}
+				}
 				.onEach {
 					updateState {
-						if (contentType != MainState.ContentType.PREVIOUS) {
-							produceSideEffect(MainSideEffect.ScrollToTop)
-						}
-						copy(places = it, contentType = MainState.ContentType.PREVIOUS, isLoading = false)
+						copy(
+							places = it,
+							likedOnly = if (it.isEmpty()) false else likedOnly
+						)
 					}
-				}.launchIn(viewModelScope)
-
-			placesSource
-				.map { it == MainState.ContentType.FAVORITE }
-				.distinctUntilChanged()
-				.flatMapLatestOnTrue(
-					placeRepository
-						.getFavoritePlaces()
-						.flatMapLatest { places ->
-							state
-								.map { it.selectedCategories }
-								.distinctUntilChanged()
-								.map { categories -> places.filter { it.categories.containsAll(categories) } }
-						}
-				)
-				.onEach {
-					updateState {
-						if (contentType != MainState.ContentType.FAVORITE) {
-							produceSideEffect(MainSideEffect.ScrollToTop)
-						}
-						copy(places = it, contentType = MainState.ContentType.FAVORITE, isLoading = false)
-					}
-				}.launchIn(viewModelScope)
-
-			placesSource
-				.map { it == MainState.ContentType.NEAR }
-				.distinctUntilChanged()
-				.flatMapLatestOnTrue(
-					placeRepository
-						.getUpdatedPlacesStatus()
-						.flatMapLatestWith(placeRepository.getUpdatedPlaces())
-				)
-				.onEach { (status, places) ->
-					when (status) {
-						UpdatedPlacesStatus.LOADED -> {
-							updateState {
-								if (contentType != MainState.ContentType.NEAR) {
-									produceSideEffect(MainSideEffect.ScrollToTop)
-								}
-								copy(
-									isLoading = false,
-									places = places,
-									contentType = MainState.ContentType.NEAR
-								)
-							}
-						}
-						UpdatedPlacesStatus.FAILED -> {
-							updateState { copy(isLoading = false) }
-							placesSource.value = state.value.contentType
-							produceSideEffect(MainSideEffect.ShowError(resourceHelper.getString(R.string.something_went_wrong)))
-						}
-						UpdatedPlacesStatus.LOADING -> Unit
-					}
-				}.launchIn(viewModelScope)
+				}
+				.launchIn(viewModelScope)
 		}
 	}
 
 	override fun handleIntent(intent: MainIntent) {
 		when (intent) {
 			MainIntent.LoadMore -> {
-				if (state.value.contentType == MainState.ContentType.NEAR) {
-					placeRepository.loadMorePlaces()
-					updateState { copy(isLoading = true) }
-				}
-			}
-			MainIntent.ClickLike -> {
-				placesSource.value = MainState.ContentType.FAVORITE
+				refreshing = false
+				loadMorePlacesUseCase.execute()
 			}
 			MainIntent.ClickSettings -> {
 				navigationManager.openSettings()
 			}
-			MainIntent.ClickPrevious -> {
-				placesSource.value = MainState.ContentType.PREVIOUS
-			}
-			MainIntent.ClickBlocked -> {
-				navigationManager.openBlocked()
-			}
 			MainIntent.ClickRefresh -> {
-				viewModelScope.launch {
+				viewModelScope.launch { // TODO: 16.07.2021 Use case candidate?
 					networkStateManager.isConnected
 						.take(1).onEach { hasNetworkConnection ->
 							if (!hasNetworkConnection) {
@@ -156,14 +113,16 @@ class MainViewModel @Inject constructor(
 								)
 
 								if (permissionsGranted) {
-									placeRepository.updatePlaces(selectedCategories)
-									updateState { copy(isLoading = true) }
-									placesSource.value = MainState.ContentType.NEAR
+									refreshing = true
+									reloadPlacesUseCase.execute(selectedCategories)
 								}
 							}
 						}
 						.launchIn(viewModelScope)
 				}
+			}
+			MainIntent.ClickLike -> {
+				updateState { copy(likedOnly = !likedOnly) }
 			}
 			is MainIntent.ToggleCategory -> {
 				updateState {
@@ -180,10 +139,16 @@ class MainViewModel @Inject constructor(
 				}
 			}
 			is MainIntent.ToggleItemFavorite -> {
-				placeRepository.toggleFavoriteState(intent.place)
+				intent.place.run {
+					if (isFavorite) {
+						dislikePlaceUseCase.execute(this)
+					} else {
+						likePlaceUseCase.execute(this)
+					}
+				}
 			}
 			is MainIntent.ClickBlock -> {
-				placeRepository.blockPlace(intent.place)
+				blockPlaceUseCase.execute(intent.place)
 			}
 			is MainIntent.ClickShowInMaps -> {
 				navigationManager.openMaps(intent.place.position)

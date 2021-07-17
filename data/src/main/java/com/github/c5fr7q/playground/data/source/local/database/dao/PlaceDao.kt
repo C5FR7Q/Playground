@@ -13,19 +13,19 @@ interface PlaceDao {
 	suspend fun addPlaces(places: List<PlaceDto>)
 
 	@Query("DELETE FROM place WHERE createdDate < :minDate AND isFavorite = 0")
-	suspend fun deleteOutdated(minDate: Long)
+	suspend fun deleteOutdatedPlaces(minDate: Long)
 
 	@Query("UPDATE place SET isFavorite = 1 WHERE id == :placeId")
-	suspend fun addPlaceToFavorite(placeId: String)
+	suspend fun likePlace(placeId: String)
 
 	@Query("UPDATE place SET isFavorite = 0 WHERE id == :placeId")
-	suspend fun removePlaceFromFavorite(placeId: String)
+	suspend fun dislikePlace(placeId: String)
 
 	@Query("UPDATE place SET isBlocked = 1 WHERE id == :placeId")
-	suspend fun addPlaceToBlocked(placeId: String)
+	suspend fun blockPlace(placeId: String)
 
 	@Query("UPDATE place SET isBlocked = 0 WHERE id IN (:placeIds)")
-	suspend fun removePlacesFromBlocked(placeIds: List<String>)
+	suspend fun unblockPlaces(placeIds: List<String>)
 
 	@Update
 	suspend fun updatePlaces(places: List<PlaceDto>)

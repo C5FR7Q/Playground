@@ -6,13 +6,13 @@ import com.github.c5fr7q.playground.data.repository.mapper.PlaceDtoMapper
 import com.github.c5fr7q.playground.data.repository.mapper.SygicPlaceMapper
 import com.github.c5fr7q.playground.data.source.local.Storage
 import com.github.c5fr7q.playground.data.source.local.database.dao.PlaceDao
-import com.github.c5fr7q.playground.data.source.local.database.entity.PlaceDto
 import com.github.c5fr7q.playground.data.source.remote.sygic.SygicService
 import com.github.c5fr7q.playground.data.source.remote.unsplash.UnsplashPhotoProvider
+import com.github.c5fr7q.playground.domain.entity.LoadPlacesStatus
 import com.github.c5fr7q.playground.domain.entity.Place
 import com.github.c5fr7q.playground.domain.entity.Position
-import com.github.c5fr7q.playground.domain.entity.UpdatedPlacesStatus
 import com.github.c5fr7q.playground.domain.repository.PlaceRepository
+import com.github.c5fr7q.util.mapIterable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -32,17 +32,23 @@ class PlaceRepositoryImpl @Inject constructor(
 	@GeneralCoroutineScope private val generalScope: CoroutineScope
 ) : PlaceRepository {
 
-	private val requestedPlaces = MutableSharedFlow<List<Place>>(1)
-	private val placesStatus = MutableSharedFlow<UpdatedPlacesStatus>(1).apply { tryEmit(UpdatedPlacesStatus.LOADED) }
+	private val loadedPlaces = MutableStateFlow(emptyList<Place>())
+	private val loadPlacesStatus = MutableStateFlow(LoadPlacesStatus.LOADED)
+	private val hasLoadError = MutableSharedFlow<Boolean>()
 
-	private var currentPosition = Position(0f, 0f)
+	private var currentPosition: Position? = null
 
 	private var requestedPosition: Position? = null
+
 	private var requestedCategories: List<Place.Category>? = null
 	private var requestedRadius: Int? = null
+	private var placesPackCount: Int? = null
 
-	private var placesPackCount: Int = 0
-	private var placesMetersRadius: Int = 0
+	private var placesMetersRadius: Int? = null
+
+	private var prefetchedPlaces = true
+
+	private var allPlaces: List<Place>? = null
 
 	init {
 		storage.getPlacesPackCount()
@@ -55,137 +61,122 @@ class PlaceRepositoryImpl @Inject constructor(
 
 		storage.getDataCachingTime()
 			.take(1)
-			.onEach { placeDao.deleteOutdated(Date.from(Instant.now()).time - it.toMillis()) }
+			.onEach { placeDao.deleteOutdatedPlaces(Date.from(Instant.now()).time - it.toMillis()) }
 			.launchIn(generalScope)
 
-		placeDao.getAllPlaces()
-			.take(1)
-			.onEach { places ->
-				if (places.indexOfFirst { it.imageUrl.isEmpty() } == -1) return@onEach
-
-				placeDao.updatePlaces(places.populateWithPhotos())
-			}
+		getAllPlaces().take(1)
+			.onEach { loadedPlaces.value = it }
 			.launchIn(generalScope)
 	}
 
-	override fun getPreviousPlaces(): Flow<List<Place>> {
-		return placeDao
-			.getAllPlaces()
-			.map { list ->
-				list
-					.map { placeDtoMapper.mapDtoToPlace(it) }
-					.filter { !it.isBlocked }
-			}
-	}
-
-	override fun updatePlaces(categories: List<Place.Category>) {
+	override fun blockPlace(place: Place) {
 		generalScope.launch {
-			currentPosition = locationManager.getLastKnownLocation() ?: currentPosition
-			val canRefreshPlaces = requestedCategories == null ||
-					requestedRadius == null ||
-					requestedPosition == null ||
-					requestedCategories != categories ||
-					requestedRadius != placesMetersRadius ||
-					!(requestedPosition!!.almostTheSameAs(currentPosition))
-			if (canRefreshPlaces) {
-				requestedCategories = categories
-				requestedRadius = placesMetersRadius
-				requestedPosition = currentPosition
-				fetchPlaces(categories, placesMetersRadius, 0)
-			} else {
-				placesStatus.emit(placesStatus.replayCache[0])
+			placeDao.blockPlace(place.id)
+		}
+	}
+
+	override fun unblockPlaces(places: List<Place>) {
+		generalScope.launch {
+			placeDao.unblockPlaces(places.map { it.id })
+		}
+	}
+
+	override fun likePlace(place: Place) {
+		generalScope.launch {
+			placeDao.likePlace(place.id)
+			loadedPlaces.value = loadedPlaces.value.map { listPlace ->
+				if (listPlace.id == place.id) {
+					listPlace.copy(isFavorite = true)
+				} else {
+					listPlace
+				}
+			}
+		}
+	}
+
+	override fun dislikePlace(place: Place) {
+		generalScope.launch {
+			placeDao.dislikePlace(place.id)
+			loadedPlaces.value = loadedPlaces.value.map { listPlace ->
+				if (listPlace.id == place.id) {
+					listPlace.copy(isFavorite = false)
+				} else {
+					listPlace
+				}
 			}
 		}
 	}
 
 	override fun loadMorePlaces() {
 		generalScope.launch {
-			fetchPlaces(
-				requestedCategories!!,
-				requestedRadius!!,
-				requestedPlaces.replayCache[0].size
-			)
-		}
-	}
-
-	override fun getUpdatedPlaces(): Flow<List<Place>> {
-		return requestedPlaces.flatMapLatest { places ->
-			getPreviousPlaces().map { previousPlaces ->
-				val favoritePlacesIds = previousPlaces.filter { it.isFavorite }.map { it.id }
-				places.updateFavorites(favoritePlacesIds)
+			if (requestedCategories != null && requestedRadius != null && !prefetchedPlaces) {
+				fetchPlaces(
+					requestedCategories!!,
+					requestedRadius!!,
+					loadedPlaces.value.size
+				)
 			}
-		}.combine(getBlockedPlaces()) { places, blockedPlaces ->
-			val blockedPlacesIds = blockedPlaces.map { it.id }
-			places.filter { !blockedPlacesIds.contains(it.id) }
 		}
 	}
 
-	override fun getUpdatedPlacesStatus() = placesStatus.asSharedFlow()
-
-	override fun toggleFavoriteState(place: Place) {
+	override fun reloadPlaces(categories: List<Place.Category>) {
 		generalScope.launch {
-			placeDao.run {
-				if (place.isFavorite) {
-					removePlaceFromFavorite(place.id)
-				} else {
-					addPlaceToFavorite(place.id)
-				}
+			currentPosition = locationManager.getLastKnownLocation()
+
+			if (currentPosition == null || placesMetersRadius == null) return@launch
+
+			val canRefreshPlaces = requestedCategories != categories ||
+					requestedRadius != placesMetersRadius ||
+					!(requestedPosition.almostTheSameAs(currentPosition))
+			if (canRefreshPlaces) {
+				requestedCategories = categories
+				requestedRadius = placesMetersRadius
+				requestedPosition = currentPosition
+				fetchPlaces(categories, placesMetersRadius!!, 0)
 			}
 		}
 	}
 
-	override fun getFavoritePlaces() = getPreviousPlaces().map { list -> list.filter { it.isFavorite } }
+	override fun getLoadPlacesStatus() = loadPlacesStatus.asStateFlow()
+
+	override fun getLoadedPlaces() = loadedPlaces.asStateFlow()
+
+	override fun getAllPlaces() = placeDao.getAllPlaces().mapIterable { placeDtoMapper.mapDtoToPlace(it) }
 
 	private suspend fun fetchPlaces(categories: List<Place.Category>, radius: Int, offset: Int) {
 		try {
-			placesStatus.emit(UpdatedPlacesStatus.LOADING)
+			if (currentPosition == null || placesPackCount == null) return
+
+			loadPlacesStatus.value = LoadPlacesStatus.LOADING
 			val placesResponse = sygicService.getPlaces(
 				sygicPlaceMapper.mapCategoriesToString(categories),
-				sygicPlaceMapper.mapArea(currentPosition.lat, currentPosition.lon, radius),
-				placesPackCount,
+				sygicPlaceMapper.mapArea(currentPosition!!.lat, currentPosition!!.lon, radius),
+				placesPackCount!!,
 				offset
 			)
-			val places = sygicPlaceMapper.mapResponse(placesResponse).populateWithPhotos()
-			places.map { placeDtoMapper.mapPlaceToDto(it) }.let { placeDao.addPlaces(it) }
-			requestedPlaces.emit(
-				when {
-					offset != 0 -> requestedPlaces.replayCache[0] + places
-					else -> places
-				}
-			)
-			placesStatus.emit(UpdatedPlacesStatus.LOADED)
+			val newPlaces = sygicPlaceMapper
+				.mapResponse(placesResponse)
+				.populateWithPhotos()
+				.updateFavorites()
+			newPlaces.map { placeDtoMapper.mapPlaceToDto(it) }.let { placeDao.addPlaces(it) }
+			loadedPlaces.value = when {
+				offset != 0 -> loadedPlaces.value + newPlaces
+				else -> newPlaces
+			}
+			loadPlacesStatus.value = LoadPlacesStatus.LOADED
 		} catch (e: Exception) {
 			requestedCategories = null
 			requestedRadius = null
 			requestedPosition = null
-			requestedPlaces.emit(emptyList())
-			placesStatus.emit(UpdatedPlacesStatus.FAILED)
+			loadedPlaces.value = emptyList()
+			loadPlacesStatus.value = LoadPlacesStatus.LOADED
+			hasLoadError.tryEmit(true)
 		}
 	}
 
-	override fun blockPlace(place: Place) {
-		generalScope.launch {
-			placeDao.addPlaceToBlocked(place.id)
-		}
-	}
-
-	override fun unblockPlaces(places: List<Place>) {
-		generalScope.launch {
-			placeDao.removePlacesFromBlocked(places.map { it.id })
-		}
-	}
-
-	override fun getBlockedPlaces(): Flow<List<Place>> {
-		return placeDao
-			.getAllPlaces()
-			.map { list ->
-				list
-					.map { placeDtoMapper.mapDtoToPlace(it) }
-					.filter { it.isBlocked }
-			}
-	}
-
-	private fun List<Place>.updateFavorites(favoritePlacesIds: List<String>): List<Place> {
+	private fun List<Place>.updateFavorites(): List<Place> {
+		if (allPlaces == null) return this
+		val favoritePlacesIds = allPlaces!!.filter { it.isFavorite }.map { it.id }
 		return map { place ->
 			if (place.id in favoritePlacesIds) {
 				place.copy(isFavorite = true)
@@ -198,7 +189,7 @@ class PlaceRepositoryImpl @Inject constructor(
 	private suspend fun List<Place>.populateWithPhotos(): List<Place> {
 		val countToRequest = count { it.imageUrl.isEmpty() }
 		if (countToRequest == 0) return this
-		val photos = unsplashPhotoProvider.getPhotos(placesPackCount).toMutableList()
+		val photos = unsplashPhotoProvider.getPhotos(countToRequest).toMutableList()
 		return map { place ->
 			when {
 				place.imageUrl.isEmpty() -> place.copy(imageUrl = photos.removeFirstOrNull() ?: "")
@@ -207,25 +198,14 @@ class PlaceRepositoryImpl @Inject constructor(
 		}
 	}
 
-	@JvmName("populateWithPhotosPlaceDto")
-	private suspend fun List<PlaceDto>.populateWithPhotos(): List<PlaceDto> {
-		val countToRequest = count { it.imageUrl.isEmpty() }
-		if (countToRequest == 0) return this
-		val photos = unsplashPhotoProvider.getPhotos(placesPackCount).toMutableList()
-		return map { place ->
-			when {
-				place.imageUrl.isEmpty() -> place.copy(imageUrl = photos.removeFirstOrNull() ?: "")
-				else -> place
+	private fun Position?.almostTheSameAs(other: Position?): Boolean {
+		fun Position?.dropDigits(): Position? {
+			return this?.run {
+				Position(
+					lon = round(lon * 100.0f) / 100.0f,
+					lat = round(lat * 100.0f) / 100.0f
+				)
 			}
-		}
-	}
-
-	private fun Position.almostTheSameAs(other: Position): Boolean {
-		fun Position.dropDigits(): Position {
-			return Position(
-				lon = round(lon * 100.0f) / 100.0f,
-				lat = round(lat * 100.0f) / 100.0f
-			)
 		}
 
 		return dropDigits() == other.dropDigits()

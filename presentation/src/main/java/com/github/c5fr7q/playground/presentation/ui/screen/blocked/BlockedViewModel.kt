@@ -1,7 +1,8 @@
 package com.github.c5fr7q.playground.presentation.ui.screen.blocked
 
 import androidx.lifecycle.viewModelScope
-import com.github.c5fr7q.playground.domain.repository.PlaceRepository
+import com.github.c5fr7q.playground.domain.usecase.place.GetBlockedPlacesUseCase
+import com.github.c5fr7q.playground.domain.usecase.place.UnblockPlacesUseCase
 import com.github.c5fr7q.playground.presentation.ui.base.BaseIntent
 import com.github.c5fr7q.playground.presentation.ui.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -10,12 +11,14 @@ import javax.inject.Inject
 
 @HiltViewModel
 class BlockedViewModel @Inject constructor(
-	private val placeRepository: PlaceRepository
+	private val getBlockedPlacesUseCase: GetBlockedPlacesUseCase,
+	private val unblockPlacesUseCase: UnblockPlacesUseCase
 ) : BaseViewModel<BlockedState, Unit, BlockedIntent>() {
 	override fun handleIntent(intent: BaseIntent.Default) {
 		super.handleIntent(intent)
 		if (intent is BaseIntent.Default.Init) {
-			placeRepository.getBlockedPlaces()
+			getBlockedPlacesUseCase
+				.execute()
 				.flatMapLatest { places ->
 					state
 						.map { it.selectedCategories }
@@ -39,7 +42,7 @@ class BlockedViewModel @Inject constructor(
 	override fun handleIntent(intent: BlockedIntent) {
 		when (intent) {
 			BlockedIntent.ClickDelete -> {
-				placeRepository.unblockPlaces(state.value.selectedPlaces)
+				unblockPlacesUseCase.execute(state.value.selectedPlaces)
 			}
 			is BlockedIntent.ToggleCategory -> {
 				updateState {

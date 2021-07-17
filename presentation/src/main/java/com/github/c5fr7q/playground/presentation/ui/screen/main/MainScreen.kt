@@ -1,6 +1,5 @@
 package com.github.c5fr7q.playground.presentation.ui.screen.main
 
-import androidx.annotation.StringRes
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
@@ -21,8 +20,6 @@ import androidx.compose.ui.unit.dp
 import com.github.c5fr7q.playground.domain.entity.Place
 import com.github.c5fr7q.playground.presentation.R
 import com.github.c5fr7q.playground.presentation.ui.util.transition.VisibilityTransitionState
-import com.github.c5fr7q.playground.presentation.ui.widget.OptionsMenu
-import com.github.c5fr7q.playground.presentation.ui.widget.OptionsMenuItemModel
 import com.github.c5fr7q.playground.presentation.ui.widget.PlaceItem
 import com.github.c5fr7q.playground.presentation.ui.widget.SelectCategoriesRow
 import com.google.accompanist.insets.navigationBarsHeight
@@ -38,11 +35,9 @@ fun MainScreen(viewModel: MainViewModel) {
 		state = state,
 		sideEffectFlow = viewModel.sideEffect,
 		onLoadMore = { viewModel.produceIntent(MainIntent.LoadMore) },
-		onLikeClick = { viewModel.produceIntent(MainIntent.ClickLike) },
-		onPreviousClick = { viewModel.produceIntent(MainIntent.ClickPrevious) },
-		onBlockedClick = { viewModel.produceIntent(MainIntent.ClickBlocked) },
 		onSettingsClick = { viewModel.produceIntent(MainIntent.ClickSettings) },
 		onRefreshClick = { viewModel.produceIntent(MainIntent.ClickRefresh) },
+		onLikeClick = { viewModel.produceIntent(MainIntent.ClickLike) },
 		onCategoryToggle = { viewModel.produceIntent(MainIntent.ToggleCategory(it)) },
 		onToggleItemFavorite = { viewModel.produceIntent(MainIntent.ToggleItemFavorite(it)) },
 		onBlockClick = { viewModel.produceIntent(MainIntent.ClickBlock(it)) },
@@ -55,11 +50,9 @@ private fun MainScreen(
 	state: MainState,
 	sideEffectFlow: Flow<MainSideEffect>,
 	onLoadMore: () -> Unit,
-	onLikeClick: () -> Unit,
-	onPreviousClick: () -> Unit,
-	onBlockedClick: () -> Unit,
 	onSettingsClick: () -> Unit,
 	onRefreshClick: () -> Unit,
+	onLikeClick: () -> Unit,
 	onCategoryToggle: (Place.Category) -> Unit,
 	onToggleItemFavorite: (Place) -> Unit,
 	onBlockClick: (Place) -> Unit,
@@ -89,22 +82,15 @@ private fun MainScreen(
 		scaffoldState = scaffoldState,
 		topBar = {
 			TopBar(
-				titleRes = when (state.contentType) {
-					MainState.ContentType.PREVIOUS -> R.string.previous
-					MainState.ContentType.NEAR -> R.string.near_you
-					MainState.ContentType.FAVORITE -> R.string.favorite
-				},
+				likedOnly = state.likedOnly,
+				canShowLikeButton = state.places.firstOrNull { it.isFavorite } != null,
 				selectedCategories = state.selectedCategories,
-				onCategoryToggle = onCategoryToggle
+				onCategoryToggle = onCategoryToggle,
+				onLikeClick = onLikeClick
 			)
 		},
 		bottomBar = {
 			BottomBar(
-				contentType = state.contentType,
-				hasBlockedPlaces = state.hasBlockedPlaces,
-				onLikeClick = onLikeClick,
-				onPreviousClick = onPreviousClick,
-				onBlockedClick = onBlockedClick,
 				onSettingsClick = onSettingsClick
 			)
 		},
@@ -232,9 +218,11 @@ private fun MainScreen(
 
 @Composable
 private fun TopBar(
-	@StringRes titleRes: Int,
+	likedOnly: Boolean,
+	canShowLikeButton: Boolean,
 	selectedCategories: List<Place.Category>,
-	onCategoryToggle: (Place.Category) -> Unit
+	onCategoryToggle: (Place.Category) -> Unit,
+	onLikeClick: () -> Unit
 ) {
 	var filterIsActive by remember { mutableStateOf(true) }
 	Column(
@@ -249,14 +237,24 @@ private fun TopBar(
 		)
 		TopAppBar(
 			title = {
-				titleRes.takeIf { it != 0 }?.let {
-					Text(
-						text = stringResource(it),
-						style = MaterialTheme.typography.h5
-					)
-				}
+				Text(
+					text = stringResource(R.string.app_name),
+					style = MaterialTheme.typography.h5
+				)
 			},
 			actions = {
+				if (filterIsActive && canShowLikeButton) {
+					IconButton(onClick = onLikeClick) {
+						Icon(
+							painter = painterResource(
+								id = when {
+									likedOnly -> R.drawable.ic_favorite_24
+									else -> R.drawable.ic_favorite_border_24
+								}
+							), contentDescription = null
+						)
+					}
+				}
 				IconButton(onClick = { filterIsActive = !filterIsActive }) {
 					Icon(painter = painterResource(id = R.drawable.ic_filter_list_24), contentDescription = null)
 				}
@@ -275,36 +273,13 @@ private fun TopBar(
 
 @Composable
 private fun BottomBar(
-	contentType: MainState.ContentType,
-	hasBlockedPlaces: Boolean,
-	onLikeClick: () -> Unit,
-	onPreviousClick: () -> Unit,
-	onBlockedClick: () -> Unit,
 	onSettingsClick: () -> Unit
 ) {
 	Column {
 		BottomAppBar {
 			Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-				if (contentType != MainState.ContentType.FAVORITE) {
-					IconButton(onClick = onLikeClick) {
-						Icon(painter = painterResource(id = R.drawable.ic_favorite_24), contentDescription = null)
-					}
-				}
-				val hasPreviousOption = contentType != MainState.ContentType.PREVIOUS
-				if (hasPreviousOption || hasBlockedPlaces) {
-					OptionsMenu(mutableListOf<OptionsMenuItemModel>().apply {
-						if (hasPreviousOption) {
-							add(OptionsMenuItemModel(stringResource(id = R.string.previous), onPreviousClick))
-						}
-						if (hasBlockedPlaces) {
-							add(OptionsMenuItemModel(stringResource(id = R.string.blocked), onBlockedClick))
-						}
-						add(OptionsMenuItemModel(stringResource(id = R.string.settings), onSettingsClick))
-					})
-				} else {
-					IconButton(onClick = onSettingsClick) {
-						Icon(painter = painterResource(id = R.drawable.ic_settings_24), contentDescription = null)
-					}
+				IconButton(onClick = onSettingsClick) {
+					Icon(painter = painterResource(id = R.drawable.ic_settings_24), contentDescription = null)
 				}
 			}
 		}
