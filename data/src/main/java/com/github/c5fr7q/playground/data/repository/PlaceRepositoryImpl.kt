@@ -32,7 +32,7 @@ class PlaceRepositoryImpl @Inject constructor(
 	@GeneralCoroutineScope private val generalScope: CoroutineScope
 ) : PlaceRepository {
 
-	private val loadedPlaces = MutableStateFlow(emptyList<Place>())
+	private val loadedPlacesIds = MutableStateFlow(emptyList<String>())
 	private val loadPlacesStatus = MutableStateFlow(LoadPlacesStatus.LOADED)
 	private val hasLoadError = MutableSharedFlow<Boolean>()
 
@@ -65,62 +65,31 @@ class PlaceRepositoryImpl @Inject constructor(
 			.launchIn(generalScope)
 
 		getAllPlaces().take(1)
-			.onEach { loadedPlaces.value = it }
+			.onEach { places -> loadedPlacesIds.value = places.map { it.id } }
 			.launchIn(generalScope)
 	}
 
 	override fun blockPlace(place: Place) {
 		generalScope.launch {
 			placeDao.blockPlace(place.id)
-			loadedPlaces.value = loadedPlaces.value.map { listPlace ->
-				if (listPlace.id == place.id) {
-					listPlace.copy(isBlocked = true)
-				} else {
-					listPlace
-				}
-			}
 		}
 	}
 
 	override fun unblockPlaces(places: List<Place>) {
 		generalScope.launch {
-			val placeIds = places.map { it.id }
 			placeDao.unblockPlaces(places.map { it.id })
-			loadedPlaces.value = loadedPlaces.value.map { listPlace ->
-				if (listPlace.id in placeIds) {
-					listPlace.copy(isBlocked = false)
-				} else {
-					listPlace
-				}
-			}
-
 		}
 	}
 
 	override fun likePlace(place: Place) {
 		generalScope.launch {
 			placeDao.likePlace(place.id)
-			loadedPlaces.value = loadedPlaces.value.map { listPlace ->
-				if (listPlace.id == place.id) {
-					listPlace.copy(isFavorite = true)
-				} else {
-					listPlace
-				}
-			}
 		}
 	}
 
 	override fun dislikePlaces(places: List<Place>) {
 		generalScope.launch {
-			val placeIds = places.map { it.id }
-			placeDao.dislikePlaces(placeIds)
-			loadedPlaces.value = loadedPlaces.value.map { listPlace ->
-				if (listPlace.id in placeIds) {
-					listPlace.copy(isFavorite = false)
-				} else {
-					listPlace
-				}
-			}
+			placeDao.dislikePlaces(places.map { it.id })
 		}
 	}
 
@@ -130,7 +99,7 @@ class PlaceRepositoryImpl @Inject constructor(
 				fetchPlaces(
 					requestedCategories!!,
 					requestedRadius!!,
-					loadedPlaces.value.size
+					loadedPlacesIds.value.size
 				)
 			}
 		}
@@ -156,7 +125,12 @@ class PlaceRepositoryImpl @Inject constructor(
 
 	override fun getLoadPlacesStatus() = loadPlacesStatus.asStateFlow()
 
-	override fun getLoadedPlaces() = loadedPlaces.asStateFlow()
+	override fun getLoadedPlaces(): Flow<List<Place>> {
+		return getAllPlaces()
+			.combine(loadedPlacesIds) { allPlaces, loadedIds ->
+				allPlaces.filter { it.id in loadedIds }
+			}
+	}
 
 	override fun getAllPlaces() = placeDao.getAllPlaces().mapIterable { placeDtoMapper.mapDtoToPlace(it) }
 
@@ -176,16 +150,16 @@ class PlaceRepositoryImpl @Inject constructor(
 				.populateWithPhotos()
 				.updateFavorites()
 			newPlaces.map { placeDtoMapper.mapPlaceToDto(it) }.let { placeDao.addPlaces(it) }
-			loadedPlaces.value = when {
-				offset != 0 -> loadedPlaces.value + newPlaces
-				else -> newPlaces
+			loadedPlacesIds.value = when {
+				offset != 0 -> loadedPlacesIds.value + newPlaces.map { it.id }
+				else -> newPlaces.map { it.id }
 			}
 			loadPlacesStatus.value = LoadPlacesStatus.LOADED
 		} catch (e: Exception) {
 			requestedCategories = null
 			requestedRadius = null
 			requestedPosition = null
-			loadedPlaces.value = emptyList()
+			loadedPlacesIds.value = emptyList()
 			loadPlacesStatus.value = LoadPlacesStatus.LOADED
 			hasLoadError.tryEmit(true)
 		}
