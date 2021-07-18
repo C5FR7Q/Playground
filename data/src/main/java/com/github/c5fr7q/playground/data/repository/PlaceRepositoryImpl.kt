@@ -94,11 +94,12 @@ class PlaceRepositoryImpl @Inject constructor(
 		}
 	}
 
-	override fun dislikePlace(place: Place) {
+	override fun dislikePlaces(places: List<Place>) {
 		generalScope.launch {
-			placeDao.dislikePlace(place.id)
+			val placeIds = places.map { it.id }
+			placeDao.dislikePlaces(placeIds)
 			loadedPlaces.value = loadedPlaces.value.map { listPlace ->
-				if (listPlace.id == place.id) {
+				if (listPlace.id in placeIds) {
 					listPlace.copy(isFavorite = false)
 				} else {
 					listPlace

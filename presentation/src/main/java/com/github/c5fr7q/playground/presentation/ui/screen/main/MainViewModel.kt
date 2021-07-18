@@ -18,7 +18,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
 	private val blockPlaceUseCase: BlockPlaceUseCase,
-	private val dislikePlaceUseCase: DislikePlaceUseCase,
+	private val dislikePlacesUseCase: DislikePlacesUseCase,
 	private val getAvailablePlacesForCategoriesUseCase: GetAvailablePlacesForCategoriesUseCase,
 	private val getFavoritePlacesForCategoriesUseCase: GetFavoritePlacesForCategoriesUseCase,
 	private val getLoadPlacesStatusUseCase: GetLoadPlacesStatusUseCase,
@@ -30,6 +30,7 @@ class MainViewModel @Inject constructor(
 	private val resourceHelper: ResourceHelper,
 ) : BaseViewModel<MainState, MainSideEffect, MainIntent>() {
 	private var refreshing = false
+	override val defaultState = MainState()
 
 	override fun handleIntent(intent: BaseIntent.Default) {
 		if (intent is BaseIntent.Default.Init) {
@@ -141,7 +142,7 @@ class MainViewModel @Inject constructor(
 			is MainIntent.ToggleItemFavorite -> {
 				intent.place.run {
 					if (isFavorite) {
-						dislikePlaceUseCase.execute(this)
+						dislikePlacesUseCase.execute(listOf(this))
 					} else {
 						likePlaceUseCase.execute(this)
 					}

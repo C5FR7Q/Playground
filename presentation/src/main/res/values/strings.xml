@@ -31,4 +31,6 @@
 	<string name = "refresh_rationale_message">To refresh items we\'ll need to know your current location</string>
 	<string name = "refresh_fallback_message">Sorry, refresh is unavailable without location permission</string>
 	<string name = "no_internet_connection">No internet connection</string>
+	<string name = "all_liked_places">All liked places</string>
+	<string name = "all_blocked_places">All blocked places</string>
 </resources>

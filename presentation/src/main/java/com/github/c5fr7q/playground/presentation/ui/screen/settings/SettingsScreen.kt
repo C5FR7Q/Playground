@@ -15,6 +15,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.github.c5fr7q.playground.presentation.R
 import com.github.c5fr7q.playground.presentation.ui.base.BaseIntent
+import com.github.c5fr7q.playground.presentation.ui.widget.OptionsMenu
+import com.github.c5fr7q.playground.presentation.ui.widget.OptionsMenuItemModel
 import com.google.accompanist.insets.statusBarsHeight
 
 @Composable
@@ -23,6 +25,8 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
 	SettingsScreen(
 		state = state,
 		onBackClick = { viewModel.produceIntent(BaseIntent.Default.ClickBack) },
+		onLikedClick = { viewModel.produceIntent(SettingsIntent.ClickLiked) },
+		onBlockedClick = { viewModel.produceIntent(SettingsIntent.ClickBlocked) },
 		onPackCountClick = { viewModel.produceIntent(SettingsIntent.ClickPackCount) },
 		onCachingDaysClick = { viewModel.produceIntent(SettingsIntent.ClickCachingDays) },
 		onRadiusClick = { viewModel.produceIntent(SettingsIntent.ClickRadius) },
@@ -33,13 +37,19 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
 private fun SettingsScreen(
 	state: SettingsState,
 	onBackClick: () -> Unit,
+	onLikedClick: () -> Unit,
+	onBlockedClick: () -> Unit,
 	onPackCountClick: () -> Unit,
 	onCachingDaysClick: () -> Unit,
 	onRadiusClick: () -> Unit
 ) {
 	Scaffold(
 		topBar = {
-			TopBar(onBackClick)
+			TopBar(
+				onBackClick = onBackClick,
+				onLikedClick = onLikedClick,
+				onBlockedClick = onBlockedClick
+			)
 		}
 	) { innerPadding ->
 		LazyColumn {
@@ -123,7 +133,9 @@ private fun SettingsCategoryItem(text: String) {
 
 @Composable
 private fun TopBar(
-	onBackClick: () -> Unit
+	onBackClick: () -> Unit,
+	onLikedClick: () -> Unit,
+	onBlockedClick: () -> Unit
 ) {
 	Column {
 		Box(
@@ -143,6 +155,12 @@ private fun TopBar(
 					text = stringResource(R.string.settings),
 					style = MaterialTheme.typography.h5
 				)
+			},
+			actions = {
+				OptionsMenu(options = mutableListOf<OptionsMenuItemModel>().apply {
+					add(OptionsMenuItemModel(stringResource(id = R.string.all_liked_places), onLikedClick))
+					add(OptionsMenuItemModel(stringResource(id = R.string.all_blocked_places), onBlockedClick))
+				})
 			},
 			backgroundColor = MaterialTheme.colors.surface,
 			contentColor = MaterialTheme.colors.onSurface,

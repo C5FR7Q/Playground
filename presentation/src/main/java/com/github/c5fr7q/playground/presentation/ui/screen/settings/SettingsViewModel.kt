@@ -22,6 +22,8 @@ class SettingsViewModel @Inject constructor(
 	private val setPlacesRadiusUseCase: SetPlacesRadiusUseCase,
 	private val resourceHelper: ResourceHelper
 ) : BaseViewModel<SettingsState, Unit, SettingsIntent>() {
+	override val defaultState = SettingsState()
+
 	override fun handleIntent(intent: BaseIntent.Default) {
 		super.handleIntent(intent)
 		if (intent is BaseIntent.Default.Init) {
@@ -41,6 +43,12 @@ class SettingsViewModel @Inject constructor(
 
 	override fun handleIntent(intent: SettingsIntent) {
 		when (intent) {
+			SettingsIntent.ClickBlocked -> {
+				navigationManager.openBlocked()
+			}
+			SettingsIntent.ClickLiked -> {
+				navigationManager.openLiked()
+			}
 			SettingsIntent.ClickCachingDays -> {
 				navigationManager.openInputDialog(
 					title = resourceHelper.getString(R.string.caching_days),

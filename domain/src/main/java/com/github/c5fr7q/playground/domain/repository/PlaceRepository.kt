@@ -8,7 +8,7 @@ interface PlaceRepository {
 	fun blockPlace(place: Place)
 	fun unblockPlaces(places: List<Place>)
 	fun likePlace(place: Place)
-	fun dislikePlace(place: Place)
+	fun dislikePlaces(places: List<Place>)
 	fun loadMorePlaces()
 	fun reloadPlaces(categories: List<Place.Category>)
 	fun getLoadPlacesStatus(): Flow<LoadPlacesStatus>

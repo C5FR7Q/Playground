@@ -4,8 +4,8 @@ import com.github.c5fr7q.playground.domain.entity.Place
 import com.github.c5fr7q.playground.domain.repository.PlaceRepository
 import javax.inject.Inject
 
-class DislikePlaceUseCase @Inject constructor(
+class DislikePlacesUseCase @Inject constructor(
 	private val placeRepository: PlaceRepository
 ) {
-	fun execute(place: Place) = placeRepository.dislikePlace(place)
+	fun execute(places: List<Place>) = placeRepository.dislikePlaces(places)
 }

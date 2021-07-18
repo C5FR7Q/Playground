@@ -18,8 +18,8 @@ interface PlaceDao {
 	@Query("UPDATE place SET isFavorite = 1 WHERE id == :placeId")
 	suspend fun likePlace(placeId: String)
 
-	@Query("UPDATE place SET isFavorite = 0 WHERE id == :placeId")
-	suspend fun dislikePlace(placeId: String)
+	@Query("UPDATE place SET isFavorite = 0 WHERE id IN (:placeIds)")
+	suspend fun dislikePlaces(placeIds: List<String>)
 
 	@Query("UPDATE place SET isBlocked = 1 WHERE id == :placeId")
 	suspend fun blockPlace(placeId: String)

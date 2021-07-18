@@ -2,7 +2,6 @@ package com.github.c5fr7q.playground.presentation.ui
 
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.hilt.navigation.compose.hiltNavGraphViewModel
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -12,6 +11,7 @@ import androidx.navigation.compose.rememberNavController
 import com.github.c5fr7q.playground.presentation.manager.NavigationManager
 import com.github.c5fr7q.playground.presentation.ui.base.BaseViewModel
 import com.github.c5fr7q.playground.presentation.ui.screen.blocked.BlockedScreen
+import com.github.c5fr7q.playground.presentation.ui.screen.liked.LikedScreen
 import com.github.c5fr7q.playground.presentation.ui.screen.main.MainScreen
 import com.github.c5fr7q.playground.presentation.ui.screen.settings.SettingsScreen
 import com.github.c5fr7q.playground.presentation.ui.theme.PlaygroundTheme
@@ -38,6 +38,9 @@ fun Main(navigationManager: NavigationManager) {
 				}
 				composable(Navigation.Blocked.destination) {
 					BlockedScreen(baseViewModel())
+				}
+				composable(Navigation.Liked.destination) {
+					LikedScreen(baseViewModel())
 				}
 			}
 

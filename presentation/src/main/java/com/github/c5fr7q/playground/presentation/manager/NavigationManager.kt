@@ -38,6 +38,10 @@ class NavigationManager @Inject constructor() : BaseManager() {
 		navController?.navigate(Navigation.Blocked.createRoute())
 	}
 
+	fun openLiked() {
+		navController?.navigate(Navigation.Liked.createRoute())
+	}
+
 	fun openConfirmationDialog(
 		text: String,
 		title: String = "",

@@ -14,6 +14,11 @@ sealed class Navigation<A> {
 		override fun createRoute(args: Unit) = destination
 	}
 
+	object Liked : Navigation<Unit>() {
+		override val destination = "liked"
+		override fun createRoute(args: Unit) = destination
+	}
+
 	object Settings : Navigation<Unit>() {
 		override val destination = "settings"
 		override fun createRoute(args: Unit) = destination

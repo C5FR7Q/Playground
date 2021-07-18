@@ -8,7 +8,6 @@ import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.lang.reflect.ParameterizedType
 import javax.inject.Inject
 
 @Suppress("UNCHECKED_CAST")
@@ -19,8 +18,9 @@ abstract class BaseViewModel<State, SideEffect, Intent : BaseIntent> : ViewModel
 	private val intentFlow = MutableSharedFlow<BaseIntent>()
 	private val sideEffectFlow = MutableSharedFlow<SideEffect>()
 
-	private val stateType = (javaClass.genericSuperclass as ParameterizedType).actualTypeArguments[0] as Class<State>
-	private val mutableState = MutableStateFlow(Class.forName(stateType.name).newInstance() as State)
+	private val mutableState by lazy { MutableStateFlow(defaultState) }
+
+	protected abstract val defaultState: State
 
 	val state: StateFlow<State> get() = mutableState.asStateFlow()
 	val sideEffect: SharedFlow<SideEffect> get() = sideEffectFlow.asSharedFlow()
