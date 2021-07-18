@@ -72,12 +72,28 @@ class PlaceRepositoryImpl @Inject constructor(
 	override fun blockPlace(place: Place) {
 		generalScope.launch {
 			placeDao.blockPlace(place.id)
+			loadedPlaces.value = loadedPlaces.value.map { listPlace ->
+				if (listPlace.id == place.id) {
+					listPlace.copy(isBlocked = true)
+				} else {
+					listPlace
+				}
+			}
 		}
 	}
 
 	override fun unblockPlaces(places: List<Place>) {
 		generalScope.launch {
+			val placeIds = places.map { it.id }
 			placeDao.unblockPlaces(places.map { it.id })
+			loadedPlaces.value = loadedPlaces.value.map { listPlace ->
+				if (listPlace.id in placeIds) {
+					listPlace.copy(isBlocked = false)
+				} else {
+					listPlace
+				}
+			}
+
 		}
 	}
 
