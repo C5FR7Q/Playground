@@ -27,7 +27,7 @@ class PlaceRepositoryImpl @Inject constructor(
 	private val locationManager: ILocationManager,
 	private val sygicPlaceMapper: SygicPlaceMapper,
 	private val placeDtoMapper: PlaceDtoMapper,
-	private val placeDao: PlaceDao,
+	private val placeDaoFlow: Flow<@JvmSuppressWildcards PlaceDao>,
 	storage: Storage,
 	@GeneralCoroutineScope private val generalScope: CoroutineScope
 ) : PlaceRepository {
@@ -50,7 +50,13 @@ class PlaceRepositoryImpl @Inject constructor(
 
 	private var allPlaces: List<Place>? = null
 
+	private var placeDao: PlaceDao? = null
+
 	init {
+		placeDaoFlow
+			.onEach { placeDao = it }
+			.launchIn(generalScope)
+
 		storage.getPlacesPackCount()
 			.onEach { placesPackCount = it }
 			.launchIn(generalScope)
@@ -59,10 +65,14 @@ class PlaceRepositoryImpl @Inject constructor(
 			.onEach { placesMetersRadius = it }
 			.launchIn(generalScope)
 
-		storage.getDataCachingTime()
-			.take(1)
-			.onEach { placeDao.deleteOutdatedPlaces(Date.from(Instant.now()).time - it.toMillis()) }
-			.launchIn(generalScope)
+		placeDaoFlow.flatMapLatest { placeDao ->
+			storage.getDataCachingTime()
+				.take(1)
+				.onEach {
+					placeDao.deleteOutdatedPlaces(Date.from(Instant.now()).time - it.toMillis())
+				}
+
+		}.launchIn(generalScope)
 
 		getAllPlaces().take(1)
 			.onEach { places -> loadedPlacesIds.value = places.map { it.id } }
@@ -71,25 +81,25 @@ class PlaceRepositoryImpl @Inject constructor(
 
 	override fun blockPlace(place: Place) {
 		generalScope.launch {
-			placeDao.blockPlace(place.id)
+			placeDao?.blockPlace(place.id)
 		}
 	}
 
 	override fun unblockPlaces(places: List<Place>) {
 		generalScope.launch {
-			placeDao.unblockPlaces(places.map { it.id })
+			placeDao?.unblockPlaces(places.map { it.id })
 		}
 	}
 
 	override fun likePlace(place: Place) {
 		generalScope.launch {
-			placeDao.likePlace(place.id)
+			placeDao?.likePlace(place.id)
 		}
 	}
 
 	override fun dislikePlaces(places: List<Place>) {
 		generalScope.launch {
-			placeDao.dislikePlaces(places.map { it.id })
+			placeDao?.dislikePlaces(places.map { it.id })
 		}
 	}
 
@@ -132,7 +142,11 @@ class PlaceRepositoryImpl @Inject constructor(
 			}
 	}
 
-	override fun getAllPlaces() = placeDao.getAllPlaces().mapIterable { placeDtoMapper.mapDtoToPlace(it) }
+	override fun getAllPlaces(): Flow<List<Place>> {
+		return placeDaoFlow.flatMapLatest { placeDao ->
+			placeDao.getAllPlaces().mapIterable { placeDtoMapper.mapDtoToPlace(it) }
+		}
+	}
 
 	private suspend fun fetchPlaces(categories: List<Place.Category>, radius: Int, offset: Int) {
 		try {
@@ -149,7 +163,7 @@ class PlaceRepositoryImpl @Inject constructor(
 				.mapResponse(placesResponse)
 				.populateWithPhotos()
 				.updateFavorites()
-			newPlaces.map { placeDtoMapper.mapPlaceToDto(it) }.let { placeDao.addPlaces(it) }
+			newPlaces.map { placeDtoMapper.mapPlaceToDto(it) }.let { placeDao?.addPlaces(it) }
 			loadedPlacesIds.value = when {
 				offset != 0 -> loadedPlacesIds.value + newPlaces.map { it.id }
 				else -> newPlaces.map { it.id }
