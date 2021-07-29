@@ -17,14 +17,14 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-	private val blockPlaceUseCase: BlockPlaceUseCase,
-	private val dislikePlacesUseCase: DislikePlacesUseCase,
-	private val getAvailablePlacesForCategoriesUseCase: GetAvailablePlacesForCategoriesUseCase,
-	private val getFavoritePlacesForCategoriesUseCase: GetFavoritePlacesForCategoriesUseCase,
-	private val getLoadPlacesStatusUseCase: GetLoadPlacesStatusUseCase,
-	private val likePlaceUseCase: LikePlaceUseCase,
-	private val loadMorePlacesUseCase: LoadMorePlacesUseCase,
-	private val reloadPlacesUseCase: ReloadPlacesUseCase,
+	private val blockPlace: BlockPlaceUseCase,
+	private val dislikePlaces: DislikePlacesUseCase,
+	private val getAvailablePlacesForCategories: GetAvailablePlacesForCategoriesUseCase,
+	private val getFavoritePlacesForCategories: GetFavoritePlacesForCategoriesUseCase,
+	private val getLoadPlacesStatus: GetLoadPlacesStatusUseCase,
+	private val likePlace: LikePlaceUseCase,
+	private val loadMorePlaces: LoadMorePlacesUseCase,
+	private val reloadPlaces: ReloadPlacesUseCase,
 	private val permissionManager: PermissionManager,
 	private val networkStateManager: NetworkStateManager,
 	private val resourceHelper: ResourceHelper,
@@ -47,18 +47,18 @@ class MainViewModel @Inject constructor(
 				.onEach { produceSideEffect(MainSideEffect.ScrollToTop) }
 				.launchIn(viewModelScope)
 
-			getLoadPlacesStatusUseCase.execute()
+			getLoadPlacesStatus()
 				.map { it == LoadPlacesStatus.LOADING }
 				.onEach { updateState { copy(isLoading = it) } }
 				.launchIn(viewModelScope)
 
-			getLoadPlacesStatusUseCase.execute()
+			getLoadPlacesStatus()
 				.filter { it == LoadPlacesStatus.FAILED }
 				.shareIn(viewModelScope, SharingStarted.WhileSubscribed())
 				.onEach { produceSideEffect(MainSideEffect.ShowError(resourceHelper.getString(R.string.something_went_wrong))) }
 				.launchIn(viewModelScope)
 
-			getLoadPlacesStatusUseCase.execute()
+			getLoadPlacesStatus()
 				.filter { it == LoadPlacesStatus.LOADED && refreshing }
 				.shareIn(viewModelScope, SharingStarted.WhileSubscribed())
 				.onEach { updateState { copy(likedOnly = false) } }
@@ -68,9 +68,9 @@ class MainViewModel @Inject constructor(
 				.distinctUntilChanged()
 				.flatMapLatest { (categories, likedOnly) ->
 					if (likedOnly) {
-						getFavoritePlacesForCategoriesUseCase.execute(categories)
+						getFavoritePlacesForCategories(categories)
 					} else {
-						getAvailablePlacesForCategoriesUseCase.execute(categories)
+						getAvailablePlacesForCategories(categories)
 					}
 				}
 				.onEach {
@@ -89,7 +89,7 @@ class MainViewModel @Inject constructor(
 		when (intent) {
 			MainIntent.LoadMore -> {
 				refreshing = false
-				loadMorePlacesUseCase.execute()
+				loadMorePlaces()
 			}
 			MainIntent.ClickSettings -> {
 				navigationManager.openSettings()
@@ -115,7 +115,7 @@ class MainViewModel @Inject constructor(
 
 								if (permissionsGranted) {
 									refreshing = true
-									reloadPlacesUseCase.execute(selectedCategories)
+									reloadPlaces(selectedCategories)
 								}
 							}
 						}
@@ -142,14 +142,14 @@ class MainViewModel @Inject constructor(
 			is MainIntent.ToggleItemFavorite -> {
 				intent.place.run {
 					if (isFavorite) {
-						dislikePlacesUseCase.execute(listOf(this))
+						dislikePlaces(listOf(this))
 					} else {
-						likePlaceUseCase.execute(this)
+						likePlace(this)
 					}
 				}
 			}
 			is MainIntent.ClickBlock -> {
-				blockPlaceUseCase.execute(intent.place)
+				blockPlace(intent.place)
 			}
 			is MainIntent.ClickShowInMaps -> {
 				navigationManager.openMaps(intent.place.position)

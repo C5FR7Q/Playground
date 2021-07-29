@@ -6,12 +6,11 @@ import kotlinx.coroutines.flow.combine
 import javax.inject.Inject
 
 class GetFavoritePlacesForCategoriesUseCase @Inject constructor(
-	private val getAvailablePlacesForCategoriesUseCase: GetAvailablePlacesForCategoriesUseCase,
-	private val getFavoritePlacesUseCase: GetFavoritePlacesUseCase
+	private val getAvailablePlacesForCategories: GetAvailablePlacesForCategoriesUseCase,
+	private val getFavoritePlaces: GetFavoritePlacesUseCase
 ) {
-	fun execute(categories: List<Place.Category>): Flow<List<Place>> {
-		return getAvailablePlacesForCategoriesUseCase
-			.execute(categories)
-			.combine(getFavoritePlacesUseCase.execute()) { available, favorite -> available.filter { it in favorite } }
+	operator fun invoke(categories: List<Place.Category>): Flow<List<Place>> {
+		return getAvailablePlacesForCategories(categories)
+			.combine(getFavoritePlaces()) { available, favorite -> available.filter { it in favorite } }
 	}
 }

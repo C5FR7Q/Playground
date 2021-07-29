@@ -7,5 +7,5 @@ import javax.inject.Inject
 class UnblockPlacesUseCase @Inject constructor(
 	private val placeRepository: PlaceRepository
 ) {
-	fun execute(places: List<Place>) = placeRepository.unblockPlaces(places)
+	operator fun invoke(places: List<Place>) = placeRepository.unblockPlaces(places)
 }

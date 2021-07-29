@@ -9,12 +9,12 @@ import javax.inject.Inject
 
 class GetFavoritePlacesUseCase @Inject constructor(
 	private val repository: PlaceRepository,
-	private val getBlockedPlacesUseCase: GetBlockedPlacesUseCase
+	private val getBlockedPlaces: GetBlockedPlacesUseCase
 ) {
-	fun execute(): Flow<List<Place>> {
+	operator fun invoke(): Flow<List<Place>> {
 		return repository
 			.getAllPlaces()
 			.filterIterable { it.isFavorite }
-			.combine(getBlockedPlacesUseCase.execute()) { favorite, blocked -> favorite.filter { it !in blocked } }
+			.combine(getBlockedPlaces()) { favorite, blocked -> favorite.filter { it !in blocked } }
 	}
 }

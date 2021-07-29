@@ -6,5 +6,5 @@ import javax.inject.Inject
 class SetPlacesRadiusUseCase @Inject constructor(
 	private val settingsRepository: SettingsRepository
 ) {
-	fun execute(radius: Int) = settingsRepository.setPlacesRadius(radius)
+	operator fun invoke(radius: Int) = settingsRepository.setPlacesRadius(radius)
 }

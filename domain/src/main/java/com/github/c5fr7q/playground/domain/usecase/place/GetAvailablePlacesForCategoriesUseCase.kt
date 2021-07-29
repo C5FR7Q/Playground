@@ -9,12 +9,12 @@ import javax.inject.Inject
 
 class GetAvailablePlacesForCategoriesUseCase @Inject constructor(
 	private val placeRepository: PlaceRepository,
-	private val getBlockedPlacesUseCase: GetBlockedPlacesUseCase
+	private val getBlockedPlaces: GetBlockedPlacesUseCase
 ) {
-	fun execute(categories: List<Place.Category>): Flow<List<Place>> {
+	operator fun invoke(categories: List<Place.Category>): Flow<List<Place>> {
 		return placeRepository
 			.getLoadedPlaces()
-			.combine(getBlockedPlacesUseCase.execute()) { loaded, blocked -> loaded - blocked }
+			.combine(getBlockedPlaces()) { loaded, blocked -> loaded - blocked }
 			.filterIterable { it.categories.containsAll(categories) }
 	}
 }

@@ -6,5 +6,5 @@ import javax.inject.Inject
 class GetDataCachingTimeUseCase @Inject constructor(
 	private val settingsRepository: SettingsRepository
 ) {
-	fun execute() = settingsRepository.getDataCachingTime()
+	operator fun invoke() = settingsRepository.getDataCachingTime()
 }

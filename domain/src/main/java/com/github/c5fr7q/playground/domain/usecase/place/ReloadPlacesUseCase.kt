@@ -7,5 +7,5 @@ import javax.inject.Inject
 class ReloadPlacesUseCase @Inject constructor(
 	private val placeRepository: PlaceRepository
 ) {
-	fun execute(categories: List<Place.Category>) = placeRepository.reloadPlaces(categories)
+	operator fun invoke(categories: List<Place.Category>) = placeRepository.reloadPlaces(categories)
 }

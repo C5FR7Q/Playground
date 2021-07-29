@@ -6,5 +6,5 @@ import javax.inject.Inject
 class GetLoadPlacesStatusUseCase @Inject constructor(
 	private val placeRepository: PlaceRepository
 ) {
-	fun execute() = placeRepository.getLoadPlacesStatus()
+	operator fun invoke() = placeRepository.getLoadPlacesStatus()
 }

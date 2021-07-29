@@ -6,5 +6,5 @@ import javax.inject.Inject
 class SetPlacesPackCountUseCase @Inject constructor(
 	private val settingsRepository: SettingsRepository
 ) {
-	fun execute(count: Int) = settingsRepository.setPlacesPackCount(count)
+	operator fun invoke(count: Int) = settingsRepository.setPlacesPackCount(count)
 }

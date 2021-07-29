@@ -9,9 +9,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LikedViewModel @Inject constructor(
-	private val getFavoritePlacesUseCase: GetFavoritePlacesUseCase,
-	private val dislikePlacesUseCase: DislikePlacesUseCase
+	private val getFavoritePlaces: GetFavoritePlacesUseCase,
+	private val dislikePlaces: DislikePlacesUseCase
 ) : SelectionViewModel() {
-	override fun getPlaces() = getFavoritePlacesUseCase.execute()
-	override fun applySelection(places: List<Place>) = dislikePlacesUseCase.execute(places)
+	override fun getPlaces() = getFavoritePlaces()
+	override fun applySelection(places: List<Place>) = dislikePlaces(places)
 }

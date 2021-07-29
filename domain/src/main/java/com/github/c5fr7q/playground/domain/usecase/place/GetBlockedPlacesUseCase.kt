@@ -7,5 +7,5 @@ import javax.inject.Inject
 class GetBlockedPlacesUseCase @Inject constructor(
 	private val placeRepository: PlaceRepository
 ) {
-	fun execute() = placeRepository.getAllPlaces().filterIterable { it.isBlocked }
+	operator fun invoke() = placeRepository.getAllPlaces().filterIterable { it.isBlocked }
 }

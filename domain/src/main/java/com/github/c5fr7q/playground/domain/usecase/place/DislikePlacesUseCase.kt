@@ -7,5 +7,5 @@ import javax.inject.Inject
 class DislikePlacesUseCase @Inject constructor(
 	private val placeRepository: PlaceRepository
 ) {
-	fun execute(places: List<Place>) = placeRepository.dislikePlaces(places)
+	operator fun invoke(places: List<Place>) = placeRepository.dislikePlaces(places)
 }

@@ -8,11 +8,11 @@ import javax.inject.Inject
 
 class GetAvailablePlacesUseCase @Inject constructor(
 	private val placeRepository: PlaceRepository,
-	private val getBlockedPlacesUseCase: GetBlockedPlacesUseCase
+	private val getBlockedPlaces: GetBlockedPlacesUseCase
 ) {
-	fun execute(): Flow<List<Place>> {
+	operator fun invoke(): Flow<List<Place>> {
 		return placeRepository
 			.getLoadedPlaces()
-			.combine(getBlockedPlacesUseCase.execute()) { loaded, blocked -> loaded - blocked }
+			.combine(getBlockedPlaces()) { loaded, blocked -> loaded - blocked }
 	}
 }

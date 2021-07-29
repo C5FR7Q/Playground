@@ -7,5 +7,5 @@ import javax.inject.Inject
 class LikePlaceUseCase @Inject constructor(
 	private val placeRepository: PlaceRepository
 ) {
-	fun execute(place: Place) = placeRepository.likePlace(place)
+	operator fun invoke(place: Place) = placeRepository.likePlace(place)
 }

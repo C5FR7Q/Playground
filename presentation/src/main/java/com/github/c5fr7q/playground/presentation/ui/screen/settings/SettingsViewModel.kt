@@ -14,12 +14,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-	private val getDataCachingTimeUseCase: GetDataCachingTimeUseCase,
-	private val getPlacesPackCountUseCase: GetPlacesPackCountUseCase,
-	private val getPlacesRadiusUseCase: GetPlacesRadiusUseCase,
-	private val setDataCachingTimeUseCase: SetDataCachingTimeUseCase,
-	private val setPlacesPackCountUseCase: SetPlacesPackCountUseCase,
-	private val setPlacesRadiusUseCase: SetPlacesRadiusUseCase,
+	private val getDataCachingTime: GetDataCachingTimeUseCase,
+	private val getPlacesPackCount: GetPlacesPackCountUseCase,
+	private val getPlacesRadius: GetPlacesRadiusUseCase,
+	private val setDataCachingTime: SetDataCachingTimeUseCase,
+	private val setPlacesPackCount: SetPlacesPackCountUseCase,
+	private val setPlacesRadius: SetPlacesRadiusUseCase,
 	private val resourceHelper: ResourceHelper
 ) : BaseViewModel<SettingsState, Unit, SettingsIntent>() {
 	override val defaultState = SettingsState()
@@ -27,15 +27,15 @@ class SettingsViewModel @Inject constructor(
 	override fun handleIntent(intent: BaseIntent.Default) {
 		super.handleIntent(intent)
 		if (intent is BaseIntent.Default.Init) {
-			getDataCachingTimeUseCase.execute()
+			getDataCachingTime()
 				.onEach { updateState { copy(cachingDays = it.toDays().toInt()) } }
 				.launchIn(viewModelScope)
 
-			getPlacesPackCountUseCase.execute()
+			getPlacesPackCount()
 				.onEach { updateState { copy(packCount = it) } }
 				.launchIn(viewModelScope)
 
-			getPlacesRadiusUseCase.execute()
+			getPlacesRadius()
 				.onEach { updateState { copy(radius = it) } }
 				.launchIn(viewModelScope)
 		}
@@ -53,21 +53,21 @@ class SettingsViewModel @Inject constructor(
 				navigationManager.openInputDialog(
 					title = resourceHelper.getString(R.string.caching_days),
 					defaultValue = state.value.cachingDays,
-					onApplyValue = { setDataCachingTimeUseCase.execute(Duration.ofDays(it.toLong())) }
+					onApplyValue = { setDataCachingTime(Duration.ofDays(it.toLong())) }
 				)
 			}
 			SettingsIntent.ClickPackCount -> {
 				navigationManager.openInputDialog(
 					title = resourceHelper.getString(R.string.pack_count),
 					defaultValue = state.value.packCount,
-					onApplyValue = { setPlacesPackCountUseCase.execute(it) }
+					onApplyValue = { setPlacesPackCount(it) }
 				)
 			}
 			SettingsIntent.ClickRadius -> {
 				navigationManager.openInputDialog(
 					title = resourceHelper.getString(R.string.radius),
 					defaultValue = state.value.radius,
-					onApplyValue = { setPlacesRadiusUseCase.execute(it) }
+					onApplyValue = { setPlacesRadius(it) }
 				)
 			}
 		}

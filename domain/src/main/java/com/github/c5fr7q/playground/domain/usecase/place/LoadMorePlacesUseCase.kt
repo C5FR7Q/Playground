@@ -6,5 +6,5 @@ import javax.inject.Inject
 class LoadMorePlacesUseCase @Inject constructor(
 	private val placeRepository: PlaceRepository
 ) {
-	fun execute() = placeRepository.loadMorePlaces()
+	operator fun invoke() = placeRepository.loadMorePlaces()
 }
