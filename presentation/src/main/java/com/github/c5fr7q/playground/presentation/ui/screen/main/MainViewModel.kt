@@ -1,7 +1,7 @@
 package com.github.c5fr7q.playground.presentation.ui.screen.main
 
 import androidx.lifecycle.viewModelScope
-import com.github.c5fr7q.playground.domain.entity.LoadPlacesStatus
+import com.github.c5fr7q.playground.domain.entity.base.LoadState
 import com.github.c5fr7q.playground.domain.usecase.*
 import com.github.c5fr7q.playground.domain.usecase.place.*
 import com.github.c5fr7q.playground.presentation.R
@@ -21,7 +21,7 @@ class MainViewModel @Inject constructor(
 	private val dislikePlaces: DislikePlacesUseCase,
 	private val getAvailablePlacesForCategories: GetAvailablePlacesForCategoriesUseCase,
 	private val getFavoritePlacesForCategories: GetFavoritePlacesForCategoriesUseCase,
-	private val getLoadPlacesStatus: GetLoadPlacesStatusUseCase,
+	private val getPlacesLoadState: GetPlacesLoadStateUseCase,
 	private val likePlace: LikePlaceUseCase,
 	private val loadMorePlaces: LoadMorePlacesUseCase,
 	private val reloadPlaces: ReloadPlacesUseCase,
@@ -47,19 +47,19 @@ class MainViewModel @Inject constructor(
 				.onEach { produceSideEffect(MainSideEffect.ScrollToTop) }
 				.launchIn(viewModelScope)
 
-			getLoadPlacesStatus()
-				.map { it == LoadPlacesStatus.LOADING }
+			getPlacesLoadState()
+				.map { it == LoadState.LOADING }
 				.onEach { updateState { copy(isLoading = it) } }
 				.launchIn(viewModelScope)
 
-			getLoadPlacesStatus()
-				.filter { it == LoadPlacesStatus.FAILED }
+			getPlacesLoadState()
+				.filter { it == LoadState.ERROR }
 				.shareIn(viewModelScope, SharingStarted.WhileSubscribed())
 				.onEach { produceSideEffect(MainSideEffect.ShowError(resourceHelper.getString(R.string.something_went_wrong))) }
 				.launchIn(viewModelScope)
 
-			getLoadPlacesStatus()
-				.filter { it == LoadPlacesStatus.LOADED && refreshing }
+			getPlacesLoadState()
+				.filter { it == LoadState.SUCCESS && refreshing }
 				.shareIn(viewModelScope, SharingStarted.WhileSubscribed())
 				.onEach { updateState { copy(likedOnly = false) } }
 				.launchIn(viewModelScope)

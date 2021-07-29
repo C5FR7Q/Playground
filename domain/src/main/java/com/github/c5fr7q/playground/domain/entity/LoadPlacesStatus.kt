@@ -1,7 +1,0 @@
-package com.github.c5fr7q.playground.domain.entity
-
-enum class LoadPlacesStatus {
-	LOADED,
-	LOADING,
-	FAILED
-}

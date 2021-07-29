@@ -8,9 +8,9 @@ import com.github.c5fr7q.playground.data.source.local.Storage
 import com.github.c5fr7q.playground.data.source.local.database.dao.PlaceDao
 import com.github.c5fr7q.playground.data.source.remote.sygic.SygicService
 import com.github.c5fr7q.playground.data.source.remote.unsplash.UnsplashPhotoProvider
-import com.github.c5fr7q.playground.domain.entity.LoadPlacesStatus
 import com.github.c5fr7q.playground.domain.entity.Place
 import com.github.c5fr7q.playground.domain.entity.Position
+import com.github.c5fr7q.playground.domain.entity.base.Resource
 import com.github.c5fr7q.playground.domain.repository.PlaceRepository
 import com.github.c5fr7q.util.mapIterable
 import kotlinx.coroutines.CoroutineScope
@@ -32,9 +32,7 @@ class PlaceRepositoryImpl @Inject constructor(
 	@GeneralCoroutineScope private val generalScope: CoroutineScope
 ) : PlaceRepository {
 
-	private val loadedPlacesIds = MutableStateFlow(emptyList<String>())
-	private val loadPlacesStatus = MutableStateFlow(LoadPlacesStatus.LOADED)
-	private val hasLoadError = MutableSharedFlow<Boolean>()
+	private val loadedPlacesIds = MutableStateFlow(Resource.success(emptyList<String>()))
 
 	private var currentPosition: Position? = null
 
@@ -75,7 +73,7 @@ class PlaceRepositoryImpl @Inject constructor(
 		}.launchIn(generalScope)
 
 		getAllPlaces().take(1)
-			.onEach { places -> loadedPlacesIds.value = places.map { it.id } }
+			.onEach { places -> loadedPlacesIds.value = Resource.success(places.map { it.id }) }
 			.launchIn(generalScope)
 	}
 
@@ -109,7 +107,7 @@ class PlaceRepositoryImpl @Inject constructor(
 				fetchPlaces(
 					requestedCategories!!,
 					requestedRadius!!,
-					loadedPlacesIds.value.size
+					loadedPlacesIds.value.data?.size ?: 0
 				)
 			}
 		}
@@ -133,12 +131,14 @@ class PlaceRepositoryImpl @Inject constructor(
 		}
 	}
 
-	override fun getLoadPlacesStatus() = loadPlacesStatus.asStateFlow()
-
-	override fun getLoadedPlaces(): Flow<List<Place>> {
+	override fun getLoadedPlaces(): Flow<Resource<List<Place>>> {
 		return getAllPlaces()
 			.combine(loadedPlacesIds) { allPlaces, loadedIds ->
-				allPlaces.filter { it.id in loadedIds }
+				Resource(
+					loadState = loadedIds.loadState,
+					data = allPlaces.filter { it.id in (loadedIds.data ?: emptyList()) },
+					message = loadedIds.message
+				)
 			}
 	}
 
@@ -152,7 +152,7 @@ class PlaceRepositoryImpl @Inject constructor(
 		try {
 			if (currentPosition == null || placesPackCount == null) return
 
-			loadPlacesStatus.value = LoadPlacesStatus.LOADING
+			loadedPlacesIds.value = Resource.loading(loadedPlacesIds.value.data)
 			val placesResponse = sygicService.getPlaces(
 				sygicPlaceMapper.mapCategoriesToString(categories),
 				sygicPlaceMapper.mapArea(currentPosition!!.lat, currentPosition!!.lon, radius),
@@ -164,18 +164,20 @@ class PlaceRepositoryImpl @Inject constructor(
 				.populateWithPhotos()
 				.updateFavorites()
 			newPlaces.map { placeDtoMapper.mapPlaceToDto(it) }.let { placeDao?.addPlaces(it) }
-			loadedPlacesIds.value = when {
-				offset != 0 -> loadedPlacesIds.value + newPlaces.map { it.id }
-				else -> newPlaces.map { it.id }
-			}
-			loadPlacesStatus.value = LoadPlacesStatus.LOADED
+			loadedPlacesIds.value = Resource.success(
+				when {
+					offset != 0 -> {
+						val data = loadedPlacesIds.value.data ?: emptyList()
+						data + newPlaces.map { it.id }
+					}
+					else -> newPlaces.map { it.id }
+				}
+			)
 		} catch (e: Exception) {
 			requestedCategories = null
 			requestedRadius = null
 			requestedPosition = null
-			loadedPlacesIds.value = emptyList()
-			loadPlacesStatus.value = LoadPlacesStatus.LOADED
-			hasLoadError.tryEmit(true)
+			loadedPlacesIds.value = Resource.error(data = emptyList())
 		}
 	}
 
