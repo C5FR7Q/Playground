@@ -7,5 +7,5 @@ import javax.inject.Inject
 class GetPlacesLoadStateUseCase @Inject constructor(
 	private val placeRepository: PlaceRepository
 ) {
-	operator fun invoke() = placeRepository.getLoadedPlaces().map { it.loadState }
+	operator fun invoke() = placeRepository.loadedPlaces.map { it.loadState }
 }

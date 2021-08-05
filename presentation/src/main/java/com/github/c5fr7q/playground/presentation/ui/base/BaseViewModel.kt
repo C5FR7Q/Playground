@@ -4,7 +4,7 @@ import androidx.annotation.CallSuper
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.c5fr7q.playground.presentation.manager.NavigationManager
-import kotlinx.coroutines.cancelChildren
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -25,10 +25,11 @@ abstract class BaseViewModel<State, SideEffect, Intent : BaseIntent> : ViewModel
 	val state: StateFlow<State> get() = mutableState.asStateFlow()
 	val sideEffect: SharedFlow<SideEffect> get() = sideEffectFlow.asSharedFlow()
 
-	@CallSuper
-	open fun attach() {
-		viewModelScope.launch {
-			intentFlow.collect { intent ->
+	private val isActive = MutableStateFlow(false)
+
+	init {
+		intentFlow
+			.onEach { intent ->
 				Timber.v("handleIntent: $intent")
 				try {
 					(intent as? BaseIntent.Default)?.let { handleIntent(intent) }
@@ -39,13 +40,17 @@ abstract class BaseViewModel<State, SideEffect, Intent : BaseIntent> : ViewModel
 				} catch (ignored: Exception) {
 				}
 			}
-		}
-		produceIntent(BaseIntent.Default.Init)
+			.launchIfActive()
+	}
+
+	@CallSuper
+	open fun attach() {
+		isActive.value = true
 	}
 
 	@CallSuper
 	open fun detach() {
-		viewModelScope.coroutineContext.cancelChildren()
+		isActive.value = false
 	}
 
 	fun produceIntent(intent: Intent) {
@@ -68,20 +73,28 @@ abstract class BaseViewModel<State, SideEffect, Intent : BaseIntent> : ViewModel
 	}
 
 	protected fun updateState(update: State.() -> State) {
-		mutableState.value = mutableState.value
-			.update()
-			.also { Timber.v("updateState: $it") }
+		mutableState.value = mutableState.value.update()
+//			.also { Timber.v("updateState: $it") }
 	}
 
 	protected open fun handleIntent(intent: Intent) {}
 
 	protected open fun handleIntent(intent: BaseIntent.Default) {
 		when (intent) {
-			BaseIntent.Default.Init -> Unit
 			BaseIntent.Default.ClickBack -> {
 				navigationManager.closeScreen()
 			}
 		}
+	}
+
+	protected fun <T> Flow<T>.launchIfActive(): Job = viewModelScope.launch {
+		isActive.flatMapLatest { active ->
+			if (active) {
+				this@launchIfActive
+			} else {
+				emptyFlow()
+			}
+		}.collect()
 	}
 
 }

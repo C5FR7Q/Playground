@@ -1,8 +1,6 @@
 package com.github.c5fr7q.playground.presentation.ui.screen.common.selectable
 
-import androidx.lifecycle.viewModelScope
 import com.github.c5fr7q.playground.domain.entity.Place
-import com.github.c5fr7q.playground.presentation.ui.base.BaseIntent
 import com.github.c5fr7q.playground.presentation.ui.base.BaseViewModel
 import kotlinx.coroutines.flow.*
 
@@ -12,28 +10,25 @@ abstract class SelectionViewModel : BaseViewModel<SelectionState, Unit, Selectio
 
 	override val defaultState = SelectionState()
 
-	override fun handleIntent(intent: BaseIntent.Default) {
-		super.handleIntent(intent)
-		if (intent is BaseIntent.Default.Init) {
-			getPlaces()
-				.flatMapLatest { places ->
-					state
-						.map { it.selectedCategories }
-						.distinctUntilChanged()
-						.map { categories -> places.filter { it.categories.containsAll(categories) } }
+	init {
+		getPlaces()
+			.flatMapLatest { places ->
+				state
+					.map { it.selectedCategories }
+					.distinctUntilChanged()
+					.map { categories -> places.filter { it.categories.containsAll(categories) } }
+			}
+			.onEach { newPlaces ->
+				updateState {
+					val newPlacesIds = newPlaces.map { it.id }
+					val newSelectedPlaces = selectedPlaces.filter { newPlacesIds.contains(it.id) }
+					copy(
+						places = newPlaces,
+						selectedPlaces = newSelectedPlaces
+					)
 				}
-				.onEach { newPlaces ->
-					updateState {
-						val newPlacesIds = newPlaces.map { it.id }
-						val newSelectedPlaces = selectedPlaces.filter { newPlacesIds.contains(it.id) }
-						copy(
-							places = newPlaces,
-							selectedPlaces = newSelectedPlaces
-						)
-					}
-				}
-				.launchIn(viewModelScope)
-		}
+			}
+			.launchIfActive()
 	}
 
 	override fun handleIntent(intent: SelectionIntent) {

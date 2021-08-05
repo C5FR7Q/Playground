@@ -13,7 +13,7 @@ class GetAvailablePlacesUseCase @Inject constructor(
 ) {
 	operator fun invoke(): Flow<List<Place>> {
 		return placeRepository
-			.getLoadedPlaces()
+			.loadedPlaces
 			.map { it.data ?: emptyList() }
 			.combine(getBlockedPlaces()) { loaded, blocked -> loaded - blocked }
 	}

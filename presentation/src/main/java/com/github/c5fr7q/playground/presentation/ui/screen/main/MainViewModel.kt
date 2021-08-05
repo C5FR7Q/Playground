@@ -1,13 +1,11 @@
 package com.github.c5fr7q.playground.presentation.ui.screen.main
 
 import androidx.lifecycle.viewModelScope
-import com.github.c5fr7q.playground.domain.entity.base.LoadState
 import com.github.c5fr7q.playground.domain.usecase.*
 import com.github.c5fr7q.playground.domain.usecase.place.*
 import com.github.c5fr7q.playground.presentation.R
 import com.github.c5fr7q.playground.presentation.manager.NetworkStateManager
 import com.github.c5fr7q.playground.presentation.manager.PermissionManager
-import com.github.c5fr7q.playground.presentation.ui.base.BaseIntent
 import com.github.c5fr7q.playground.presentation.ui.base.BaseViewModel
 import com.github.c5fr7q.util.ResourceHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,7 +19,7 @@ class MainViewModel @Inject constructor(
 	private val dislikePlaces: DislikePlacesUseCase,
 	private val getAvailablePlacesForCategories: GetAvailablePlacesForCategoriesUseCase,
 	private val getFavoritePlacesForCategories: GetFavoritePlacesForCategoriesUseCase,
-	private val getPlacesLoadState: GetPlacesLoadStateUseCase,
+	getPlacesLoadState: GetPlacesLoadStateUseCase,
 	private val likePlace: LikePlaceUseCase,
 	private val loadMorePlaces: LoadMorePlacesUseCase,
 	private val reloadPlaces: ReloadPlacesUseCase,
@@ -32,57 +30,59 @@ class MainViewModel @Inject constructor(
 	private var refreshing = false
 	override val defaultState = MainState()
 
-	override fun handleIntent(intent: BaseIntent.Default) {
-		if (intent is BaseIntent.Default.Init) {
-			if (state.value.places.isEmpty()) {
-				updateState {
-					copy(isLoading = true)
+	init {
+		val placesLoadState = getPlacesLoadState().shareIn(viewModelScope, SharingStarted.Lazily)
+
+		placesLoadState
+			.map { it.isLoading() }
+			.onEach { updateState { copy(isLoading = it) } }
+			.launchIfActive()
+
+		placesLoadState
+			.filter { it.isFailed() }
+			.shareIn(viewModelScope, SharingStarted.Lazily)
+			.onEach { produceSideEffect(MainSideEffect.ShowError(resourceHelper.getString(R.string.something_went_wrong))) }
+			.launchIfActive()
+
+		placesLoadState
+			.filter { it.isSucceed() && refreshing }
+			.shareIn(viewModelScope, SharingStarted.Lazily)
+			.onEach { updateState { copy(likedOnly = false) } }
+			.launchIfActive()
+
+		state
+			.map { it.likedOnly }
+			.distinctUntilChanged()
+			.shareIn(viewModelScope, SharingStarted.Lazily)
+			.onEach { produceSideEffect(MainSideEffect.ScrollToTop) }
+			.launchIfActive()
+
+		state
+			.map { it.selectedCategories }
+			.distinctUntilChanged()
+			.shareIn(viewModelScope, SharingStarted.Lazily)
+			.onEach { produceSideEffect(MainSideEffect.ScrollToTop) }
+			.launchIfActive()
+
+		state.map { it.selectedCategories to it.likedOnly }
+			.distinctUntilChanged()
+			.flatMapLatest { (categories, likedOnly) ->
+				if (likedOnly) {
+					getFavoritePlacesForCategories(categories)
+				} else {
+					getAvailablePlacesForCategories(categories)
 				}
 			}
-
-			state
-				.map { it.likedOnly }
-				.distinctUntilChanged()
-				.shareIn(viewModelScope, SharingStarted.WhileSubscribed())
-				.onEach { produceSideEffect(MainSideEffect.ScrollToTop) }
-				.launchIn(viewModelScope)
-
-			getPlacesLoadState()
-				.map { it == LoadState.LOADING }
-				.onEach { updateState { copy(isLoading = it) } }
-				.launchIn(viewModelScope)
-
-			getPlacesLoadState()
-				.filter { it == LoadState.ERROR }
-				.shareIn(viewModelScope, SharingStarted.WhileSubscribed())
-				.onEach { produceSideEffect(MainSideEffect.ShowError(resourceHelper.getString(R.string.something_went_wrong))) }
-				.launchIn(viewModelScope)
-
-			getPlacesLoadState()
-				.filter { it == LoadState.SUCCESS && refreshing }
-				.shareIn(viewModelScope, SharingStarted.WhileSubscribed())
-				.onEach { updateState { copy(likedOnly = false) } }
-				.launchIn(viewModelScope)
-
-			state.map { it.selectedCategories to it.likedOnly }
-				.distinctUntilChanged()
-				.flatMapLatest { (categories, likedOnly) ->
-					if (likedOnly) {
-						getFavoritePlacesForCategories(categories)
-					} else {
-						getAvailablePlacesForCategories(categories)
-					}
+			.distinctUntilChanged()
+			.onEach {
+				updateState {
+					copy(
+						places = it,
+						likedOnly = if (it.isEmpty()) false else likedOnly
+					)
 				}
-				.onEach {
-					updateState {
-						copy(
-							places = it,
-							likedOnly = if (it.isEmpty()) false else likedOnly
-						)
-					}
-				}
-				.launchIn(viewModelScope)
-		}
+			}
+			.launchIfActive()
 	}
 
 	override fun handleIntent(intent: MainIntent) {
@@ -96,30 +96,28 @@ class MainViewModel @Inject constructor(
 			}
 			MainIntent.ClickRefresh -> {
 				viewModelScope.launch { // TODO: 16.07.2021 Use case candidate?
-					networkStateManager.isConnected
-						.take(1).onEach { hasNetworkConnection ->
-							if (!hasNetworkConnection) {
-								produceSideEffect(MainSideEffect.ShowError(resourceHelper.getString(R.string.no_internet_connection)))
-								return@onEach
-							}
-							val selectedCategories = state.value.selectedCategories
-							if (selectedCategories.isNotEmpty()) {
-								val permissionsGranted = permissionManager.requestPermissions(
-									permissions = arrayOf(
-										android.Manifest.permission.ACCESS_FINE_LOCATION,
-										android.Manifest.permission.ACCESS_COARSE_LOCATION
-									),
-									rationaleMessage = resourceHelper.getString(R.string.refresh_rationale_message),
-									createFallbackMessage = { resourceHelper.getString(R.string.refresh_fallback_message) }
-								)
+					val hasNetworkConnection = networkStateManager.isConnected.first()
 
-								if (permissionsGranted) {
-									refreshing = true
-									reloadPlaces(selectedCategories)
-								}
-							}
+					if (!hasNetworkConnection) {
+						produceSideEffect(MainSideEffect.ShowError(resourceHelper.getString(R.string.no_internet_connection)))
+						return@launch
+					}
+					val selectedCategories = state.value.selectedCategories
+					if (selectedCategories.isNotEmpty()) {
+						val permissionsGranted = permissionManager.requestPermissions(
+							permissions = arrayOf(
+								android.Manifest.permission.ACCESS_FINE_LOCATION,
+								android.Manifest.permission.ACCESS_COARSE_LOCATION
+							),
+							rationaleMessage = resourceHelper.getString(R.string.refresh_rationale_message),
+							createFallbackMessage = { resourceHelper.getString(R.string.refresh_fallback_message) }
+						)
+
+						if (permissionsGranted) {
+							refreshing = true
+							reloadPlaces(selectedCategories)
 						}
-						.launchIn(viewModelScope)
+					}
 				}
 			}
 			MainIntent.ClickLike -> {

@@ -8,7 +8,7 @@ data class Resource<T> constructor(
 ) {
 	companion object {
 		fun <T> loading(data: T? = null) = Resource(LoadState.LOADING, data)
-		fun <T> success(data: T) = Resource(LoadState.SUCCESS, data)
+		fun <T> success(data: T?) = Resource(LoadState.SUCCESS, data)
 		fun <T> error(data: T? = null, message: String? = null) = Resource(LoadState.ERROR, data, message)
 	}
 }

@@ -13,7 +13,7 @@ class GetFavoritePlacesUseCase @Inject constructor(
 ) {
 	operator fun invoke(): Flow<List<Place>> {
 		return repository
-			.getAllPlaces()
+			.allPlaces
 			.filterIterable { it.isFavorite }
 			.combine(getBlockedPlaces()) { favorite, blocked -> favorite.filter { it !in blocked } }
 	}

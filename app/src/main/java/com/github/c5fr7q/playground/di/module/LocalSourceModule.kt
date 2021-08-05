@@ -12,10 +12,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import javax.inject.Singleton
 
 @Module
@@ -30,11 +27,13 @@ abstract class LocalSourceModule {
 			@ApplicationContext context: Context,
 			@GeneralCoroutineScope coroutineScope: CoroutineScope
 		): Flow<@JvmSuppressWildcards AppDatabase> {
-			return flow<AppDatabase> {
-				Room.databaseBuilder(context, AppDatabase::class.java, "app_db")
-					.addMigrations(*migrations)
-					.build()
-			}.flowOn(coroutineScope.coroutineContext)
+			return flow {
+				emit(
+					Room.databaseBuilder(context, AppDatabase::class.java, "app_db")
+						.addMigrations(*migrations)
+						.build()
+				)
+			}.flowOn(coroutineScope.coroutineContext).shareIn(coroutineScope, SharingStarted.WhileSubscribed(), 1)
 		}
 
 		@Singleton

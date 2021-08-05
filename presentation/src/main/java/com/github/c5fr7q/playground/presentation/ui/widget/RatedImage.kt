@@ -12,6 +12,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.coil.rememberCoilPainter
 import java.util.*
+import kotlin.math.abs
 
 @Composable
 fun RatedImage(
@@ -41,8 +42,8 @@ fun RatedImage(
 				.background(color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.medium))
 				.padding(4.dp)
 		) {
-			var fakeRating = rating
-			while (fakeRating < 1f) {
+			var fakeRating = abs(rating)
+			while (fakeRating != 0f && fakeRating < 1f) {
 				fakeRating *= 10
 			}
 
