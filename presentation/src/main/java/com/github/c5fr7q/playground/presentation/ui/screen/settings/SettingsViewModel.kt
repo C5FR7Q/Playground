@@ -2,6 +2,7 @@ package com.github.c5fr7q.playground.presentation.ui.screen.settings
 
 import com.github.c5fr7q.playground.domain.usecase.settings.*
 import com.github.c5fr7q.playground.presentation.R
+import com.github.c5fr7q.playground.presentation.manager.NavigationManager
 import com.github.c5fr7q.playground.presentation.ui.base.BaseViewModel
 import com.github.c5fr7q.util.ResourceHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,6 +18,7 @@ class SettingsViewModel @Inject constructor(
 	private val setDataCachingTime: SetDataCachingTimeUseCase,
 	private val setPlacesPackCount: SetPlacesPackCountUseCase,
 	private val setPlacesRadius: SetPlacesRadiusUseCase,
+	private val navigationManager: NavigationManager,
 	private val resourceHelper: ResourceHelper
 ) : BaseViewModel<SettingsState, Unit, SettingsIntent>() {
 	override val defaultState = SettingsState()

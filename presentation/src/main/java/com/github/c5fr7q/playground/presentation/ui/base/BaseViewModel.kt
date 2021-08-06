@@ -3,19 +3,14 @@ package com.github.c5fr7q.playground.presentation.ui.base
 import androidx.annotation.CallSuper
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.c5fr7q.playground.presentation.manager.NavigationManager
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @Suppress("UNCHECKED_CAST")
-abstract class BaseViewModel<State, SideEffect, Intent : BaseIntent> : ViewModel() {
-	@Inject
-	lateinit var navigationManager: NavigationManager
-
-	private val intentFlow = MutableSharedFlow<BaseIntent>()
+abstract class BaseViewModel<State, SideEffect, Intent> : ViewModel() {
+	private val intentFlow = MutableSharedFlow<Intent>()
 	private val sideEffectFlow = MutableSharedFlow<SideEffect>()
 
 	private val mutableState by lazy { MutableStateFlow(defaultState) }
@@ -31,14 +26,7 @@ abstract class BaseViewModel<State, SideEffect, Intent : BaseIntent> : ViewModel
 		intentFlow
 			.onEach { intent ->
 				Timber.v("handleIntent: $intent")
-				try {
-					(intent as? BaseIntent.Default)?.let { handleIntent(intent) }
-				} catch (ignored: Exception) {
-				}
-				try {
-					(intent as? Intent)?.let { handleIntent(it) }
-				} catch (ignored: Exception) {
-				}
+				handleIntent(intent)
 			}
 			.launchIfActive()
 	}
@@ -59,12 +47,6 @@ abstract class BaseViewModel<State, SideEffect, Intent : BaseIntent> : ViewModel
 		}
 	}
 
-	fun produceIntent(intent: BaseIntent.Default) {
-		viewModelScope.launch {
-			intentFlow.emit(intent)
-		}
-	}
-
 	protected fun produceSideEffect(sideEffect: SideEffect) {
 		Timber.v("produceSideEffect: $sideEffect")
 		viewModelScope.launch {
@@ -78,14 +60,6 @@ abstract class BaseViewModel<State, SideEffect, Intent : BaseIntent> : ViewModel
 	}
 
 	protected open fun handleIntent(intent: Intent) {}
-
-	protected open fun handleIntent(intent: BaseIntent.Default) {
-		when (intent) {
-			BaseIntent.Default.ClickBack -> {
-				navigationManager.closeScreen()
-			}
-		}
-	}
 
 	protected fun <T> Flow<T>.launchIfActive(): Job = viewModelScope.launch {
 		isActive.flatMapLatest { active ->

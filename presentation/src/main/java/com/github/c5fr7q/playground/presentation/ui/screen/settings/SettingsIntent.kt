@@ -1,8 +1,6 @@
 package com.github.c5fr7q.playground.presentation.ui.screen.settings
 
-import com.github.c5fr7q.playground.presentation.ui.base.BaseIntent
-
-sealed class SettingsIntent : BaseIntent {
+sealed class SettingsIntent {
 	object ClickLiked : SettingsIntent()
 	object ClickBlocked : SettingsIntent()
 	object ClickPackCount : SettingsIntent()

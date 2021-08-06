@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.github.c5fr7q.playground.domain.usecase.*
 import com.github.c5fr7q.playground.domain.usecase.place.*
 import com.github.c5fr7q.playground.presentation.R
+import com.github.c5fr7q.playground.presentation.manager.NavigationManager
 import com.github.c5fr7q.playground.presentation.manager.NetworkStateManager
 import com.github.c5fr7q.playground.presentation.manager.PermissionManager
 import com.github.c5fr7q.playground.presentation.ui.base.BaseViewModel
@@ -25,6 +26,7 @@ class MainViewModel @Inject constructor(
 	private val reloadPlaces: ReloadPlacesUseCase,
 	private val permissionManager: PermissionManager,
 	private val networkStateManager: NetworkStateManager,
+	private val navigationManager: NavigationManager,
 	private val resourceHelper: ResourceHelper,
 ) : BaseViewModel<MainState, MainSideEffect, MainIntent>() {
 	private var refreshing = false

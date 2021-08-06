@@ -18,7 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.github.c5fr7q.playground.domain.entity.Place
 import com.github.c5fr7q.playground.presentation.R
-import com.github.c5fr7q.playground.presentation.ui.base.BaseIntent
+import com.github.c5fr7q.playground.presentation.ui.LocalOnHomeClick
 import com.github.c5fr7q.playground.presentation.ui.widget.SelectCategoriesRow
 import com.github.c5fr7q.playground.presentation.ui.widget.SelectablePlaceItem
 import com.google.accompanist.insets.statusBarsHeight
@@ -34,7 +34,6 @@ fun SelectionScreen(
 		applySelectionIconResId = applySelectionIconResId,
 		titleResId = titleResId,
 		state = state,
-		onBackClick = { viewModel.produceIntent(BaseIntent.Default.ClickBack) },
 		onApplySelectionClick = { viewModel.produceIntent(SelectionIntent.ClickApplySelection) },
 		onCategoryToggle = { viewModel.produceIntent(SelectionIntent.ToggleCategory(it)) },
 		onPlaceSelectionToggle = { viewModel.produceIntent(SelectionIntent.TogglePlaceSelection(it)) }
@@ -46,7 +45,6 @@ private fun SelectionScreen(
 	@DrawableRes applySelectionIconResId: Int,
 	@StringRes titleResId: Int,
 	state: SelectionState,
-	onBackClick: () -> Unit,
 	onApplySelectionClick: () -> Unit,
 	onCategoryToggle: (Place.Category) -> Unit,
 	onPlaceSelectionToggle: (Place) -> Unit
@@ -58,7 +56,6 @@ private fun SelectionScreen(
 				titleResId = titleResId,
 				placesSelected = state.selectedPlaces.isNotEmpty(),
 				selectedCategories = state.selectedCategories,
-				onBackClick = onBackClick,
 				onApplySelectionClick = onApplySelectionClick,
 				onCategoryToggle = onCategoryToggle
 			)
@@ -98,7 +95,6 @@ private fun TopBar(
 	@StringRes titleResId: Int,
 	placesSelected: Boolean,
 	selectedCategories: List<Place.Category>,
-	onBackClick: () -> Unit,
 	onApplySelectionClick: () -> Unit,
 	onCategoryToggle: (Place.Category) -> Unit
 ) {
@@ -120,7 +116,7 @@ private fun TopBar(
 			)
 			TopAppBar(
 				navigationIcon = {
-					IconButton(onClick = onBackClick) {
+					IconButton(onClick = LocalOnHomeClick.current) {
 						Icon(painter = painterResource(id = R.drawable.ic_arrow_back_24), contentDescription = null)
 					}
 				},

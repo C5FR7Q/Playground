@@ -14,7 +14,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.github.c5fr7q.playground.presentation.R
-import com.github.c5fr7q.playground.presentation.ui.base.BaseIntent
+import com.github.c5fr7q.playground.presentation.ui.LocalOnHomeClick
 import com.github.c5fr7q.playground.presentation.ui.widget.OptionsMenu
 import com.github.c5fr7q.playground.presentation.ui.widget.OptionsMenuItemModel
 import com.google.accompanist.insets.statusBarsHeight
@@ -24,7 +24,6 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
 	val state by viewModel.state.collectAsState()
 	SettingsScreen(
 		state = state,
-		onBackClick = { viewModel.produceIntent(BaseIntent.Default.ClickBack) },
 		onLikedClick = { viewModel.produceIntent(SettingsIntent.ClickLiked) },
 		onBlockedClick = { viewModel.produceIntent(SettingsIntent.ClickBlocked) },
 		onPackCountClick = { viewModel.produceIntent(SettingsIntent.ClickPackCount) },
@@ -36,7 +35,6 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
 @Composable
 private fun SettingsScreen(
 	state: SettingsState,
-	onBackClick: () -> Unit,
 	onLikedClick: () -> Unit,
 	onBlockedClick: () -> Unit,
 	onPackCountClick: () -> Unit,
@@ -46,7 +44,6 @@ private fun SettingsScreen(
 	Scaffold(
 		topBar = {
 			TopBar(
-				onBackClick = onBackClick,
 				onLikedClick = onLikedClick,
 				onBlockedClick = onBlockedClick
 			)
@@ -133,7 +130,6 @@ private fun SettingsCategoryItem(text: String) {
 
 @Composable
 private fun TopBar(
-	onBackClick: () -> Unit,
 	onLikedClick: () -> Unit,
 	onBlockedClick: () -> Unit
 ) {
@@ -146,7 +142,7 @@ private fun TopBar(
 		)
 		TopAppBar(
 			navigationIcon = {
-				IconButton(onClick = onBackClick) {
+				IconButton(onClick = LocalOnHomeClick.current) {
 					Icon(painter = painterResource(id = R.drawable.ic_arrow_back_24), contentDescription = null)
 				}
 			},
