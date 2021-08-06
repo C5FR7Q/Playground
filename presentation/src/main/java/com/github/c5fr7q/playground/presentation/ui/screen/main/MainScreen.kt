@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import com.github.c5fr7q.playground.domain.entity.Place
 import com.github.c5fr7q.playground.presentation.R
 import com.github.c5fr7q.playground.presentation.ui.util.transition.VisibilityTransitionState
+import com.github.c5fr7q.playground.presentation.ui.widget.DefaultTopAppBar
 import com.github.c5fr7q.playground.presentation.ui.widget.PlaceItem
 import com.github.c5fr7q.playground.presentation.ui.widget.SelectCategoriesRow
 import com.google.accompanist.insets.navigationBarsHeight
@@ -235,13 +236,7 @@ private fun TopBar(
 				.fillMaxWidth()
 				.statusBarsHeight()
 		)
-		TopAppBar(
-			title = {
-				Text(
-					text = stringResource(R.string.app_name),
-					style = MaterialTheme.typography.h5
-				)
-			},
+		DefaultTopAppBar(
 			actions = {
 				if (filterIsActive && canShowLikeButton) {
 					IconButton(onClick = onLikeClick) {

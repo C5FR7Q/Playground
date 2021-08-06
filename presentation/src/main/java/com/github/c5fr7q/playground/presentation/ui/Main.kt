@@ -17,9 +17,6 @@ import com.github.c5fr7q.playground.presentation.ui.screen.settings.SettingsScre
 import com.github.c5fr7q.playground.presentation.ui.theme.PlaygroundTheme
 import com.google.accompanist.insets.ProvideWindowInsets
 
-val LocalOnDismissRequest = compositionLocalOf<() -> Unit> { error("localOnDismissRequest is not specified") }
-val LocalOnHomeClick = compositionLocalOf<() -> Unit> { error("LocalOnHomeClick is not specified") }
-
 @Composable
 fun Main(navigationManager: NavigationManager) {
 	val navController = rememberNavController()
@@ -30,7 +27,10 @@ fun Main(navigationManager: NavigationManager) {
 
 	PlaygroundTheme {
 		ProvideWindowInsets {
-			CompositionLocalProvider(LocalOnHomeClick provides { navigationManager.closeScreen() }) {
+			CompositionLocalProvider(
+				LocalOnHomeClick provides { navigationManager.closeScreen() },
+				LocalShowHomeButton provides { navigationManager.hasBackStack }
+			) {
 				NavHost(navController = navController, startDestination = Navigation.Main.destination) {
 					composable(Navigation.Main.destination) {
 						MainScreen(baseViewModel())

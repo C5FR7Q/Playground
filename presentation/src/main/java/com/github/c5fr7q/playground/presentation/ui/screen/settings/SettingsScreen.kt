@@ -10,11 +10,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.github.c5fr7q.playground.presentation.R
-import com.github.c5fr7q.playground.presentation.ui.LocalOnHomeClick
+import com.github.c5fr7q.playground.presentation.ui.widget.DefaultTopAppBar
 import com.github.c5fr7q.playground.presentation.ui.widget.OptionsMenu
 import com.github.c5fr7q.playground.presentation.ui.widget.OptionsMenuItemModel
 import com.google.accompanist.insets.statusBarsHeight
@@ -140,18 +139,8 @@ private fun TopBar(
 				.statusBarsHeight()
 				.background(MaterialTheme.colors.surface)
 		)
-		TopAppBar(
-			navigationIcon = {
-				IconButton(onClick = LocalOnHomeClick.current) {
-					Icon(painter = painterResource(id = R.drawable.ic_arrow_back_24), contentDescription = null)
-				}
-			},
-			title = {
-				Text(
-					text = stringResource(R.string.settings),
-					style = MaterialTheme.typography.h5
-				)
-			},
+		DefaultTopAppBar(
+			titleResId = R.string.settings,
 			actions = {
 				OptionsMenu(options = mutableListOf<OptionsMenuItemModel>().apply {
 					add(OptionsMenuItemModel(stringResource(id = R.string.all_liked_places), onLikedClick))

@@ -21,6 +21,8 @@ class NavigationManager @Inject constructor() : BaseManager() {
 
 	val dialog = dialogs.map { it.firstOrNull() }
 
+	val hasBackStack get() = navController!!.previousBackStackEntry != null
+
 	var navController: NavHostController? = null
 
 	fun openMaps(position: Position) {

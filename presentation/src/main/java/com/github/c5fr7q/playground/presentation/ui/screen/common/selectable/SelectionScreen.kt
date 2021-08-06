@@ -18,7 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.github.c5fr7q.playground.domain.entity.Place
 import com.github.c5fr7q.playground.presentation.R
-import com.github.c5fr7q.playground.presentation.ui.LocalOnHomeClick
+import com.github.c5fr7q.playground.presentation.ui.widget.DefaultTopAppBar
 import com.github.c5fr7q.playground.presentation.ui.widget.SelectCategoriesRow
 import com.github.c5fr7q.playground.presentation.ui.widget.SelectablePlaceItem
 import com.google.accompanist.insets.statusBarsHeight
@@ -114,18 +114,8 @@ private fun TopBar(
 					.fillMaxWidth()
 					.statusBarsHeight()
 			)
-			TopAppBar(
-				navigationIcon = {
-					IconButton(onClick = LocalOnHomeClick.current) {
-						Icon(painter = painterResource(id = R.drawable.ic_arrow_back_24), contentDescription = null)
-					}
-				},
-				title = {
-					Text(
-						text = stringResource(titleResId),
-						style = MaterialTheme.typography.h5
-					)
-				},
+			DefaultTopAppBar(
+				titleResId = titleResId,
 				actions = {
 					IconButton(onClick = { filterIsActive = !filterIsActive }) {
 						Icon(painter = painterResource(id = R.drawable.ic_filter_list_24), contentDescription = null)
