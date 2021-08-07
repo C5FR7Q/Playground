@@ -8,8 +8,6 @@ abstract class SelectionViewModel : BaseViewModel<SelectionState, Unit, Selectio
 	abstract fun getPlaces(): Flow<List<Place>>
 	abstract fun applySelection(places: List<Place>)
 
-	override val defaultState = SelectionState()
-
 	init {
 		getPlaces()
 			.flatMapLatest { places ->

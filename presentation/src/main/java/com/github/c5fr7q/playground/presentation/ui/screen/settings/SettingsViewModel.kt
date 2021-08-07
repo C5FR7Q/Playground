@@ -21,7 +21,6 @@ class SettingsViewModel @Inject constructor(
 	private val navigationManager: NavigationManager,
 	private val resourceHelper: ResourceHelper
 ) : BaseViewModel<SettingsState, Unit, SettingsIntent>() {
-	override val defaultState = SettingsState()
 
 	init {
 		getDataCachingTime()

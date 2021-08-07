@@ -7,15 +7,29 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.lang.reflect.ParameterizedType
+import java.lang.reflect.Type
 
 @Suppress("UNCHECKED_CAST")
 abstract class BaseViewModel<State, SideEffect, Intent> : ViewModel() {
 	private val intentFlow = MutableSharedFlow<Intent>()
 	private val sideEffectFlow = MutableSharedFlow<SideEffect>()
 
-	private val mutableState by lazy { MutableStateFlow(defaultState) }
+	private val stateType: Class<State>
+		get() {
+			var type: Type? = javaClass.genericSuperclass
+			while (type !is ParameterizedType || type.rawType !== BaseViewModel::class.java) {
+				type = if (type is ParameterizedType) {
+					(type.rawType as Class<*>).genericSuperclass
+				} else {
+					(type as Class<*>).genericSuperclass
+				}
+			}
 
-	protected abstract val defaultState: State
+			return type.actualTypeArguments[0] as Class<State>
+		}
+
+	private val mutableState = MutableStateFlow(Class.forName(stateType.name).newInstance() as State)
 
 	val state: StateFlow<State> get() = mutableState.asStateFlow()
 	val sideEffect: SharedFlow<SideEffect> get() = sideEffectFlow.asSharedFlow()

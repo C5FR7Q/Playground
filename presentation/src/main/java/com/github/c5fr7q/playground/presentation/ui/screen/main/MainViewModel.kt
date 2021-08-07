@@ -30,7 +30,6 @@ class MainViewModel @Inject constructor(
 	private val resourceHelper: ResourceHelper,
 ) : BaseViewModel<MainState, MainSideEffect, MainIntent>() {
 	private var refreshing = false
-	override val defaultState = MainState()
 
 	init {
 		val placesLoadState = getPlacesLoadState().shareIn(viewModelScope, SharingStarted.Lazily)
