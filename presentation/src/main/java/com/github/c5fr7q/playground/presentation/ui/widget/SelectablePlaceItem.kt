@@ -18,9 +18,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import coil.compose.rememberImagePainter
 import com.github.c5fr7q.playground.domain.entity.Place
 import com.github.c5fr7q.playground.presentation.ui.util.asText
-import com.google.accompanist.coil.rememberCoilPainter
 
 @Composable
 fun SelectablePlaceItem(
@@ -88,10 +88,11 @@ private fun PlaceImage(modifier: Modifier = Modifier, url: String) {
 		Image(
 			modifier = Modifier.fillMaxSize(),
 			contentScale = ContentScale.Crop,
-			painter = rememberCoilPainter(
-				request = url,
-				fadeIn = true,
-				shouldRefetchOnSizeChange = { _, _ -> false },
+			painter = rememberImagePainter(
+				data = url,
+				builder = {
+					crossfade(true)
+				}
 			),
 			contentDescription = null,
 		)

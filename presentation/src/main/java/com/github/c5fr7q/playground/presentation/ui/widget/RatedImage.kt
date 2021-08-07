@@ -10,7 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.coil.rememberCoilPainter
+import coil.compose.rememberImagePainter
 import java.util.*
 import kotlin.math.abs
 
@@ -29,10 +29,11 @@ fun RatedImage(
 		Image(
 			modifier = Modifier.fillMaxSize(),
 			contentScale = ContentScale.Crop,
-			painter = rememberCoilPainter(
-				request = url,
-				fadeIn = true,
-				shouldRefetchOnSizeChange = { _, _ -> false },
+			painter = rememberImagePainter(
+				data = url,
+				builder = {
+					crossfade(true)
+				}
 			),
 			contentDescription = null,
 		)
