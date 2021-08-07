@@ -9,9 +9,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 class BlockedViewModel @Inject constructor(
-	private val getBlockedPlaces: GetBlockedPlacesUseCase,
+	getBlockedPlaces: GetBlockedPlacesUseCase,
 	private val unblockPlaces: UnblockPlacesUseCase
 ) : SelectionViewModel() {
-	override fun getPlaces() = getBlockedPlaces()
 	override fun applySelection(places: List<Place>) = unblockPlaces(places)
+
+	init {
+		getBlockedPlaces().processPlaces()
+	}
 }
