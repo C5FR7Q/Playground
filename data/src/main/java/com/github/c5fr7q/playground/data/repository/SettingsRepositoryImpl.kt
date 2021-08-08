@@ -1,6 +1,5 @@
 package com.github.c5fr7q.playground.data.repository
 
-import com.github.c5fr7q.playground.data.GeneralCoroutineScope
 import com.github.c5fr7q.playground.data.source.local.Storage
 import com.github.c5fr7q.playground.domain.repository.SettingsRepository
 import kotlinx.coroutines.CoroutineScope
@@ -10,7 +9,7 @@ import javax.inject.Inject
 
 class SettingsRepositoryImpl @Inject constructor(
 	private val storage: Storage,
-	@GeneralCoroutineScope private val generalScope: CoroutineScope
+	private val generalScope: CoroutineScope
 ) : SettingsRepository {
 	override fun setPlacesPackCount(value: Int) {
 		generalScope.launch {

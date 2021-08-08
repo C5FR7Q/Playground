@@ -1,6 +1,5 @@
 package com.github.c5fr7q.playground.data.repository
 
-import com.github.c5fr7q.playground.data.GeneralCoroutineScope
 import com.github.c5fr7q.playground.data.manager.ILocationManager
 import com.github.c5fr7q.playground.data.repository.mapper.PlaceDtoMapper
 import com.github.c5fr7q.playground.data.source.local.database.dao.PlaceDao
@@ -19,7 +18,7 @@ class PlaceRepositoryImpl @Inject constructor(
 	private val placeDtoMapper: PlaceDtoMapper,
 	private val placeDaoFlow: Flow<@JvmSuppressWildcards PlaceDao>,
 	private val placeProcessor: PlaceProcessor,
-	@GeneralCoroutineScope private val generalScope: CoroutineScope
+	private val generalScope: CoroutineScope
 ) : PlaceRepository {
 	private var placeDao: PlaceDao? = null
 

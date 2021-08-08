@@ -1,6 +1,5 @@
 package com.github.c5fr7q.playground.di.module
 
-import com.github.c5fr7q.playground.data.GeneralCoroutineScope
 import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
@@ -18,7 +17,6 @@ abstract class UtilModule {
 		@Provides
 		fun provideMoshi(): Moshi = Moshi.Builder().build()
 
-		@GeneralCoroutineScope
 		@Singleton
 		@Provides
 		fun provideGeneralCoroutineScope(): CoroutineScope = GlobalScope

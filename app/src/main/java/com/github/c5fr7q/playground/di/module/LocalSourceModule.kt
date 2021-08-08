@@ -2,7 +2,6 @@ package com.github.c5fr7q.playground.di.module
 
 import android.content.Context
 import androidx.room.Room
-import com.github.c5fr7q.playground.data.GeneralCoroutineScope
 import com.github.c5fr7q.playground.data.source.local.database.AppDatabase
 import com.github.c5fr7q.playground.data.source.local.database.dao.PlaceDao
 import com.github.c5fr7q.playground.data.source.local.database.migrations
@@ -25,7 +24,7 @@ abstract class LocalSourceModule {
 		@Provides
 		fun provideAppDatabaseFlow(
 			@ApplicationContext context: Context,
-			@GeneralCoroutineScope coroutineScope: CoroutineScope
+			coroutineScope: CoroutineScope
 		): Flow<@JvmSuppressWildcards AppDatabase> {
 			return flow {
 				emit(
