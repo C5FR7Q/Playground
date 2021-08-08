@@ -16,7 +16,6 @@ import com.github.c5fr7q.playground.presentation.R
 import com.github.c5fr7q.playground.presentation.ui.widget.DefaultTopAppBar
 import com.github.c5fr7q.playground.presentation.ui.widget.OptionsMenu
 import com.github.c5fr7q.playground.presentation.ui.widget.OptionsMenuItemModel
-import com.google.accompanist.insets.statusBarsHeight
 
 @Composable
 fun SettingsScreen(viewModel: SettingsViewModel) {
@@ -133,12 +132,6 @@ private fun TopBar(
 	onBlockedClick: () -> Unit
 ) {
 	Column {
-		Box(
-			modifier = Modifier
-				.fillMaxWidth()
-				.statusBarsHeight()
-				.background(MaterialTheme.colors.surface)
-		)
 		DefaultTopAppBar(
 			titleResId = R.string.settings,
 			actions = {

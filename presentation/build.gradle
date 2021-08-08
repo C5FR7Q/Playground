@@ -71,6 +71,8 @@ dependencies {
 
 	implementation "com.google.accompanist:accompanist-insets:$accompanist_version"
 	implementation "com.google.accompanist:accompanist-navigation-animation:$accompanist_version"
+	implementation "com.google.accompanist:accompanist-systemuicontroller:$accompanist_version"
+
 	implementation("io.coil-kt:coil-compose:$coil_version")
 
 	implementation "androidx.navigation:navigation-compose:$navigation_compose_version"

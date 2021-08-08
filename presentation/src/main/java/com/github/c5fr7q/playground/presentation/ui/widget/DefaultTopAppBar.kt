@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.Dp
 import com.github.c5fr7q.playground.presentation.R
 import com.github.c5fr7q.playground.presentation.ui.LocalOnHomeClick
 import com.github.c5fr7q.playground.presentation.ui.LocalShowHomeButton
+import com.google.accompanist.insets.statusBarsPadding
 
 
 @Composable
@@ -38,7 +39,7 @@ fun DefaultTopAppBar(
 				style = MaterialTheme.typography.h5
 			)
 		},
-		modifier = modifier,
+		modifier = modifier.statusBarsPadding(),
 		navigationIcon = if (LocalShowHomeButton.current()) navigationIcon else null,
 		actions = actions,
 		backgroundColor = backgroundColor,

@@ -3,6 +3,7 @@ package com.github.c5fr7q.playground
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowCompat
 import com.github.c5fr7q.playground.presentation.manager.NavigationManager
 import com.github.c5fr7q.playground.presentation.ui.Main
 import dagger.hilt.android.AndroidEntryPoint
@@ -16,6 +17,9 @@ class MainActivity : AppCompatActivity() {
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
+
+		WindowCompat.setDecorFitsSystemWindows(window, false)
+
 		setContent {
 			Main(navigationManager)
 		}

@@ -1,13 +1,11 @@
 package com.github.c5fr7q.playground.presentation.ui
 
 import androidx.compose.animation.*
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.VisibilityThreshold
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.unit.IntOffset
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -26,10 +24,21 @@ import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun Main(navigationManager: NavigationManager) {
+	val systemUiController = rememberSystemUiController()
+	val useDarkIcons = MaterialTheme.colors.isLight
+
+	SideEffect {
+		systemUiController.setSystemBarsColor(
+			color = Color.Transparent,
+			darkIcons = useDarkIcons
+		)
+	}
+
 	val navController = rememberAnimatedNavController()
 	DisposableEffect(navController) {
 		navigationManager.navController = navController

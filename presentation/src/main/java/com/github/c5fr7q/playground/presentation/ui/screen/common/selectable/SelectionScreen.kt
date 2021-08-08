@@ -21,7 +21,6 @@ import com.github.c5fr7q.playground.presentation.R
 import com.github.c5fr7q.playground.presentation.ui.widget.DefaultTopAppBar
 import com.github.c5fr7q.playground.presentation.ui.widget.SelectCategoriesRow
 import com.github.c5fr7q.playground.presentation.ui.widget.SelectablePlaceItem
-import com.google.accompanist.insets.statusBarsHeight
 
 @Composable
 fun SelectionScreen(
@@ -109,11 +108,6 @@ private fun TopBar(
 				.background(color = MaterialTheme.colors.surface)
 				.animateContentSize()
 		) {
-			Box(
-				modifier = Modifier
-					.fillMaxWidth()
-					.statusBarsHeight()
-			)
 			DefaultTopAppBar(
 				titleResId = titleResId,
 				actions = {

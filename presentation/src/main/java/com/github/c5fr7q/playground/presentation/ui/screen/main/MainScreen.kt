@@ -24,7 +24,6 @@ import com.github.c5fr7q.playground.presentation.ui.widget.DefaultTopAppBar
 import com.github.c5fr7q.playground.presentation.ui.widget.PlaceItem
 import com.github.c5fr7q.playground.presentation.ui.widget.SelectCategoriesRow
 import com.google.accompanist.insets.navigationBarsHeight
-import com.google.accompanist.insets.statusBarsHeight
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -231,11 +230,6 @@ private fun TopBar(
 			.background(MaterialTheme.colors.surface)
 			.animateContentSize()
 	) {
-		Box(
-			modifier = Modifier
-				.fillMaxWidth()
-				.statusBarsHeight()
-		)
 		DefaultTopAppBar(
 			actions = {
 				if (filterIsActive && canShowLikeButton) {
@@ -271,7 +265,8 @@ private fun BottomBar(
 	onSettingsClick: () -> Unit
 ) {
 	Column {
-		BottomAppBar {
+		val backgroundColor = MaterialTheme.colors.primarySurface
+		BottomAppBar(backgroundColor = backgroundColor) {
 			Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
 				IconButton(onClick = onSettingsClick) {
 					Icon(painter = painterResource(id = R.drawable.ic_settings_24), contentDescription = null)
@@ -282,7 +277,7 @@ private fun BottomBar(
 			modifier = Modifier
 				.fillMaxWidth()
 				.navigationBarsHeight()
-				.background(MaterialTheme.colors.primarySurface)
+				.background(backgroundColor)
 		)
 	}
 }
