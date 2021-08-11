@@ -1,5 +1,6 @@
 package com.github.c5fr7q.playground.data.repository
 
+import android.util.Log
 import com.github.c5fr7q.playground.data.manager.ILocationManager
 import com.github.c5fr7q.playground.data.repository.mapper.PlaceDtoMapper
 import com.github.c5fr7q.playground.data.source.local.database.dao.PlaceDao
@@ -42,7 +43,7 @@ class PlaceRepositoryImpl @Inject constructor(
 				loadState = loadedIds.loadState,
 				data = when (data) {
 					null -> allPlaces
-					else -> data.map { id -> allPlaces.first { it.id == id } }
+					else -> data.mapNotNull { id -> allPlaces.firstOrNull { it.id == id } }
 				},
 				message = loadedIds.message
 			)
