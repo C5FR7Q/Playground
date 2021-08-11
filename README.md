@@ -43,31 +43,28 @@
 ❎ Uses **all** persisted places on app launch if possible  
 ❎ Uses pagination in case of data was reloaded through the network
 
-<img src="https://user-images.githubusercontent.com/17059563/129094137-76e85f79-3855-49c2-9170-208d72211a22.gif" width="300"><img src="https://user-images.githubusercontent.com/17059563/129094147-30cf01fa-30ec-4ca9-9f96-4aeec0316525.gif" width="300"><img src="https://user-images.githubusercontent.com/17059563/129094152-2eb44688-1269-4b67-b770-030514fd1636.gif" width="300">
-
-<img src="https://user-images.githubusercontent.com/17059563/129094161-947598a0-a7b7-49d4-8215-cccc1ce8492d.gif" width="300"><img src="https://user-images.githubusercontent.com/17059563/129094166-39c3b91a-8621-48b9-b3ad-8dec5521e1b3.gif" width="300">
-<img src="https://user-images.githubusercontent.com/17059563/129094175-ba41a54e-64cd-4302-af10-1792251e50a4.gif" width="300">
+<img src="https://user-images.githubusercontent.com/17059563/129094137-76e85f79-3855-49c2-9170-208d72211a22.gif" width="270"><img src="https://user-images.githubusercontent.com/17059563/129094147-30cf01fa-30ec-4ca9-9f96-4aeec0316525.gif" width="270"><img src="https://user-images.githubusercontent.com/17059563/129094152-2eb44688-1269-4b67-b770-030514fd1636.gif" width="270"><img src="https://user-images.githubusercontent.com/17059563/129094161-947598a0-a7b7-49d4-8215-cccc1ce8492d.gif" width="270"><img src="https://user-images.githubusercontent.com/17059563/129094166-39c3b91a-8621-48b9-b3ad-8dec5521e1b3.gif" width="270"><img src="https://user-images.githubusercontent.com/17059563/129094175-ba41a54e-64cd-4302-af10-1792251e50a4.gif" width="270">
 
 
 
 ### Settings
 ❎ Displays app settings and allows to change them
 
-<img src="https://user-images.githubusercontent.com/17059563/129094239-1b701d18-202d-4293-95ad-136df1862e63.gif" width="300">
+<img src="https://user-images.githubusercontent.com/17059563/129094239-1b701d18-202d-4293-95ad-136df1862e63.gif" width="270">
 
 ### All liked places
 ❎ Displays **all** liked places  
 ❎ Allows to dislike selected places  
 ❎ Uses the same UI as for ***All blocked places***
 
-<img src="https://user-images.githubusercontent.com/17059563/129094257-0d578b26-531d-4601-b28b-31e31533d8ba.gif" width="300">
+<img src="https://user-images.githubusercontent.com/17059563/129094257-0d578b26-531d-4601-b28b-31e31533d8ba.gif" width="270">
 
 ### All blocked places
 ❎ Displays **all** blocked places  
 ❎ Allows to unblock selected places  
 ❎ Uses the same UI as for ***All liked places***
 
-<img src="https://user-images.githubusercontent.com/17059563/129094281-3c68555f-f796-4fab-a012-91858d2c4ac7.gif" width="300">
+<img src="https://user-images.githubusercontent.com/17059563/129094281-3c68555f-f796-4fab-a012-91858d2c4ac7.gif" width="270">
 
 ## Future work
 🔜 **Multi module architecture**  
