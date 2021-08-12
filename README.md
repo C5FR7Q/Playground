@@ -26,6 +26,8 @@
 ✅ **Retrofit**  
 ➡ Moshi
 
+✅ **Room**
+
 ✅ **DataStore**
 
 ✅ **Clean Architecture**  
