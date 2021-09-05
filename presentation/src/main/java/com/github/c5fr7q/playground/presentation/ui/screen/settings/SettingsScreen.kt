@@ -1,6 +1,5 @@
 package com.github.c5fr7q.playground.presentation.ui.screen.settings
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -16,12 +15,12 @@ import com.github.c5fr7q.playground.presentation.R
 import com.github.c5fr7q.playground.presentation.ui.widget.DefaultTopAppBar
 import com.github.c5fr7q.playground.presentation.ui.widget.OptionsMenu
 import com.github.c5fr7q.playground.presentation.ui.widget.OptionsMenuItemModel
+import kotlinx.coroutines.flow.StateFlow
 
 @Composable
 fun SettingsScreen(viewModel: SettingsViewModel) {
-	val state by viewModel.state.collectAsState()
 	SettingsScreen(
-		state = state,
+		stateFlow = viewModel.state,
 		onLikedClick = { viewModel.produceIntent(SettingsIntent.ClickLiked) },
 		onBlockedClick = { viewModel.produceIntent(SettingsIntent.ClickBlocked) },
 		onPackCountClick = { viewModel.produceIntent(SettingsIntent.ClickPackCount) },
@@ -32,13 +31,14 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
 
 @Composable
 private fun SettingsScreen(
-	state: SettingsState,
+	stateFlow: StateFlow<SettingsState>,
 	onLikedClick: () -> Unit,
 	onBlockedClick: () -> Unit,
 	onPackCountClick: () -> Unit,
 	onCachingDaysClick: () -> Unit,
 	onRadiusClick: () -> Unit
 ) {
+	val state by stateFlow.collectAsState()
 	Scaffold(
 		topBar = {
 			TopBar(

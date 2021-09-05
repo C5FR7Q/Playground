@@ -25,14 +25,14 @@ import com.github.c5fr7q.playground.presentation.ui.widget.PlaceItem
 import com.github.c5fr7q.playground.presentation.ui.widget.SelectCategoriesRow
 import com.google.accompanist.insets.navigationBarsHeight
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 @Composable
 fun MainScreen(viewModel: MainViewModel) {
-	val state by viewModel.state.collectAsState()
 	MainScreen(
-		state = state,
+		stateFlow = viewModel.state,
 		sideEffectFlow = viewModel.sideEffect,
 		onLoadMore = { viewModel.produceIntent(MainIntent.LoadMore) },
 		onSettingsClick = { viewModel.produceIntent(MainIntent.ClickSettings) },
@@ -47,7 +47,7 @@ fun MainScreen(viewModel: MainViewModel) {
 
 @Composable
 private fun MainScreen(
-	state: MainState,
+	stateFlow: StateFlow<MainState>,
 	sideEffectFlow: Flow<MainSideEffect>,
 	onLoadMore: () -> Unit,
 	onSettingsClick: () -> Unit,
@@ -58,6 +58,8 @@ private fun MainScreen(
 	onBlockClick: (Place) -> Unit,
 	onShowInMapsClick: (Place) -> Unit
 ) {
+	val state by stateFlow.collectAsState()
+
 	val listState = rememberLazyListState()
 	val scaffoldState = rememberScaffoldState()
 

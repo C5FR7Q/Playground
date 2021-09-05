@@ -5,7 +5,10 @@ import androidx.annotation.StringRes
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
@@ -21,6 +24,7 @@ import com.github.c5fr7q.playground.presentation.R
 import com.github.c5fr7q.playground.presentation.ui.widget.DefaultTopAppBar
 import com.github.c5fr7q.playground.presentation.ui.widget.SelectCategoriesRow
 import com.github.c5fr7q.playground.presentation.ui.widget.SelectablePlaceItem
+import kotlinx.coroutines.flow.StateFlow
 
 @Composable
 fun SelectionScreen(
@@ -28,11 +32,10 @@ fun SelectionScreen(
 	@StringRes titleResId: Int,
 	viewModel: SelectionViewModel
 ) {
-	val state by viewModel.state.collectAsState()
 	SelectionScreen(
 		applySelectionIconResId = applySelectionIconResId,
 		titleResId = titleResId,
-		state = state,
+		stateFlow = viewModel.state,
 		onApplySelectionClick = { viewModel.produceIntent(SelectionIntent.ClickApplySelection) },
 		onCategoryToggle = { viewModel.produceIntent(SelectionIntent.ToggleCategory(it)) },
 		onPlaceSelectionToggle = { viewModel.produceIntent(SelectionIntent.TogglePlaceSelection(it)) }
@@ -43,11 +46,13 @@ fun SelectionScreen(
 private fun SelectionScreen(
 	@DrawableRes applySelectionIconResId: Int,
 	@StringRes titleResId: Int,
-	state: SelectionState,
+	stateFlow: StateFlow<SelectionState>,
 	onApplySelectionClick: () -> Unit,
 	onCategoryToggle: (Place.Category) -> Unit,
 	onPlaceSelectionToggle: (Place) -> Unit
 ) {
+	val state by stateFlow.collectAsState()
+
 	Scaffold(
 		topBar = {
 			TopBar(
